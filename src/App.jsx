@@ -9,7 +9,7 @@ import routes from "./routes/routes";
 const MainLayout = ({ children }) => (
   <div className="bg-gray-50 min-h-screen">
     {/* <Header /> */}
-    <main className=" mx-auto px-1 pt-1 lg:px-8">{children}</main>
+    <main className=" mx-auto px-2 pt-1 ">{children}</main>
   </div>
 );
 

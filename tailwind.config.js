@@ -5,6 +5,7 @@ export default {
     extend: {
       fontFamily: {
         poppins: ["Poppins", "sans-serif"],
+        jakarta: ['"Plus Jakarta Sans"', "sans-serif"],
       },
       screens: {
         xs: { min: "390px", max: "639px" }, // Custom breakpoint for screens below 639px

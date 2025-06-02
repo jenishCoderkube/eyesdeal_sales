@@ -60,3 +60,12 @@
   transform: rotate(-8deg) translate(20px, 0px) scale(0.8);
 }
 
+/* Tablet screens (768px to 1024px) */
+@media (max-width: 1024px) {
+
+}
+
+/* Mobile screens (below 768px) */
+@media (max-width: 767px) {
+
+}

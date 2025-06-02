@@ -41,7 +41,7 @@ const SelectPackage = () => {
       fontWeight: 400,
       fontSize: isMobile ? "16px" : "18px",
       lineHeight: "24px",
-      width: isMobile ? "400px" : "455px",
+
       height: "50px",
       padding: "0 5px",
     }),
@@ -63,39 +63,39 @@ const SelectPackage = () => {
       <div className="flex flex-col  md:flex-row gap-5 p-5 w-full mx-auto">
         {/* Left Section */}
 
-        <div className="flex-1 w-1/2">
-          <div className="flex gap-3 mb-5">
+        <div className="flex-1 md:w-1/2 w-full">
+          <div className="flex flex-nowrap gap-3 mb-5">
             <button
-              className={`font-poppins font-normal text-[18px] leading-[24px] w-full max-w-[255px] h-[50px] rounded-[8px] flex items-center justify-center gap-2 ${
+              className={`font-poppins font-normal text-[18px] leading-[24px] text-nowrap w-[245px] md:w-[255px] h-[50px] rounded-[8px] flex items-center justify-center relative ${
                 selectedPairs === 1
                   ? "bg-[#007569] text-white"
                   : "bg-white border border-[#000000] text-black"
               }`}
               onClick={() => setSelectedPairs(1)}
             >
-              Add 1-Pair
+              <span className="text-center">Add 1-Pair</span>
               {selectedPairs === 1 && (
                 <img
                   src="/success_icon.png"
                   alt="Success Icon"
-                  className="w-[21px] h-[21px]"
+                  className="w-[21px] h-[21px] absolute right-6"
                 />
               )}
             </button>
             <button
-              className={`font-poppins font-normal text-[18px] leading-[24px]  w-full max-w-[255px] directory path]/h-[50px] rounded-[8px] flex items-center justify-center gap-2 ${
+              className={`font-poppins font-normal text-[18px] leading-[24px] text-nowrap w-[245px] md:w-[255px] h-[50px] rounded-[8px] flex items-center justify-center relative ${
                 selectedPairs === 2
                   ? "bg-[#007569] text-white"
                   : "bg-white border border-[#000000] text-black"
               }`}
               onClick={() => setSelectedPairs(2)}
             >
-              Add 2-Pair
+              <span className="text-center">Add 2-Pair</span>
               {selectedPairs === 2 && (
                 <img
                   src="/success_icon.png"
                   alt="Success Icon"
-                  className="w-[21px] h-[21px]"
+                  className="w-[21px] h-[21px] absolute right-6"
                 />
               )}
             </button>
@@ -103,7 +103,7 @@ const SelectPackage = () => {
 
           {/* First Package */}
           <div className=" p-5 mb-5">
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center sm:flex-nowrap flex-wrap gap-3 mb-3">
               <button className="font-poppins text-nowrap font-normal text-[18px] leading-[24px] border border-[#000000] rounded-[8px] px-3 py-2">
                 + Add Frame Barcode
               </button>
@@ -117,7 +117,7 @@ const SelectPackage = () => {
                   color: "#000",
                 }}
               >
-                <div className="w-fit flex items-center justify-center bg-[#E8ECEF] px-3">
+                <div className="w-fit flex items-center text-nowrap justify-center bg-[#E8ECEF] px-3">
                   <span>I-GOG Frames</span>
                   <FaTimes className="ml-2" size={12} />
                 </div>
@@ -127,7 +127,8 @@ const SelectPackage = () => {
               <Select
                 options={lensOptions}
                 styles={customStyles}
-                placeholder="Select Lens "
+                placeholder="Select Lens"
+                className="md:pr-0 pr-4  md:w-[455px] sm:w-[400px] w-[300px]"
               />
               <button
                 className={`font-poppins font-normal md:text-[18px] text-[12px] leading-[24px] w-fit md:px-6 px-5 h-[50px] rounded-[8px] flex items-center justify-center text-nowrap gap-2 bg-[#007569] text-white "bg-white `}
@@ -146,64 +147,68 @@ const SelectPackage = () => {
                 Price
               </h6>{" "}
               =
-              <span className="font-poppins font-normal text-[18px] leading-[24px] bg-[#E77817] text-white rounded-[8px] px-3 py-2">
-                1300 ₹
+              <span className="font-poppins font-normal text-nowrap text-[18px] leading-[24px] bg-[#E77817] text-white rounded-[8px] px-3 py-2">
+                800 ₹
               </span>
             </div>
           </div>
 
-          <div className="text-center text-[24px] mb-5">+</div>
+          {selectedPairs === 2 && (
+            <div className="text-center text-[24px] mb-5">+</div>
+          )}
+          {/* second Package */}
+          {selectedPairs === 2 && (
+            <div className=" p-5 mb-5">
+              <div className="flex items-center sm:flex-nowrap flex-wrap gap-3 mb-3">
+                <button className="font-poppins text-nowrap font-normal text-[18px] leading-[24px] border border-[#000000] rounded-[8px] px-3 py-2">
+                  + Add Frame Barcode
+                </button>
+                <span className="text-[18px]">=</span>
+                <button
+                  className="custom-button text-n  flex justify-center  w-fit px-3  gap-2 font-poppins font-normal text-[13px] leading-[24px] py-2"
+                  style={{
+                    borderRadius: "8px",
+                    border: "2px dashed #8D8D8D",
 
-          {/* First Package */}
-          <div className=" p-5 mb-5">
-            <div className="flex items-center gap-3 mb-3">
-              <button className="font-poppins text-nowrap font-normal text-[18px] leading-[24px] border border-[#000000] rounded-[8px] px-3 py-2">
-                + Add Frame Barcode
-              </button>
-              <span className="text-[18px]">=</span>
-              <button
-                className="custom-button text-n  flex justify-center  w-fit px-3  gap-2 font-poppins font-normal text-[13px] leading-[24px] py-2"
-                style={{
-                  borderRadius: "8px",
-                  border: "2px dashed #8D8D8D",
-
-                  color: "#000",
-                }}
-              >
-                <div className="w-fit flex items-center justify-center bg-[#E8ECEF] px-3">
-                  <span>I-GOG Frames</span>
-                  <FaTimes className="ml-2" size={12} />
-                </div>
-              </button>
-            </div>
-            <div className="flex sm:flex-nowrap  flex-wrap w-full items-center gap-3">
-              <Select
-                options={lensOptions}
-                styles={customStyles}
-                placeholder="Select Lens "
-              />
-              <button
-                className={`font-poppins font-normal md:text-[18px] text-[12px] leading-[24px] w-fit md:px-6 px-5 h-[50px] rounded-[8px] flex items-center justify-center text-nowrap gap-2 bg-[#007569] text-white "bg-white `}
-                onClick={() => setSelectedPairs(1)}
-              >
-                <img
-                  src="/eyes_icons.png"
-                  alt="Success Icon"
-                  className="w-[19px] h-[13px] object-cover"
+                    color: "#000",
+                  }}
+                >
+                  <div className="w-fit flex items-center justify-center bg-[#E8ECEF] px-3">
+                    <span>I-GOG Frames</span>
+                    <FaTimes className="ml-2" size={12} />
+                  </div>
+                </button>
+              </div>
+              <div className="flex sm:flex-nowrap  flex-wrap w-full items-center gap-3">
+                <Select
+                  options={lensOptions}
+                  styles={customStyles}
+                  placeholder="Select Lens "
+                  className="md:pr-0 pr-4  md:w-[455px] sm:w-[400px] w-[300px]"
                 />
-                View Lens
-              </button>
+                <button
+                  className={`font-poppins font-normal md:text-[18px] text-[12px] leading-[24px] w-fit md:px-6 px-5 h-[50px] rounded-[8px] flex items-center justify-center text-nowrap gap-2 bg-[#007569] text-white "bg-white `}
+                  onClick={() => setSelectedPairs(1)}
+                >
+                  <img
+                    src="/eyes_icons.png"
+                    alt="Success Icon"
+                    className="w-[19px] h-[13px] object-cover"
+                  />
+                  View Lens
+                </button>
+              </div>
+              <div className="flex items-center gap-3 mt-4">
+                <h6 className="font-poppins font-normal text-[18px] leading-[24px]">
+                  Price
+                </h6>{" "}
+                =
+                <span className="font-poppins font-normal text-nowrap text-[18px] leading-[24px] bg-[#E77817] text-white rounded-[8px] px-3 py-2">
+                  1300 ₹
+                </span>
+              </div>
             </div>
-            <div className="flex items-center gap-3 mt-4">
-              <h6 className="font-poppins font-normal text-[18px] leading-[24px]">
-                Price
-              </h6>{" "}
-              =
-              <span className="font-poppins font-normal text-[18px] leading-[24px] bg-[#E77817] text-white rounded-[8px] px-3 py-2">
-                1300 ₹
-              </span>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Right Section */}

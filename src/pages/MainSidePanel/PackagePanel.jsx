@@ -8,6 +8,8 @@ import LeftSidebar from "../../components/Sidebar/LeftSidebar";
 import SelectPackage from "../../components/Sidebar/SelectPackage";
 import TopTabBar from "../../components/Sidebar/TopTabBar";
 import TopBarGlasses from "../../components/Frame/TopBarGlasses";
+import Lense from "../../components/Lense/Lense";
+import LenseDetails from "../../components/Lense/LenseDetails";
 
 const PackagePanel = () => {
   const [activeLeftTab, setActiveLeftTab] = useState("Frame");
@@ -20,6 +22,8 @@ const PackagePanel = () => {
 
   // Check if the current route is a FrameDetails route
   const isFrameDetails = location.pathname.startsWith("/frame/details");
+  // Check if the current route is a LenseDetails route
+  const isLenseDetails = location.pathname.startsWith("/lense/details");
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100">
@@ -70,6 +74,25 @@ const PackagePanel = () => {
             <div className="flex-1 flex flex-col mx-4 mt-1 border border-gray-200 rounded-xl">
               <TopBarGlasses />
               {isFrameDetails ? <FrameDetails /> : <Frame />}
+            </div>
+          )}
+        </div>
+      )}
+      {activeLeftTab === "Lenses" && (
+        <div className="flex-1 flex flex-col">
+          {isTablet ? (
+            <>
+              <div className="rounded-lg mx-4 mt-4">
+                <TopTabBar
+                  activeTab={activeTopTab}
+                  setActiveTab={setActiveTopTab}
+                />
+              </div>
+              {isLenseDetails ? <LenseDetails /> : <Lense />}
+            </>
+          ) : (
+            <div className="flex-1 flex flex-col mx-4 mt-1 border border-gray-200 rounded-xl">
+              {isLenseDetails ? <LenseDetails /> : <Lense />}
             </div>
           )}
         </div>

@@ -32,6 +32,15 @@ const routes = [
       </PrivateRoute>
     ),
   },
+  {
+    title: "SunglassesDetails",
+    path: "/Sunglasses/details/:id",
+    element: (
+      <PrivateRoute>
+        <PackagePanel />
+      </PrivateRoute>
+    ),
+  },
 ];
 
 export default routes;

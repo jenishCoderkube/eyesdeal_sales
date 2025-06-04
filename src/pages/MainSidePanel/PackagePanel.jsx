@@ -10,6 +10,9 @@ import TopTabBar from "../../components/Sidebar/TopTabBar";
 import TopBarGlasses from "../../components/Frame/TopBarGlasses";
 import Lense from "../../components/Lense/Lense";
 import LenseDetails from "../../components/Lense/LenseDetails";
+import TopBarSunglasses from "../../components/Sunglasses/TopBarSunglasses";
+import SunglassesDetails from "../../components/Sunglasses/SunglassesDetails";
+import Sunglasses from "../../components/Sunglasses/Sunglasses";
 
 const PackagePanel = () => {
   const [activeLeftTab, setActiveLeftTab] = useState("Frame");
@@ -24,6 +27,10 @@ const PackagePanel = () => {
   const isFrameDetails = location.pathname.startsWith("/frame/details");
   // Check if the current route is a LenseDetails route
   const isLenseDetails = location.pathname.startsWith("/lense/details");
+  // Check if the current route is a SunglassesDetails route
+  const isSunglassesDetails = location.pathname.startsWith("/Sunglasses/details");
+  console.log(isSunglassesDetails,"true or false");
+  
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100">
@@ -97,6 +104,28 @@ const PackagePanel = () => {
           )}
         </div>
       )}
+      {activeLeftTab === "Sunglasses" && (
+        <div className="flex-1 flex flex-col">
+          {isTablet ? (
+            <>
+              <div className="rounded-lg mx-4 mt-4">
+                <TopTabBar
+                  activeTab={activeTopTab}
+                  setActiveTab={setActiveTopTab}
+                />
+              </div>
+              <TopBarSunglasses />
+              {isSunglassesDetails ? <SunglassesDetails /> : <Sunglasses />}
+            </>
+          ) : (
+            <div className="flex-1 flex flex-col mx-4 mt-1 border border-gray-200 rounded-xl">
+              <TopBarSunglasses />
+              {isSunglassesDetails ? <SunglassesDetails /> : <Sunglasses />}
+            </div>
+          )}
+        </div>
+      )}
+      
     </div>
   );
 };

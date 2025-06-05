@@ -26,7 +26,7 @@ const PackagePanel = () => {
   // Check if the current route is a FrameDetails route
   const isFrameDetails = location.pathname.startsWith("/frame/details");
   // Check if the current route is a LenseDetails route
-  const isLenseDetails = location.pathname.startsWith("/lense/details");
+  const isLenseDetails = location.pathname.startsWith("/lens/details");
   // Check if the current route is a SunglassesDetails route
   const isSunglassesDetails = location.pathname.startsWith("/Sunglasses/details");
   console.log(isSunglassesDetails,"true or false");

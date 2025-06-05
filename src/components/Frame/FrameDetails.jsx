@@ -105,7 +105,7 @@ console.log(frameImages, "frameImages");
             {glass.title}
           </h1>
           <p className="font-['Poppins'] font-medium w-fit py-1 px-[10px] rounded text-[14px] bg-[#EBEBEB] mt-[15px]">
-            IG-2345-C1
+            {glass.displayName}
           </p>
 
           {/* Price and Reviews */}

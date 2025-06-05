@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import {
   AiOutlineHeart,
@@ -9,43 +9,44 @@ import { IoIosArrowDropleft } from "react-icons/io";
 import { FaRegHeart } from "react-icons/fa";
 import { FaShippingFast } from "react-icons/fa";
 
-const frameImages = [
-  "/Sunglasses1.png",
-  "/Sunglasses2.png",
-  "/Sunglasses3.png",
-  "/Sunglasses4.png",
-];
-
 const SunglassesDetails = () => {
   const { id } = useParams();
   const { state } = useLocation();
   const navigate = useNavigate();
-  const glass = state?.sunglass;
-  console.log(`glass`, glass);
-  console.log(frameImages, "frameImages");
+  const sunglass = state?.sunglass;
 
-  if (!glass) {
+  if (!sunglass) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#18181B]">
         <h1 className="font-['Poppins'] font-medium text-[24px] text-white">
-          Frame Not Found
+          Sunglasses Not Found
         </h1>
         <button
           className="mt-4 font-['Poppins'] font-normal text-[16px] text-white bg-[#242424] px-4 py-2 rounded-md hover:bg-[#3a3a3a]"
-          onClick={() => navigate("/sales-panel")}
+          onClick={() => navigate("/sunglasses")}
         >
-          Back to Frames
+          Back to Sunglasses
         </button>
       </div>
     );
   }
 
-  const [activeImage, setActiveImage] = React.useState(glass.imageUrl);
+  // Initialize activeImage with the first photo or a fallback
+  const [activeImage, setActiveImage] = useState(
+    sunglass.photos && sunglass.photos.length > 0
+      ? sunglass.photos[0]
+      : "/images/placeholder-sunglasses.jpg"
+  );
 
-  // Thumbnail images component to reuse in both places
+  // Use photos array from sunglass data or fallback to a single placeholder
+  const images = sunglass.photos && sunglass.photos.length > 0
+    ? sunglass.photos
+    : ["/images/placeholder-sunglasses.jpg"];
+
+  // Thumbnail images component
   const ThumbnailImages = () => (
     <div className="flex flex-row sm:flex-col gap-2">
-      {frameImages.map((img, index) => (
+      {images.map((img, index) => (
         <img
           key={index}
           src={img}
@@ -54,6 +55,7 @@ const SunglassesDetails = () => {
             activeImage === img ? "border-2 border-[#E77817]" : "border-none"
           }`}
           onClick={() => setActiveImage(img)}
+          onError={(e) => (e.target.src = "/images/placeholder-sunglasses.jpg")}
         />
       ))}
     </div>
@@ -64,7 +66,7 @@ const SunglassesDetails = () => {
       {/* Back Button */}
       <button
         className="self-start mb-4 flex items-center font-['Poppins'] font-medium text-[24px] text-[#18181B]"
-        onClick={() => navigate("/sales-panel")}
+        onClick={() => navigate("/sunglasses")}
       >
         <IoIosArrowDropleft size={24} className="mr-[10px]" /> Back
       </button>
@@ -80,8 +82,9 @@ const SunglassesDetails = () => {
           <div className="flex-1">
             <img
               src={activeImage}
-              alt={glass.title}
+              alt={sunglass.sku}
               className="md:w-[559px] w-full sm:w-[327px] h-full sm:max-h-[290px] md:h-[494px] object-contain rounded-lg"
+              onError={(e) => (e.target.src = "/images/placeholder-sunglasses.jpg")}
             />
             <div className="mt-4">
               <button className="w-full font-['Poppins'] font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-4 py-2 rounded-md">
@@ -103,18 +106,18 @@ const SunglassesDetails = () => {
         <div className="flex flex-col sm:mt-0 mt-36 w-full sm:max-w-[300px] md:max-w-[400px]">
           {/* Title */}
           <h1 className="font-poppins font-bold text-[28px] leading-[38px] mb-1">
-            {glass.title}
+            {sunglass.displayName}
           </h1>
           <p className="font-['Poppins'] font-medium w-fit py-1 px-[10px] rounded text-[14px] bg-[#EBEBEB] mt-[15px]">
-            IG-2345-C1
+            {sunglass.sku}
           </p>
 
           {/* Price and Reviews */}
           <div className="flex flex-col mt-[15px] gap-2 mb-4">
             <span className="font-['Plus_Jakarta_Sans'] flex items-center font-bold text-[38px] leading-[38px] text-[#18181B]">
-              {glass.price}{" "}
+              {sunglass.sellPrice} ₹{" "}
               <span className="text-[#5A5A5A] md:hidden block text-[20px] ml-3">
-                [ MRP-870 ]
+                [ MRP-{sunglass.MRP} ]
               </span>
             </span>
             <div className="flex items-center gap-x-5">
@@ -135,15 +138,20 @@ const SunglassesDetails = () => {
             Features:
           </h2>
           <ul className="list-disc pl-5 mb-4">
-            <li className="font-['Poppins'] font-medium text-[16px] leading-[29px] text-[#52525B]">
-              Lightweight acetate
-            </li>
-            <li className="font-['Poppins'] font-medium text-[16px] leading-[29px] text-[#52525B]">
-              Anti-glare, scratch-resistant
-            </li>
-            <li className="font-['Poppins'] font-medium text-[16px] leading-[29px] text-[#52525B]">
-              Unisex, modern minimalist
-            </li>
+            {sunglass.features && sunglass.features.length > 0 ? (
+              sunglass.features.map((feature, index) => (
+                <li
+                  key={index}
+                  className="font-['Poppins'] font-medium text-[16px] leading-[29px] text-[#52525B]"
+                >
+                  {feature.name}
+                </li>
+              ))
+            ) : (
+              <li className="font-['Poppins'] font-medium text-[16px] leading-[29px] text-[#52525B]">
+                No features available
+              </li>
+            )}
           </ul>
 
           {/* Store Color Available */}
@@ -151,10 +159,12 @@ const SunglassesDetails = () => {
             Store Color Available
           </h3>
           <div className="flex gap-3 mb-4">
-            <div className="w-[30px] h-[30px] rounded-[4px] bg-[#059669]"></div>
-            <div className="w-[30px] h-[30px] rounded-[4px] bg-[#EA580C]"></div>
-            <div className="w-[30px] h-[30px] rounded-[4px] bg-[#6366F1]"></div>
-            <div className="w-[30px] h-[30px] rounded-[4px] bg-[#334155]"></div>
+            <div
+              className="w-[30px] h-[30px] rounded-[4px]"
+              style={{ backgroundColor: sunglass.frameColor?.name || "#334155" }}
+              title={sunglass.frameColor?.name || "Default Color"}
+            ></div>
+            {/* Add more colors if available in the API response */}
           </div>
 
           {/* Add to Cart Button */}

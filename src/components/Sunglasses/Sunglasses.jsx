@@ -1,105 +1,71 @@
-import React from "react";
-// import TopBarGlasses from "./TopBarGlasses";
-// import GlassesCard from "./SunglassesCard";
-import SunglassesCard from "./SunglassesCard";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { SunGlassesService } from "../../services/sunglassesService"; // Adjust the path as needed
+import SunglassesCard from "./SunglassesCard"; // Adjust the path as needed
 
 const Sunglasses = () => {
+  const [sunglasses, setSunglasses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Dummy data for 10 cards
-  const glassesData = [
-    {
-      id: 1,
-      title: "I-GOG Glasses",
-      price: "800 ₹",
-      brand: "Ray-Ban",
-      frameType: "Full Rim",
-      material: "Acetate",
-      imageUrl: "/Sunglasses1.png",
-    },
-    {
-      id: 2,
-      title: "I-GOG Glasses",
-      price: "800 ₹",
-      brand: "Oakley",
-      frameType: "Half Rim",
-      material: "Metal",
-      imageUrl: "/Sunglasses2.png",
-    },
-    {
-      id: 3,
-      title: "I-GOG Glasses",
-      price: "800 ₹",
-      brand: "Gucci",
-      frameType: "Rimless",
-      material: "Titanium",
-      imageUrl: "/Sunglasses3.png",
-    },
-    {
-      id: 4,
-      title: "I-GOG Glasses",
-      price: "800 ₹",
-      brand: "Prada",
-      frameType: "Full Rim",
-      material: "Acetate",
-      imageUrl: "Sunglasses4.png",
-    },
-    {
-      id: 5,
-      title: "I-GOG Glasses",
-      price: "800 ₹",
-      brand: "Versace",
-      frameType: "Half Rim",
-      material: "Metal",
-      imageUrl: "/Sunglasses1.png",
-    },
-    {
-      id: 6,
-      title: "I-GOG Glasses",
-      price: "800 ₹",
-      brand: "Ray-Ban",
-      frameType: "Rimless",
-      material: "Titanium",
-      imageUrl: "/Sunglasses2.png",
-    },
-    {
-      id: 7,
-      title: "I-GOG Glasses",
-      price: "800 ₹",
-      brand: "Oakley",
-      frameType: "Full Rim",
-      material: "Acetate",
-      imageUrl: "/Sunglasses3.png",
-    },
-    {
-      id: 8,
-      title: "I-GOG Glasses",
-      price: "800 ₹",
-      brand: "Gucci",
-      frameType: "Half Rim",
-      material: "Metal",
-      imageUrl: "/Sunglasses4.png",
-    },
-    {
-      id: 9,
-      title: "I-GOG Glasses",
-      price: "800 ₹",
-      brand: "Prada",
-      frameType: "Rimless",
-      material: "Titanium",
-      imageUrl: "/Sunglasses1.png",
-    },
-    {
-      id: 10,
-      title: "I-GOG Glasses",
-      price: "800 ₹",
-      brand: "Versace",
-      frameType: "Full Rim",
-      material: "Acetate",
-      imageUrl: "/Sunglasses5.png",
-    },
-  ];
+  const frameType = "63888b24e890e301c3b9862b";
+  const brand = "6388875fe890e301c3b98579";
+  const frameMaterial = "63888f87e890e301c3b9868d";
+
+  useEffect(() => {
+    const fetchSunglasses = async () => {
+      setLoading(true);
+      try {
+        const response = await SunGlassesService.getAllSunGlasses(frameType, brand, frameMaterial);
+        console.log("API Response:", response); // Debug: Log the entire API response
+
+        if (response.success) {
+          // Correctly access the nested data array
+          const sunglassesData = Array.isArray(response.data?.message?.data)
+            ? response.data.message.data
+            : response.data?.message?.data
+              ? [response.data.message.data] // If it's a single object, wrap it in an array
+              : [];
+          console.log("Sunglasses Data:", sunglassesData); // Debug: Log the sunglasses data
+          setSunglasses(sunglassesData);
+        } else {
+          setError(response.message);
+          console.error("Error from SunGlassesService:", response.message); // Debug: Log the error
+          // If the error is due to missing/invalid token, redirect to login
+          if (response.message.includes("access token") || response.message.includes("Unauthorized")) {
+            navigate("/login");
+          }
+        }
+      } catch (error) {
+        const errorMessage = error.response?.data?.message || "Error fetching sunglasses";
+        setError(errorMessage);
+        console.error("Fetch Error:", errorMessage); // Debug: Log any unexpected errors
+        if (errorMessage.includes("Unauthorized") || error.response?.status === 401) {
+          navigate("/login");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSunglasses();
+  }, [navigate]);
+
+  // console.log("Sunglasses State:", sunglasses); // Debug: Log the sunglasses state before rendering
+
+  if (loading) {
+    return <div className="px-5 py-5">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="px-5 py-5">Error: {error}</div>;
+  }
+
+  if (!sunglasses || sunglasses.length === 0) {
+    return <div className="px-5 py-5">No sunglasses available.</div>;
+  }
+
 
   return (
     <div className="px-5 py-5">
@@ -108,18 +74,21 @@ const Sunglasses = () => {
           Select Sunglasses
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-5">
-          {glassesData.map((sunglass) => (
+          {sunglasses.map((sunglass) => (
             <SunglassesCard
-              key={sunglass.id}
-              title={sunglass.title}
-              price={sunglass.price}
-              imageUrl={sunglass.imageUrl}
-              active={true}
-              onClick={() =>{
-                console.log(`sunglass`, sunglass);
-
-                navigate(`/Sunglasses/details/${sunglass.id}`, { state: { sunglass } })
+              key={sunglass._id} // Use _id from API response
+              title={sunglass.sku} // Map displayName to title
+              price={`${sunglass.sellPrice} ₹`} // Map sellPrice to price
+              imageUrl={
+                sunglass.photos && sunglass.photos.length > 0
+                  ? sunglass.photos[0]
+                  : "/images/placeholder-sunglasses.jpg" // Fallback image if photos array is empty
               }
+              active={true}
+              onClick={() => {
+                console.log("Navigating to details for sunglass:", sunglass); // Debug: Log the sunglass being clicked
+                navigate(`/sunglasses/details/${sunglass._id}`, { state: { sunglass } })
+              } // Pass individual sunglass
               }
             />
           ))}

@@ -4,18 +4,21 @@ import React from "react";
 const GlassesCard = ({
   title = "I-GOG Frames",
   price = "800 ₹",
-  imageUrl,
+  imageUrl = "/images/placeholder-frame.jpg", // Default fallback image
   onClick,
 }) => {
+  // console.log("GlassesCard Props:", { title, price, imageUrl }); // Debug: Log the props received
+
   return (
-    <div className="w-full  md:max-w-[269.4px] h-[173px]  rounded-[15px] px-3 py-2  flex flex-col justify-between cursor-pointer hover:border hover:border-[#E77817] transition-all duration-300 ease-in-out">
+    <div className="w-full md:max-w-[269.4px] h-[173px] rounded-[15px] px-3 py-2 flex flex-col justify-between cursor-pointer hover:border hover:border-[#E77817] transition-all duration-300 ease-in-out">
       {/* Image */}
       <div className="w-full h-[100px] rounded-[4px]">
         <img
-          src={imageUrl}
-          alt={title}
+          // src={imageUrl}
+          // alt={title}
           className="w-full h-full object-contain rounded-[4px]"
           onClick={onClick}
+          onError={(e) => (e.target.src = "/images/placeholder-frame.jpg")} // Fallback on error
         />
       </div>
 
@@ -24,7 +27,7 @@ const GlassesCard = ({
         <span className="font-poppins font-normal text-[16px] leading-[24px] tracking-[0%]">
           {title}
         </span>
-        <span className="font-poppins font-normal text-[16px] bg-[#EBEBEB] px-[10px] py-[2px] rounded-md  leading-[24px] tracking-[0%]">
+        <span className="font-poppins font-normal text-[16px] bg-[#EBEBEB] px-[10px] py-[2px] rounded-md leading-[24px] tracking-[0%]">
           {price}
         </span>
       </div>

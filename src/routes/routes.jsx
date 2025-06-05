@@ -33,8 +33,17 @@ const routes = [
     ),
   },
   {
-    title: "SunglassesDetails",
-    path: "/Sunglasses/details/:id",
+    title: "sunglassesDetails",
+    path: "/sunglasses/details/:id",
+    element: (
+      <PrivateRoute>
+        <PackagePanel />
+      </PrivateRoute>
+    ),
+  },
+   {
+    title: "LensDetails",
+    path: "/lens/details/:id",
     element: (
       <PrivateRoute>
         <PackagePanel />

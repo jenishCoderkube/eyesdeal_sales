@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 const brands = [
   { name: "All", logo: null },
   { name: "Aqualens", logo: "/logo1.png" },
@@ -9,6 +9,7 @@ const brands = [
 ];
 
 const lensTabs = ["Single Vision", "Bifocal", "Progressive", "Power Sunglasses"];
+
 
 const lenses = [
   {
@@ -81,6 +82,10 @@ const Lense = () => {
   const [selectedBrand, setSelectedBrand] = useState("All");
   const [activeTab, setActiveTab] = useState("Progressive");
   const [search, setSearch] = useState("");
+
+
+const navigate = useNavigate();
+
 
   const filteredLenses = lenses.filter(
     (lens) =>
@@ -224,6 +229,13 @@ const Lense = () => {
                   <button
                     className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-semibold px-3 py-1 rounded"
                     style={{ zIndex: 1 }}
+                    onClick={() =>
+                    {
+                        // console.log(`lens`, lens);
+
+                       navigate(`/lens/details/${lens.id}`, { state: { lens } })
+                    }
+                    }
                   >
                     View
                   </button>

@@ -10,10 +10,10 @@ const AUTH_ENDPOINTS = {
 export const authService = {
 
 
-  login: async (email, password) => {
+  login: async (phone, password) => {
     try {
       const response = await api.post(AUTH_ENDPOINTS.LOGIN, {
-        email,
+        phone,
         password,
         // validationMethod: "password",
       });

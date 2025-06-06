@@ -18,21 +18,19 @@ const Sunglasses = () => {
       setLoading(true);
       try {
         const response = await SunGlassesService.getAllSunGlasses(frameType, brand, frameMaterial);
-        console.log("API Response:", response); // Debug: Log the entire API response
+        console.log("API Response:", response);
 
         if (response.success) {
-          // Correctly access the nested data array
           const sunglassesData = Array.isArray(response.data?.message?.data)
             ? response.data.message.data
             : response.data?.message?.data
-              ? [response.data.message.data] // If it's a single object, wrap it in an array
+              ? [response.data.message.data]
               : [];
-          console.log("Sunglasses Data:", sunglassesData); // Debug: Log the sunglasses data
+          console.log("Sunglasses Data:", sunglassesData);
           setSunglasses(sunglassesData);
         } else {
           setError(response.message);
-          console.error("Error from SunGlassesService:", response.message); // Debug: Log the error
-          // If the error is due to missing/invalid token, redirect to login
+          console.error("Error from SunGlassesService:", response.message);
           if (response.message.includes("access token") || response.message.includes("Unauthorized")) {
             navigate("/login");
           }
@@ -40,7 +38,7 @@ const Sunglasses = () => {
       } catch (error) {
         const errorMessage = error.response?.data?.message || "Error fetching sunglasses";
         setError(errorMessage);
-        console.error("Fetch Error:", errorMessage); // Debug: Log any unexpected errors
+        console.error("Fetch Error:", errorMessage);
         if (errorMessage.includes("Unauthorized") || error.response?.status === 401) {
           navigate("/login");
         }
@@ -51,8 +49,6 @@ const Sunglasses = () => {
 
     fetchSunglasses();
   }, [navigate]);
-
-  // console.log("Sunglasses State:", sunglasses); // Debug: Log the sunglasses state before rendering
 
   if (loading) {
     return <div className="px-5 py-5">Loading...</div>;
@@ -66,7 +62,6 @@ const Sunglasses = () => {
     return <div className="px-5 py-5">No sunglasses available.</div>;
   }
 
-
   return (
     <div className="px-5 py-5">
       <div>
@@ -76,21 +71,18 @@ const Sunglasses = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-5">
           {sunglasses.map((sunglass) => (
             <SunglassesCard
-              key={sunglass._id} // Use _id from API response
-              title={sunglass.sku} // Map displayName to title
-              price={`${sunglass.sellPrice} ₹`} // Map sellPrice to price
+              key={sunglass._id}
+              title={sunglass.sku}
+              price={`${sunglass.sellPrice} ₹`}
               imageUrl={
                 sunglass.photos && sunglass.photos.length > 0
                   ? sunglass.photos[0]
-                  : "/images/placeholder-sunglasses.jpg" // Fallback image if photos array is empty
+                  : null
               }
               active={true}
-              onClick={() => {
-                console.log("Navigating to details for sunglass:", sunglass); // Debug: Log the sunglass being clicked
-                navigate(`/sunglasses/details/${sunglass._id}`, { state: { sunglass } })
-              } // Pass individual sunglass
-              }
+              onClick={() => navigate(`/sunglasses/details/${sunglass._id}`)}
             />
+
           ))}
         </div>
       </div>

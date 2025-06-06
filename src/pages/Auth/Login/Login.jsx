@@ -7,16 +7,19 @@ import CommonButton from "../../../components/CommonButton/CommonButton";
 import { authService } from "../../../services/authService";
 
 const loginInitialValues = {
-  email: "",
+  phone: "",
   password: "",
 };
 
 const loginValidationSchema = Yup.object({
-  email: Yup.string()
-    .email("Please enter a valid email address")
-    .required("Email is required"),
+  phone: Yup.string()
+    .matches(
+      // /^[0-9]{10,15}$/, // Adjust based on country/format
+      // "Please enter a valid phone number"
+    )
+    .required("Phone is required"),
   password: Yup.string()
-    .required("Password is required")
+    .required("Password is required"),
     // .min(6, "Password must be at least 6 characters"),
 });
 
@@ -29,10 +32,10 @@ const Login = () => {
     initialValues: loginInitialValues,
     validationSchema: loginValidationSchema,
     onSubmit: async (values) => {
-      const { email, password } = values;
+      const { phone, password } = values;
       setLoading(true);
       try {
-        const response = await authService.login(email, password);
+        const response = await authService.login(phone, password);
         
         if (response.success) {
           toast.success(response.message || "Login successful");
@@ -85,34 +88,34 @@ const Login = () => {
                   Sign In
                 </h3>
 
-                {/* Email Input */}
+                {/* phone Input */}
                 <div className="mb-5">
                   <label
-                    htmlFor="email"
+                    htmlFor="phone"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    Email <span className="text-red-500">*</span>
+                    phone <span className="text-red-500">*</span>
                   </label>
                   <input
-                    type="email"
+                    type="phone"
                     className={`w-full rounded-md border ${
-                      formik.touched.email && formik.errors.email
+                      formik.touched.phone && formik.errors.phone
                         ? "border-red-500"
                         : "border-gray-300"
                     } focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 text-sm py-2 px-3 disabled:bg-gray-100`}
-                    id="email"
-                    name="email"
-                    value={formik.values.email}
+                    id="phone"
+                    name="phone"
+                    value={formik.values.phone}
                     onChange={(e) =>
-                      formik.setFieldValue("email", e.target.value?.trimStart())
+                      formik.setFieldValue("phone", e.target.value?.trimStart())
                     }
                     onBlur={formik.handleBlur}
-                    placeholder="Enter email"
+                    placeholder="Enter phone"
                     disabled={loading}
                   />
-                  {formik.touched.email && formik.errors.email && (
+                  {formik.touched.phone && formik.errors.phone && (
                     <p className="mt-1 text-xs text-red-500">
-                      {formik.errors.email}
+                      {formik.errors.phone}
                     </p>
                   )}
                 </div>

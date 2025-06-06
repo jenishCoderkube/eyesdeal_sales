@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { SunGlassesService } from "../../services/sunglassesService"; // Adjust the path as needed
 import {
   AiOutlineHeart,
   AiOutlineSafetyCertificate,
@@ -11,19 +12,66 @@ import { FaShippingFast } from "react-icons/fa";
 
 const SunglassesDetails = () => {
   const { id } = useParams();
-  const { state } = useLocation();
   const navigate = useNavigate();
-  const sunglass = state?.sunglass;
+  const [sunglass, setSunglass] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeImage, setActiveImage] = useState("/images/placeholder-sunglasses.jpg");
 
-  if (!sunglass) {
+  useEffect(() => {
+    const fetchSunglassById = async () => {
+      setLoading(true);
+      try {
+        const response = await SunGlassesService.getSunGlassById(id);
+        console.log("Sunglass by ID Response:", response);
+
+        if (response.success) {
+          const sunglassData = response.data?.message?.data || response.data?.message;
+          if (sunglassData) {
+            setSunglass(sunglassData);
+            setActiveImage(
+              sunglassData.photos && sunglassData.photos.length > 0
+                ? sunglassData.photos[0]
+                : "/images/placeholder-sunglasses.jpg"
+            );
+          } else {
+            setError("No sunglass data found");
+          }
+        } else {
+          setError(response.message);
+          console.error("Error from getSunGlassById:", response.message);
+          if (response.message.includes("access token") || response.message.includes("Unauthorized")) {
+            navigate("/login");
+          }
+        }
+      } catch (error) {
+        const errorMessage = error.response?.data?.message || "Error fetching sunglass details";
+        setError(errorMessage);
+        console.error("Fetch Sunglass by ID Error:", errorMessage);
+        if (errorMessage.includes("Unauthorized") || error.response?.status === 401) {
+          navigate("/login");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSunglassById();
+  }, [id, navigate]);
+
+  if (loading) {
+    return <div className="px-5 py-5">Loading...</div>;
+  }
+
+  if (error || !sunglass) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#18181B]">
         <h1 className="font-['Poppins'] font-medium text-[24px] text-white">
-          Sunglasses Not Found
+          {error || "Sunglasses Not Found"}
         </h1>
         <button
           className="mt-4 font-['Poppins'] font-normal text-[16px] text-white bg-[#242424] px-4 py-2 rounded-md hover:bg-[#3a3a3a]"
-          onClick={() => navigate("/sunglasses")}
+          onClick={() => navigate("/sales-panel")}
         >
           Back to Sunglasses
         </button>
@@ -31,29 +79,19 @@ const SunglassesDetails = () => {
     );
   }
 
-  // Initialize activeImage with the first photo or a fallback
-  const [activeImage, setActiveImage] = useState(
-    sunglass.photos && sunglass.photos.length > 0
-      ? sunglass.photos[0]
-      : "/images/placeholder-sunglasses.jpg"
-  );
-
-  // Use photos array from sunglass data or fallback to a single placeholder
   const images = sunglass.photos && sunglass.photos.length > 0
     ? sunglass.photos
     : ["/images/placeholder-sunglasses.jpg"];
 
-  // Thumbnail images component
   const ThumbnailImages = () => (
     <div className="flex flex-row sm:flex-col gap-2">
       {images.map((img, index) => (
         <img
           key={index}
-          src={img}
+          // src={img}
           alt={`Thumbnail ${index + 1}`}
-          className={`w-[129.85px] object-contain h-[94px] rounded-[5px] cursor-pointer ${
-            activeImage === img ? "border-2 border-[#E77817]" : "border-none"
-          }`}
+          className={`w-[129.85px] object-contain h-[94px] rounded-[5px] cursor-pointer ${activeImage === img ? "border-2 border-[#E77817]" : "border-none"
+            }`}
           onClick={() => setActiveImage(img)}
           onError={(e) => (e.target.src = "/images/placeholder-sunglasses.jpg")}
         />
@@ -63,25 +101,22 @@ const SunglassesDetails = () => {
 
   return (
     <div className="flex flex-col min-h-screen px-5 py-5 bg-[#F9FAFB]">
-      {/* Back Button */}
       <button
         className="self-start mb-4 flex items-center font-['Poppins'] font-medium text-[24px] text-[#18181B]"
-        onClick={() => navigate("/sunglasses")}
+        onClick={() => navigate("/sales-panel")}
+
       >
         <IoIosArrowDropleft size={24} className="mr-[10px]" /> Back
       </button>
 
       <div className="flex sm:flex-row flex-col md:gap-x-10 gap-x-3">
-        {/* Left Side Thumbnail Images (Hidden on small screens) */}
         <div className="flex gap-x-5">
           <div className="md:flex hidden sm:flex flex-col gap-2">
             <ThumbnailImages />
           </div>
-
-          {/* Center Image */}
           <div className="flex-1">
             <img
-              src={activeImage}
+              // src={activeImage}
               alt={sunglass.sku}
               className="md:w-[559px] w-full sm:w-[327px] h-full sm:max-h-[290px] md:h-[494px] object-contain rounded-lg"
               onError={(e) => (e.target.src = "/images/placeholder-sunglasses.jpg")}
@@ -101,21 +136,16 @@ const SunglassesDetails = () => {
             </div>
           </div>
         </div>
-
-        {/* Right Side Details */}
         <div className="flex flex-col sm:mt-0 mt-36 w-full sm:max-w-[300px] md:max-w-[400px]">
-          {/* Title */}
           <h1 className="font-poppins font-bold text-[28px] leading-[38px] mb-1">
             {sunglass.displayName}
           </h1>
           <p className="font-['Poppins'] font-medium w-fit py-1 px-[10px] rounded text-[14px] bg-[#EBEBEB] mt-[15px]">
             {sunglass.sku}
           </p>
-
-          {/* Price and Reviews */}
           <div className="flex flex-col mt-[15px] gap-2 mb-4">
             <span className="font-['Plus_Jakarta_Sans'] flex items-center font-bold text-[38px] leading-[38px] text-[#18181B]">
-              {sunglass.sellPrice} ₹{" "}
+              {sunglass.sellPrice} ₹
               <span className="text-[#5A5A5A] md:hidden block text-[20px] ml-3">
                 [ MRP-{sunglass.MRP} ]
               </span>
@@ -127,13 +157,9 @@ const SunglassesDetails = () => {
               </span>
             </div>
           </div>
-
-          {/* Thumbnail Images on Small Screens (Hidden on larger screens) */}
           <div className="sm:hidden flex mb-4">
             <ThumbnailImages />
           </div>
-
-          {/* Features */}
           <h2 className="font-['Poppins'] font-bold text-[16px] leading-[24px] mb-2 text-[#18181B]">
             Features:
           </h2>
@@ -153,8 +179,6 @@ const SunglassesDetails = () => {
               </li>
             )}
           </ul>
-
-          {/* Store Color Available */}
           <h3 className="font-jakarta font-bold text-[16px] leading-[24px] mb-2 text-[#18181B]">
             Store Color Available
           </h3>
@@ -164,10 +188,7 @@ const SunglassesDetails = () => {
               style={{ backgroundColor: sunglass.frameColor?.name || "#334155" }}
               title={sunglass.frameColor?.name || "Default Color"}
             ></div>
-            {/* Add more colors if available in the API response */}
           </div>
-
-          {/* Add to Cart Button */}
           <div className="flex items-center w-full justify-start gap-x-2">
             <button className="flex justify-center items-center w-full md:w-[336px] text-center bg-[#007569] text-white font-poppins font-normal text-[16px] leading-[24px] capitalize px-4 py-[15px] rounded-md">
               Add To Cart
@@ -176,8 +197,6 @@ const SunglassesDetails = () => {
               <FaRegHeart size={20} height={16} />
             </div>
           </div>
-
-          {/* Additional Info */}
           <div className="flex items-center mt-[15px] gap-2 mb-2">
             <FaShippingFast size={20} className="text-[#52525B]" />
             <p className="font-['Poppins'] font-medium text-[14px] leading-[21px] text-[#52525B]">

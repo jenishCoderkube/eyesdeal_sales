@@ -137,7 +137,7 @@ const SelectPackage = () => {
                 <img
                   src="/eyes_icons.png"
                   alt="Success Icon"
-                  className="w-[19px] h-[13px] object-cover"
+                  className="w-auto h-auto object-cover"
                 />
                 View Lens
               </button>
@@ -145,7 +145,7 @@ const SelectPackage = () => {
             <div className="flex items-center gap-3 mt-4">
               <h6 className="font-poppins font-normal text-[18px] leading-[24px]">
                 Price
-              </h6>{" "}
+              </h6>
               =
               <span className="font-poppins font-normal text-nowrap text-[18px] leading-[24px] bg-[#E77817] text-white rounded-[8px] px-3 py-2">
                 800 ₹
@@ -193,7 +193,7 @@ const SelectPackage = () => {
                   <img
                     src="/eyes_icons.png"
                     alt="Success Icon"
-                    className="w-[19px] h-[13px] object-cover"
+                    className="w-auto h-auto object-cover"
                   />
                   View Lens
                 </button>

@@ -10,7 +10,7 @@ const LeftSidebar = ({ activeTab, setActiveTab }) => {
     "Contact Lenses",
     "Solution",
     "Accessories",
-    "Logout"
+    "Logout",
   ];
 
   return (

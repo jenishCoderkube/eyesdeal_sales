@@ -257,7 +257,7 @@ const PackagePanel = () => {
               {isLenseDetails ? <LenseDetails /> : <Lense />}
             </>
           ) : (
-            <div className="flex-1 flex flex-col mx-4 mt-1 border border-gray-200 rounded-xl">
+            <div className="">
               {isLenseDetails ? <LenseDetails /> : <Lense />}
             </div>
           )}

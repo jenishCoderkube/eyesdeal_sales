@@ -1,27 +1,55 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
-const LenseCard = () => {
+const LenseCard = ({ lens, imageUrl }) => {
+  const navigate = useNavigate();
+  const baseUrl =
+    "https://s3.ap-south-1.amazonaws.com/eyesdeal.blinklinksolutions.com/";
+  const fullImageUrl = imageUrl
+    ? `${baseUrl}${imageUrl}`
+    : "/images/placeholder-sunglasses.jpg";
+
+  const random = Math.floor(Math.random() * 5) + 1;
+  console.log("random", random);
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-      <div className="p-4">
-        <div className="aspect-w-16 aspect-h-9 bg-gray-100 rounded-lg mb-4">
-          {/* Lense image will go here */}
-          <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-400">Lense Image</span>
+    <div
+      className="bg-white rounded-xl shadow p-3 flex flex-col justify-between relative"
+      style={{ minWidth: 220, maxWidth: 264, height: 177 }}
+    >
+      <button
+        className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-semibold px-3 py-1 rounded"
+        style={{ zIndex: 1 }}
+        onClick={() => {
+          navigate(`/lens/details/${lens._id}`, { state: { lens } });
+        }}
+      >
+        View
+      </button>
+      <div className="flex-1 flex justify-center items-center">
+        {imageUrl ? (
+          <img
+            // src={fullImageUrl}
+            src={fullImageUrl}
+            className="max-w-[190px] max-h-[100px] object-contain rounded-[4px]"
+            onError={(e) => {
+              e.target.style.display = "none";
+              const fallback = e.target.nextSibling;
+              if (fallback) fallback.style.display = "flex";
+            }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-white rounded-[4px]">
+            <p className="text-gray-400">Image not found</p>
           </div>
+        )}
+      </div>
+      <div className="flex items-center justify-between w-full mt-2">
+        <div className="text-sm sm:text-md font-medium text-gray-800">
+          {lens.HSNCode}
         </div>
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">
-          Premium Lense
-        </h3>
-        <p className="text-gray-600 text-sm mb-4">
-          High-quality optical lens with advanced coating
-        </p>
-        <div className="flex justify-between items-center">
-          <span className="text-blue-600 font-semibold">$99.99</span>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-            Select
-          </button>
-        </div>
+        <span className="font-poppins font-normal text-[16px] bg-[#EBEBEB] px-[10px] py-[2px] rounded-md leading-[24px] tracking-[0%]">
+          {lens.sellPrice} ₹
+        </span>
       </div>
     </div>
   );

@@ -6,11 +6,15 @@ const SunglassesCard = ({
   imageUrl,
   onClick,
 }) => {
-  const baseUrl = "https://s3.ap-south-1.amazonaws.com/eyesdeal.blinklinksolutions.com/";
-  const fullImageUrl = imageUrl ? `${baseUrl}${imageUrl}` : "/images/placeholder-sunglasses.jpg";
-console.log("imageUrl",imageUrl);
+  const baseUrl =
+    "https://s3.ap-south-1.amazonaws.com/eyesdeal.blinklinksolutions.com/";
+  const fullImageUrl = imageUrl
+    ? `${baseUrl}${imageUrl}`
+    : "/images/placeholder-sunglasses.jpg";
+  console.log("imageUrl", imageUrl);
 
-const random = Math.floor(Math.random() * 5) + 1;
+  const random = Math.floor(Math.random() * 3) + 1;
+
   console.log("random", random);
 
   return (
@@ -19,25 +23,22 @@ const random = Math.floor(Math.random() * 5) + 1;
       onClick={onClick}
     >
       <div className="w-full h-[100px] rounded-[4px] relative bg-white overflow-hidden">
-       {
-        imageUrl ? (
-           <img
-          // src={fullImageUrl}
-          src={`/Sunglasses${random}.png `}
-
-           className="w-full h-full object-contain rounded-[4px]"
-          onError={(e) => {
-            e.target.style.display = "none";
-            const fallback = e.target.nextSibling;
-            if (fallback) fallback.style.display = "flex";
-          }}
-        />) : (
+        {imageUrl ? (
+          <img
+            // src={fullImageUrl}
+            src={`/Sunglasses${random}.png `}
+            className="w-full h-full object-contain rounded-[4px]"
+            onError={(e) => {
+              e.target.style.display = "none";
+              const fallback = e.target.nextSibling;
+              if (fallback) fallback.style.display = "flex";
+            }}
+          />
+        ) : (
           <div className="w-full h-full flex items-center justify-center bg-white rounded-[4px]">
             <p className="text-gray-400">Image not found</p>
-            </div>
-            )
-       }
-       
+          </div>
+        )}
       </div>
       <div className="flex justify-between items-center">
         <span className="font-poppins font-normal text-[16px] leading-[24px] tracking-[0%]">
@@ -50,6 +51,5 @@ const random = Math.floor(Math.random() * 5) + 1;
     </div>
   );
 };
-
 
 export default SunglassesCard;

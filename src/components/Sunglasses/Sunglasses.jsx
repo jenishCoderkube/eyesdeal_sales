@@ -17,29 +17,36 @@ const Sunglasses = () => {
     const fetchSunglasses = async () => {
       setLoading(true);
       try {
-        const response = await SunGlassesService.getAllSunGlasses(frameType, brand, frameMaterial);
+        const response = await SunGlassesService.getAllSunGlasses();
         console.log("API Response:", response);
 
         if (response.success) {
           const sunglassesData = Array.isArray(response.data?.message?.data)
             ? response.data.message.data
             : response.data?.message?.data
-              ? [response.data.message.data]
-              : [];
+            ? [response.data.message.data]
+            : [];
           console.log("Sunglasses Data:", sunglassesData);
           setSunglasses(sunglassesData);
         } else {
           setError(response.message);
           console.error("Error from SunGlassesService:", response.message);
-          if (response.message.includes("access token") || response.message.includes("Unauthorized")) {
+          if (
+            response.message.includes("access token") ||
+            response.message.includes("Unauthorized")
+          ) {
             navigate("/login");
           }
         }
       } catch (error) {
-        const errorMessage = error.response?.data?.message || "Error fetching sunglasses";
+        const errorMessage =
+          error.response?.data?.message || "Error fetching sunglasses";
         setError(errorMessage);
         console.error("Fetch Error:", errorMessage);
-        if (errorMessage.includes("Unauthorized") || error.response?.status === 401) {
+        if (
+          errorMessage.includes("Unauthorized") ||
+          error.response?.status === 401
+        ) {
           navigate("/login");
         }
       } finally {
@@ -82,7 +89,6 @@ const Sunglasses = () => {
               active={true}
               onClick={() => navigate(`/sunglasses/details/${sunglass._id}`)}
             />
-
           ))}
         </div>
       </div>

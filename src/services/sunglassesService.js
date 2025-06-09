@@ -8,7 +8,8 @@ const SUNGLASSES_ENDPOINTS = {
 
 // Sunglasses service functions
 export const SunGlassesService = {
-  getAllSunGlasses: async (frameType, brand, frameMaterial) => {
+  // getAllSunGlasses: async (frameType, brand, frameMaterial) => {
+  getAllSunGlasses: async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
       if (!accessToken) {
@@ -18,17 +19,22 @@ export const SunGlassesService = {
         };
       }
 
-      const params = new URLSearchParams({
-        frameType: frameType || "",
-        brand: brand || "",
-        frameMaterial: frameMaterial || "",
-      }).toString();
+      // const params = new URLSearchParams({
+      //   frameType: frameType || "",
+      //   brand: brand || "",
+      //   frameMaterial: frameMaterial || "",
+      // }).toString();
 
-      const response = await api.get(`${SUNGLASSES_ENDPOINTS.GET_ALL_SUNGLASSES()}?${params}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await api.get(
+        // `${SUNGLASSES_ENDPOINTS.GET_ALL_SUNGLASSES()}?${params}`,
+        `${SUNGLASSES_ENDPOINTS.GET_ALL_SUNGLASSES()}`,
+
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       return {
         success: true,
@@ -52,11 +58,14 @@ export const SunGlassesService = {
         };
       }
 
-      const response = await api.get(SUNGLASSES_ENDPOINTS.GET_SUNGLASS_BY_ID(id), {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await api.get(
+        SUNGLASSES_ENDPOINTS.GET_SUNGLASS_BY_ID(id),
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       return {
         success: true,
@@ -65,7 +74,8 @@ export const SunGlassesService = {
     } catch (error) {
       return {
         success: false,
-        message: error.response?.data?.message || "Error fetching sunglass details",
+        message:
+          error.response?.data?.message || "Error fetching sunglass details",
       };
     }
   },

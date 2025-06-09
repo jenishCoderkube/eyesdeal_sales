@@ -35,76 +35,126 @@ const PackagePanel = () => {
   // Check if the current route is a details route
   const isFrameDetails = location.pathname.startsWith("/frame/details");
   const isLenseDetails = location.pathname.startsWith("/lens/details");
-  const isSunglassesDetails = location.pathname.startsWith("/sunglasses/details");
+  const isSunglassesDetails = location.pathname.startsWith(
+    "/sunglasses/details"
+  );
 
   // Fetch all required data when activeLeftTab changes to "Frame"
   useEffect(() => {
-   if (activeLeftTab === "Frame") {
-    const fetchAllData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        // Execute all API calls concurrently
-        const results = await Promise.allSettled([
-          masterDataService.getFrameTypes(),
-          masterDataService.getMaterials(),
-          masterDataService.getBrands(),
-          frameService.getAllFrames(),
-        ]);
+    if (activeLeftTab === "Frame") {
+      const fetchAllData = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          // Execute all API calls concurrently
+          const results = await Promise.allSettled([
+            masterDataService.getFrameTypes(),
+            masterDataService.getMaterials(),
+            masterDataService.getBrands(),
+            frameService.getAllFrames(),
+          ]);
 
-        const [frameTypeResult, materialResult, brandResult, frameResult] = results;
+          const [frameTypeResult, materialResult, brandResult, frameResult] =
+            results;
 
-        // Process frame types
-        if (frameTypeResult.status === "fulfilled" && frameTypeResult.value.success) {
-          setFrameTypes(Array.isArray(frameTypeResult.value.data?.data) ? frameTypeResult.value.data.data : []);
-        } else if (frameTypeResult.status === "rejected" || !frameTypeResult.value?.success) {
-          const errorMessage = frameTypeResult.value?.message || frameTypeResult.reason?.response?.data?.message || "Error fetching frame types";
-          setError((prevError) => prevError || errorMessage);      
-        }
+          // Process frame types
+          if (
+            frameTypeResult.status === "fulfilled" &&
+            frameTypeResult.value.success
+          ) {
+            setFrameTypes(
+              Array.isArray(frameTypeResult.value.data?.data)
+                ? frameTypeResult.value.data.data
+                : []
+            );
+          } else if (
+            frameTypeResult.status === "rejected" ||
+            !frameTypeResult.value?.success
+          ) {
+            const errorMessage =
+              frameTypeResult.value?.message ||
+              frameTypeResult.reason?.response?.data?.message ||
+              "Error fetching frame types";
+            setError((prevError) => prevError || errorMessage);
+          }
 
-        // Process materials
-        if (materialResult.status === "fulfilled" && materialResult.value.success) {
-          setMaterials(Array.isArray(materialResult.value.data?.data) ? materialResult.value.data.data : []);
-        } else if (materialResult.status === "rejected" || !materialResult.value?.success) {
-          const errorMessage = materialResult.value?.message || materialResult.reason?.response?.data?.message || "Error fetching materials";
-          setError((prevError) => prevError || errorMessage);
-        }
+          // Process materials
+          if (
+            materialResult.status === "fulfilled" &&
+            materialResult.value.success
+          ) {
+            setMaterials(
+              Array.isArray(materialResult.value.data?.data)
+                ? materialResult.value.data.data
+                : []
+            );
+          } else if (
+            materialResult.status === "rejected" ||
+            !materialResult.value?.success
+          ) {
+            const errorMessage =
+              materialResult.value?.message ||
+              materialResult.reason?.response?.data?.message ||
+              "Error fetching materials";
+            setError((prevError) => prevError || errorMessage);
+          }
 
-        // Process brands
-        if (brandResult.status === "fulfilled" && brandResult.value.success) {
-          setBrands(Array.isArray(brandResult.value.data?.data) ? brandResult.value.data.data : []);
-        } else if (brandResult.status === "rejected" || !brandResult.value?.success) {
-          const errorMessage = brandResult.value?.message || brandResult.reason?.response?.data?.message || "Error fetching brands";
-          setError((prevError) => prevError || errorMessage);
-        }
+          // Process brands
+          if (brandResult.status === "fulfilled" && brandResult.value.success) {
+            setBrands(
+              Array.isArray(brandResult.value.data?.data)
+                ? brandResult.value.data.data
+                : []
+            );
+          } else if (
+            brandResult.status === "rejected" ||
+            !brandResult.value?.success
+          ) {
+            const errorMessage =
+              brandResult.value?.message ||
+              brandResult.reason?.response?.data?.message ||
+              "Error fetching brands";
+            setError((prevError) => prevError || errorMessage);
+          }
 
-        // Process frames
-        if (frameResult.status === "fulfilled" && frameResult.value.success) {
-          setFrames(
-            Array.isArray(frameResult.value.data?.message?.data)
-              ? frameResult.value.data.message.data
-              : frameResult.value.data?.message?.data
-              ? [frameResult.value.data.message.data]
-              : []
-          );
-        } else if (frameResult.status === "rejected" || !frameResult.value?.success) {
-          const errorMessage = frameResult.value?.message || frameResult.reason?.response?.data?.message || "Error fetching frames";
-          setError((prevError) => prevError || errorMessage);
-        
+          // Process frames
+          if (frameResult.status === "fulfilled" && frameResult.value.success) {
+            setFrames(
+              Array.isArray(frameResult.value.data?.message?.data)
+                ? frameResult.value.data.message.data
+                : frameResult.value.data?.message?.data
+                ? [frameResult.value.data.message.data]
+                : []
+            );
+          } else if (
+            frameResult.status === "rejected" ||
+            !frameResult.value?.success
+          ) {
+            const errorMessage =
+              frameResult.value?.message ||
+              frameResult.reason?.response?.data?.message ||
+              "Error fetching frames";
+            setError((prevError) => prevError || errorMessage);
+          }
+        } catch (error) {
+          const errorMessage =
+            error.response?.data?.message || "Unexpected error fetching data";
+          setError(errorMessage);
+          if (
+            errorMessage.includes("Unauthorized") ||
+            error.response?.status === 401
+          ) {
+            navigate("/login");
+          }
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        const errorMessage = error.response?.data?.message || "Unexpected error fetching data";
-        setError(errorMessage);
-        if (errorMessage.includes("Unauthorized") || error.response?.status === 401) {
-          navigate("/login");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAllData();
-  }
+      };
+      fetchAllData();
+    }
   }, [activeLeftTab, navigate]);
+
+  console.log(brands, "brands");
 
   // Handle logout
   if (activeLeftTab === "Logout") {
@@ -163,7 +213,11 @@ const PackagePanel = () => {
                 loading={loading}
                 error={error}
               />
-              {isFrameDetails ? <FrameDetails /> : <Frame frames={frames} loading={loading} error={error} />}
+              {isFrameDetails ? (
+                <FrameDetails />
+              ) : (
+                <Frame frames={frames} loading={loading} error={error} />
+              )}
             </>
           ) : (
             <div className="flex-1 flex flex-col mx-4 mt-1 border border-gray-200 rounded-xl">
@@ -174,7 +228,11 @@ const PackagePanel = () => {
                 loading={loading}
                 error={error}
               />
-              {isFrameDetails ? <FrameDetails /> : <Frame frames={frames} loading={loading} error={error} />}
+              {isFrameDetails ? (
+                <FrameDetails />
+              ) : (
+                <Frame frames={frames} loading={loading} error={error} />
+              )}
             </div>
           )}
         </div>
@@ -189,6 +247,13 @@ const PackagePanel = () => {
                   setActiveTab={setActiveTopTab}
                 />
               </div>
+              <TopBarGlasses
+                frameTypes={frameTypes}
+                materials={materials}
+                brands={brands}
+                loading={loading}
+                error={error}
+              />
               {isLenseDetails ? <LenseDetails /> : <Lense />}
             </>
           ) : (
@@ -208,12 +273,24 @@ const PackagePanel = () => {
                   setActiveTab={setActiveTopTab}
                 />
               </div>
-              <TopBarSunglasses />
+              <TopBarGlasses
+                frameTypes={frameTypes}
+                materials={materials}
+                brands={brands}
+                loading={loading}
+                error={error}
+              />
               {isSunglassesDetails ? <SunglassesDetails /> : <Sunglasses />}
             </>
           ) : (
             <div className="flex-1 flex-col mx-4 mt-1 border border-gray-200 rounded-xl">
-              <TopBarSunglasses />
+              <TopBarGlasses
+                frameTypes={frameTypes}
+                materials={materials}
+                brands={brands}
+                loading={loading}
+                error={error}
+              />
               {isSunglassesDetails ? <SunglassesDetails /> : <Sunglasses />}
             </div>
           )}

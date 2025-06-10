@@ -8,34 +8,19 @@ const FRAME_ENDPOINTS = {
 
 // Frame service functions
 export const frameService = {
-  getAllFrames: async (frameType, brand, frameMaterial) => {
+  getAllFrames: async (filters = {}) => {
     try {
-      // Retrieve the accessToken from localStorage
-      const accessToken = localStorage.getItem("accessToken");
-
-      // If no token is found, return an error
-      if (!accessToken) {
-        return {
-          success: false,
-          message: "No access token found. Please log in.",
-        };
-      }
-
       // Construct query parameters
-      // const params = new URLSearchParams({
-      //   frameType: frameType || "",
-      //   brand: brand || "",
-      //   frameMaterial: frameMaterial || "",
-      // }).toString();
+      const params = new URLSearchParams();
+      if (filters.frameType) params.append("frameType", filters.frameType);
+      if (filters.brand) params.append("brand", filters.brand);
+      if (filters.frameMaterial)
+        params.append("frameMaterial", filters.frameMaterial);
 
       // Make the API call with the Bearer token in the Authorization header
-      // const response = await api.get(`${FRAME_ENDPOINTS.GET_ALL_FRAMES()}?${params}`, {
-      const response = await api.get(`${FRAME_ENDPOINTS.GET_ALL_FRAMES()}`, {
-
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await api.get(
+        `${FRAME_ENDPOINTS.GET_ALL_FRAMES()}?${params.toString()}`
+      );
 
       return {
         success: true,
@@ -76,7 +61,8 @@ export const frameService = {
     } catch (error) {
       return {
         success: false,
-        message: error.response?.data?.message || "Error fetching frame details",
+        message:
+          error.response?.data?.message || "Error fetching frame details",
       };
     }
   },

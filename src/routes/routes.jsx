@@ -24,6 +24,33 @@ const routes = [
     ),
   },
   {
+    title: "SalesPackageFrame",
+    path: "/sales-panel/frame",
+    element: (
+      <PrivateRoute>
+        <PackagePanel />
+      </PrivateRoute>
+    ),
+  },
+  {
+    title: "SalesPackageLens",
+    path: "/sales-panel/lens",
+    element: (
+      <PrivateRoute>
+        <PackagePanel />
+      </PrivateRoute>
+    ),
+  },
+  {
+    title: "SalesPackageSunglasses",
+    path: "/sales-panel/sunglasses",
+    element: (
+      <PrivateRoute>
+        <PackagePanel />
+      </PrivateRoute>
+    ),
+  },
+  {
     title: "FrameDetails",
     path: "/frame/details/:id",
     element: (
@@ -41,7 +68,7 @@ const routes = [
       </PrivateRoute>
     ),
   },
-   {
+  {
     title: "LensDetails",
     path: "/lens/details/:id",
     element: (

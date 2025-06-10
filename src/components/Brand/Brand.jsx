@@ -2,9 +2,9 @@ import React from "react";
 
 const Brand = ({ selectedBrand, setSelectedBrand, brands = [] }) => {
   return (
-    <div className="flex flex-col items-start w-full md:w-auto md:mr-6">
-      <span className="inline-flex items-center justify-center bg-gray-300 text-gray-600 font-semibold rounded px-4 sm:px-7 mb-2 h-10 sm:h-[42px] select-none opacity-60">
-        Select Brand
+    <div className="flex flex-col items-start w-full md:w-auto">
+      <span className="inline-flex w-full max-w-[150px] text-nowrap truncate items-center justify-center bg-gray-300 text-gray-600 font-semibold rounded px-4 sm:px-7 mb-2 h-10 sm:h-[42px] select-none opacity-60">
+        {selectedBrand === "All" ? "Select Brand" : selectedBrand}
       </span>
 
       <div className="w-[188px] max-h-[695px] overflow-y-auto scrollbar-hide mt-3">

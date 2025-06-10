@@ -6,29 +6,10 @@ import GlassesCard from "./GlassesCard"; // Adjust the path as needed
 const Frame = ({ frames, loading, error }) => {
   const navigate = useNavigate();
 
-  const handleCardClick = async (frameId) => {
-    try {
-      const response = await frameService.getFrameById(frameId);
-      if (response.success) {
-        const frameData = response.data?.message?.data || response.data?.message;
-        if (frameData) {
-          navigate(`/frame/details/${frameId}`, { state: { glass: frameData } });
-        } else {
-          console.error("No frame data found");
-        }
-      } else {
-        console.error("Error from getFrameById:", response.message);
-        if (response.message.includes("access token") || response.message.includes("Unauthorized")) {
-          navigate("/login");
-        }
-      }
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || "Error fetching frame details";
-      console.error("Fetch Frame by ID Error:", errorMessage);
-      if (errorMessage.includes("Unauthorized") || error.response?.status === 401) {
-        navigate("/login");
-      }
-    }
+  const handleCardClick = async (frameId, frameData) => {
+    navigate(`/frame/details/${frameId}`, {
+      state: { glass: frameData },
+    });
   };
 
   if (loading) {
@@ -56,12 +37,10 @@ const Frame = ({ frames, loading, error }) => {
               title={frame.sku}
               price={`${frame.sellPrice} ₹`}
               imageUrl={
-                frame.photos && frame.photos.length > 0
-                  ? frame.photos[0]
-                  : "/images/placeholder-frame.jpg"
+                frame.photos && frame.photos.length > 0 && frame.photos[0]
               }
               active={true}
-              onClick={() => handleCardClick(frame._id)}
+              onClick={() => handleCardClick(frame._id, frame)}
             />
           ))}
         </div>

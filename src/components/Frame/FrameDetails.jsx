@@ -1,5 +1,5 @@
-import React from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   AiOutlineHeart,
   AiOutlineSafetyCertificate,
@@ -8,7 +8,8 @@ import {
 import { IoIosArrowDropleft } from "react-icons/io";
 import { FaRegHeart } from "react-icons/fa";
 import { FaShippingFast } from "react-icons/fa";
-
+import { frameService } from "../../services/frameService"; // Adjust path as needed
+import "./Frames.css"; // Import your CSS file for styling
 const frameImages = [
   "/glass_1.png",
   "/glass_2.png",
@@ -18,44 +19,70 @@ const frameImages = [
 
 // Define a color map
 const colorMap = {
-  "DA Brown": "#A0522D", // Adjust hex for your preferred brown
+  Blue: "#0000FF", // Updated for the API response
+  "DA Brown": "#A0522D",
   "Transparent Green": "#059669",
-  "Black": "#000000",
+  Black: "#000000",
   "Transparent Pink": "#FFC0CB",
   "Transparent Brown": "#A52A2A",
-  "Transparent Purplen": "#A020F0",
-
-  // Add more mappings as needed
+  "Transparent Purple": "#A020F0",
 };
-
-
 
 const FrameDetails = () => {
   const { id } = useParams();
-  const { state } = useLocation();
   const navigate = useNavigate();
-  const glass = state?.glass || {
-    sku: "I-GOG Frames",
-    sellPrice: "₹800",
-    photos: ["/glass_1.png"],
-    displayName: "I-GOG Frames",
+  const [glass, setGlass] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeImage, setActiveImage] = useState(null);
 
-  };
+  // Fetch frame data by ID
+  useEffect(() => {
+    const fetchFrame = async () => {
+      try {
+        setLoading(true);
+        const response = await frameService.getFrameById(id);
+        if (response.success) {
+          const frameData = response.data.message.data;
+          setGlass(frameData);
+          setActiveImage(frameData.photos?.[0] || frameImages[0]);
+        } else {
+          setError(response.message || "Failed to fetch frame details");
+        }
+      } catch (err) {
+        setError(err.message || "Unexpected error occurred");
+        if (err.message.includes("Unauthorized")) {
+          navigate("/login");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // console.log("Glass Data:", glass.frameColor.name);
-  // console.log("Frame Images:", frameImages);
-const frameColorName = glass?.frameColor?.name || "";
-const colorHex = colorMap[frameColorName];
+    fetchFrame();
+  }, [id, navigate]);
 
-  if (!state?.glass) {
+  // Handle loading state
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h1 className="font-['Poppins'] font-medium text-[24px] text-black">
+          Loading...
+        </h1>
+      </div>
+    );
+  }
+
+  // Handle error or no frame found
+  if (error || !glass) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#18181B]">
         <h1 className="font-['Poppins'] font-medium text-[24px] text-white">
-          Frame Not Found
+          {error || "Frame Not Found"}
         </h1>
         <button
           className="mt-4 font-['Poppins'] font-normal text-[16px] text-white bg-[#242424] px-4 py-2 rounded-md hover:bg-[#3a3a3a]"
-          onClick={() => navigate("/sales-panel")}
+          onClick={() => navigate("/sales-panel/frames")}
         >
           Back to Frames
         </button>
@@ -63,41 +90,68 @@ const colorHex = colorMap[frameColorName];
     );
   }
 
-  const [activeImage, setActiveImage] = React.useState(glass.photos?.[0] || "/glass_1.png");
+  const frameColorName = glass?.frameColor?.name || "Unknown";
+  const colorHex = colorMap[frameColorName] || "#000000"; // Default to black if color not in map
 
   return (
     <div className="flex flex-col min-h-screen px-5 py-5 bg-[#F9FAFB]">
       <button
         className="self-start mb-4 flex items-center font-['Poppins'] font-medium text-[24px] text-[#18181B]"
-        onClick={() => navigate("/sales-panel")}
+        onClick={() => navigate("/sales-panel/frame")}
       >
         <IoIosArrowDropleft size={24} className="mr-[10px]" /> Back
       </button>
 
       <div className="flex sm:flex-row flex-col md:gap-x-10 gap-x-3">
         <div className="flex gap-x-5">
-          <div className="md:flex hidden flex-col gap-2">
-            {(glass.photos || frameImages).map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt={`Thumbnail ${index + 1}`}
-                className={`w-[129.85px] object-contain h-[94px] rounded-[5px] cursor-pointer ${activeImage === img
-                    ? "border-2 border-[#E77817]"
-                    : "border-none"
+          <div className="md:flex hidden h-screen flex-col overflow-y-scroll gap-2 scrollbar-hidden">
+            {(glass.photos?.length > 0 ? glass.photos : frameImages).map(
+              (img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt={`Thumbnail ${index + 1}`}
+                  className={`w-[129.85px] object-contain h-[94px] rounded-[5px] cursor-pointer ${
+                    activeImage === img
+                      ? "border-2 border-[#E77817]"
+                      : "border-none"
                   }`}
-                onClick={() => setActiveImage(img)}
-              />
-            ))}
+                  onClick={() => setActiveImage(img)}
+                  onError={(e) =>
+                    (e.target.src = "/images/placeholder-frame.jpg")
+                  }
+                />
+              )
+            )}
           </div>
 
           <div className="flex-1">
             <img
               src={activeImage}
-              alt={glass.sku}
+              alt={glass.displayName}
               className="md:w-[559px] w-full sm:w-[327px] h-full sm:max-h-[290px] md:h-[494px] object-contain rounded-lg"
               onError={(e) => (e.target.src = "/images/placeholder-frame.jpg")}
             />
+            <div className="md:hidden grid grid-cols-3 flex-wrap gap-2">
+              {(glass.photos?.length > 0 ? glass.photos : frameImages).map(
+                (img, index) => (
+                  <img
+                    key={index}
+                    src={img}
+                    alt={`Thumbnail ${index + 1}`}
+                    className={`w-[100px] object-contain   h-[50px] rounded-[5px] cursor-pointer ${
+                      activeImage === img
+                        ? "border-2 border-[#E77817]"
+                        : "border-none"
+                    }`}
+                    onClick={() => setActiveImage(img)}
+                    onError={(e) =>
+                      (e.target.src = "/images/placeholder-frame.jpg")
+                    }
+                  />
+                )
+              )}
+            </div>
             <div className="mt-4">
               <button className="w-full font-['Poppins'] font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-4 py-2 rounded-md">
                 Select Lens
@@ -124,9 +178,9 @@ const colorHex = colorMap[frameColorName];
 
           <div className="flex flex-col mt-[15px] gap-2 mb-4">
             <span className="font-['Plus_Jakarta_Sans'] flex items-center font-bold text-[38px] leading-[38px] text-[#18181B]">
-              {glass.sellPrice} ₹
+              ₹{glass.sellPrice}
               <span className="text-[#5A5A5A] md:hidden block text-[20px] ml-3">
-                [ MRP-870 ]
+                [ MRP-{glass.MRP} ]
               </span>
             </span>
             <div className="flex items-center gap-x-5">
@@ -137,29 +191,24 @@ const colorHex = colorMap[frameColorName];
             </div>
           </div>
 
-          <div>
-            <h3 className="font-jakarta font-bold text-[16px] leading-[24px] mb-2 text-[#18181B]">
-              {/* {glass.frameColor.name} */}
-            </h3>
-          </div>
-
           <h2 className="font-['Poppins'] font-bold text-[16px] leading-[24px] mb-2 text-[#18181B]">
             Features:
           </h2>
           <ul className="list-disc pl-5 mb-4">
             <li className="font-['Poppins'] font-medium text-[16px] leading-[29px] text-[#52525B]">
-              Lightweight acetate
+              {glass.frameMaterial?.name || "Lightweight material"}
             </li>
             <li className="font-['Poppins'] font-medium text-[16px] leading-[29px] text-[#52525B]">
               Anti-glare, scratch-resistant
             </li>
             <li className="font-['Poppins'] font-medium text-[16px] leading-[29px] text-[#52525B]">
-              Unisex, modern minimalist
+              {glass.gender === "kids" ? "Kids-friendly" : "Unisex"},{" "}
+              {glass.frameShape?.name || "modern"} design
             </li>
           </ul>
 
           <h3 className="font-jakarta font-bold text-[16px] leading-[24px] mb-2 text-[#18181B]">
-            {frameColorName}
+            Color: {frameColorName}
           </h3>
 
           {colorHex && (
@@ -170,7 +219,6 @@ const colorHex = colorMap[frameColorName];
               ></div>
             </div>
           )}
-
 
           <div className="flex items-center w-full justify-start gap-x-2">
             <button className="flex justify-center items-center w-full md:w-[336px] text-center bg-[#007569] text-white font-poppins font-normal text-[16px] leading-[24px] capitalize px-4 py-[15px] rounded-md">

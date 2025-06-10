@@ -2,10 +2,33 @@ import React, { useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 
-const TopBarGlasses = ({ frameTypes, materials, brands, loading, error }) => {
+const TopBarGlasses = ({
+  frameTypes,
+  materials,
+  brands,
+  loading,
+  error,
+  onFilterChange,
+}) => {
   const [isFrameTypeOpen, setIsFrameTypeOpen] = useState(false);
   const [isMaterialOpen, setIsMaterialOpen] = useState(false);
   const [isBrandOpen, setIsBrandOpen] = useState(false);
+
+  // Handle dropdown item clicks
+  const handleFrameTypeSelect = (id, name) => {
+    setIsFrameTypeOpen(false);
+    onFilterChange({ frameType: id });
+  };
+
+  const handleMaterialSelect = (id, name) => {
+    setIsMaterialOpen(false);
+    onFilterChange({ frameMaterial: id });
+  };
+
+  const handleBrandSelect = (id, name) => {
+    setIsBrandOpen(false);
+    onFilterChange({ brand: id });
+  };
 
   return (
     <div className="flex md:flex-nowrap md:gap-y-0 gap-y-3 flex-wrap items-center justify-between w-full p-2 border-b border-gray-200 bg-white">
@@ -41,20 +64,24 @@ const TopBarGlasses = ({ frameTypes, materials, brands, loading, error }) => {
           {isFrameTypeOpen && (
             <div className="absolute z-10 mt-0 w-40 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[300px] overflow-y-auto">
               {loading ? (
-                <div className="px-4 py-2 text-sm text-gray-700">Loading...</div>
+                <div className="px-4 py-2 text-sm text-gray-700">
+                  Loading...
+                </div>
               ) : error ? (
                 <div className="px-4 py-2 text-sm text-red-500">{error}</div>
               ) : frameTypes.length === 0 ? (
-                <div className="px-4 py-2 text-sm text-gray-700">No frame types available</div>
+                <div className="px-4 py-2 text-sm text-gray-700">
+                  No frame types available
+                </div>
               ) : (
                 frameTypes.map((type) => (
-                  <a
+                  <button
                     key={type._id}
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => handleFrameTypeSelect(type._id, type.name)}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     {type.name}
-                  </a>
+                  </button>
                 ))
               )}
             </div>
@@ -78,20 +105,26 @@ const TopBarGlasses = ({ frameTypes, materials, brands, loading, error }) => {
           {isMaterialOpen && (
             <div className="absolute z-10 mt-0 w-40 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[300px] overflow-y-auto">
               {loading ? (
-                <div className="px-4 py-2 text-sm text-gray-700">Loading...</div>
+                <div className="px-4 py-2 text-sm text-gray-700">
+                  Loading...
+                </div>
               ) : error ? (
                 <div className="px-4 py-2 text-sm text-red-500">{error}</div>
               ) : materials.length === 0 ? (
-                <div className="px-4 py-2 text-sm text-gray-700">No materials available</div>
+                <div className="px-4 py-2 text-sm text-gray-700">
+                  No materials available
+                </div>
               ) : (
                 materials.map((material) => (
-                  <a
+                  <button
                     key={material._id}
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() =>
+                      handleMaterialSelect(material._id, material.name)
+                    }
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     {material.name}
-                  </a>
+                  </button>
                 ))
               )}
             </div>
@@ -115,20 +148,24 @@ const TopBarGlasses = ({ frameTypes, materials, brands, loading, error }) => {
           {isBrandOpen && (
             <div className="absolute z-10 mt-0 w-40 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[300px] overflow-y-auto">
               {loading ? (
-                <div className="px-4 py-2 text-sm text-gray-700">Loading...</div>
+                <div className="px-4 py-2 text-sm text-gray-700">
+                  Loading...
+                </div>
               ) : error ? (
                 <div className="px-4 py-2 text-sm text-red-500">{error}</div>
               ) : brands.length === 0 ? (
-                <div className="px-4 py-2 text-sm text-gray-700">No brands available</div>
+                <div className="px-4 py-2 text-sm text-gray-700">
+                  No brands available
+                </div>
               ) : (
                 brands.map((brand) => (
-                  <a
+                  <button
                     key={brand._id}
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => handleBrandSelect(brand._id, brand.name)}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     {brand.name}
-                  </a>
+                  </button>
                 ))
               )}
             </div>

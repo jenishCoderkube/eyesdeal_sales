@@ -3,15 +3,9 @@ import React from "react";
 const GlassesCard = ({
   title = "I-GOG Frames",
   price = "800 ₹",
-  imageUrl = "/images/placeholder-frame.jpg",
+  imageUrl = null,
   onClick,
 }) => {
-  const baseUrl =
-    "https://s3.ap-south-1.amazonaws.com/eyesdeal.blinklinksolutions.com/";
-  const fullImageUrl = imageUrl
-    ? `${baseUrl}${imageUrl}`
-    : "/images/placeholder-sunglasses.jpg";
-
   const random = Math.floor(Math.random() * 4) + 1;
   console.log("random", random);
 
@@ -23,9 +17,9 @@ const GlassesCard = ({
       <div className="w-full h-[100px] rounded-[4px] relative bg-white overflow-hidden">
         {imageUrl ? (
           <img
-            // src={fullImageUrl}
-            src={`/glass_${random}.png `}
-            className="w-full h-full object-contain rounded-[4px]"
+            src={imageUrl}
+            // src={`/glass_${random}.png `}
+            className="w-full h-full object-cover rounded-[4px]"
             onError={(e) => {
               e.target.style.display = "none";
               const fallback = e.target.nextSibling;

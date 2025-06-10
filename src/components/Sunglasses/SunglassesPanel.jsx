@@ -1,18 +1,18 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useLocation, useNavigate } from "react-router-dom";
+import { masterDataService } from "../../services/masterDataService";
+import { SunGlassesService } from "../../services/sunglassesService";
 import TopTabBar from "../Sidebar/TopTabBar";
-import TopBarGlasses from "../Frame/TopBarGlasses";
-import Frame from "../Frame/Frame";
-import FrameDetails from "../Frame/FrameDetails";
-import { masterDataService } from "../../services/masterDataService"; // Adjust path as needed
-import { frameService } from "../../services/frameService"; // Adjust path as needed
+import TopBarSunglasses from "./TopBarSunglasses";
+import Sunglasses from "./Sunglasses";
+import SunglassesDetails from "./SunglassesDetails";
 
-const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
+const SunglassesPanel = ({ activeTopTab, setActiveTopTab }) => {
   const [frameTypes, setFrameTypes] = useState([]);
   const [materials, setMaterials] = useState([]);
   const [brands, setBrands] = useState([]);
-  const [frames, setFrames] = useState([]);
+  const [sunglasses, setSunglasses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
@@ -24,7 +24,9 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const isTablet = useMediaQuery({ query: "(max-width: 1024px)" });
-  const isFrameDetails = location.pathname.startsWith("/frame/details");
+  const isSunglassesDetails = location.pathname.startsWith(
+    "/sunglasses/details"
+  );
 
   // Handle filter changes
   const handleFilterChange = (newFilter) => {
@@ -34,11 +36,9 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
     }));
   };
 
-  console.log("filddddddters", frames);
-
-  // Fetch frame data
+  // Fetch data
   useEffect(() => {
-    const fetchFrameData = async () => {
+    const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
@@ -46,16 +46,22 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
           masterDataService.getFrameTypes(),
           masterDataService.getMaterials(),
           masterDataService.getBrands(),
-          frameService.getAllFrames(filters),
+          SunGlassesService.getAllSunGlasses(filters),
         ]);
 
-        const [frameTypeResult, materialResult, brandResult, frameResult] =
+        const [frameTypeResult, materialResult, brandResult, sunglassesResult] =
           results;
 
         // Process frame types
+
+        console.log(
+          "Frame Types Result:",
+          sunglassesResult.value.data.message.data
+        );
+
         if (
           frameTypeResult.status === "fulfilled" &&
-          frameTypeResult.value.success
+          frameTypeResult.value?.success
         ) {
           setFrameTypes(
             Array.isArray(frameTypeResult.value.data?.data)
@@ -63,17 +69,18 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
               : []
           );
         } else {
-          const errorMessage =
-            frameTypeResult.value?.message ||
-            frameTypeResult.reason?.response?.data?.message ||
-            "Error fetching frame types";
-          setError((prevError) => prevError || errorMessage);
+          setError(
+            (prev) =>
+              prev ||
+              frameTypeResult.reason?.response?.data?.message ||
+              "Failed to fetch frame types"
+          );
         }
 
         // Process materials
         if (
           materialResult.status === "fulfilled" &&
-          materialResult.value.success
+          materialResult.value?.success
         ) {
           setMaterials(
             Array.isArray(materialResult.value.data?.data)
@@ -81,51 +88,55 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
               : []
           );
         } else {
-          const errorMessage =
-            materialResult.value?.message ||
-            materialResult.reason?.response?.data?.message ||
-            "Error fetching materials";
-          setError((prevError) => prevError || errorMessage);
+          setError(
+            (prev) =>
+              prev ||
+              materialResult.reason?.response?.data?.message ||
+              "Failed to fetch materials"
+          );
         }
 
         // Process brands
-        if (brandResult.status === "fulfilled" && brandResult.value.success) {
+        if (brandResult.status === "fulfilled" && brandResult.value?.success) {
           setBrands(
             Array.isArray(brandResult.value.data?.data)
               ? brandResult.value.data.data
               : []
           );
         } else {
-          const errorMessage =
-            brandResult.value?.message ||
-            brandResult.reason?.response?.data?.message ||
-            "Error fetching brands";
-          setError((prevError) => prevError || errorMessage);
+          setError(
+            (prev) =>
+              prev ||
+              brandResult.reason?.response?.data?.message ||
+              "Failed to fetch brands"
+          );
         }
 
-        // Process frames
-        if (frameResult.status === "fulfilled" && frameResult.value.success) {
-          setFrames(
-            Array.isArray(frameResult.value.data?.message?.data)
-              ? frameResult.value.data.message.data
-              : frameResult.value.data?.message?.data
-              ? [frameResult.value.data.message.data]
+        // Process sunglasses
+        if (
+          sunglassesResult.status === "fulfilled" &&
+          sunglassesResult.value?.success
+        ) {
+          setSunglasses(
+            Array.isArray(sunglassesResult.value.data.message.data)
+              ? sunglassesResult.value.data.message.data
               : []
           );
         } else {
-          const errorMessage =
-            frameResult.value?.message ||
-            frameResult.reason?.response?.data?.message ||
-            "Error fetching frames";
-          setError((prevError) => prevError || errorMessage);
+          setError(
+            (prev) =>
+              prev ||
+              sunglassesResult.reason?.response?.data?.message ||
+              "Failed to fetch sunglasses"
+          );
         }
-      } catch (error) {
+      } catch (err) {
         const errorMessage =
-          error.response?.data?.message || "Unexpected error fetching data";
+          err.response?.data?.message || "Unexpected error fetching data";
         setError(errorMessage);
         if (
-          errorMessage.includes("Unauthorized") ||
-          error.response?.status === 401
+          err.response?.status === 401 ||
+          errorMessage.includes("Unauthorized")
         ) {
           navigate("/login");
         }
@@ -134,7 +145,7 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
       }
     };
 
-    fetchFrameData();
+    fetchData();
   }, [filters, navigate]);
 
   return (
@@ -147,7 +158,7 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
               setActiveTab={setActiveTopTab}
             />
           </div>
-          <TopBarGlasses
+          <TopBarSunglasses
             frameTypes={frameTypes}
             materials={materials}
             brands={brands}
@@ -155,15 +166,19 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
             error={error}
             onFilterChange={handleFilterChange}
           />
-          {isFrameDetails ? (
-            <FrameDetails />
+          {isSunglassesDetails ? (
+            <SunglassesDetails />
           ) : (
-            <Frame frames={frames} loading={loading} error={error} />
+            <Sunglasses
+              sunglasses={sunglasses}
+              loading={loading}
+              error={error}
+            />
           )}
         </>
       ) : (
         <div className="flex-1 flex flex-col mx-4 mt-1 border border-gray-200 rounded-xl">
-          <TopBarGlasses
+          <TopBarSunglasses
             frameTypes={frameTypes}
             materials={materials}
             brands={brands}
@@ -171,10 +186,14 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
             error={error}
             onFilterChange={handleFilterChange}
           />
-          {isFrameDetails ? (
-            <FrameDetails />
+          {isSunglassesDetails ? (
+            <SunglassesDetails />
           ) : (
-            <Frame frames={frames} loading={loading} error={error} />
+            <Sunglasses
+              sunglasses={sunglasses}
+              loading={loading}
+              error={error}
+            />
           )}
         </div>
       )}
@@ -182,4 +201,4 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
   );
 };
 
-export default FramesPanel;
+export default SunglassesPanel;

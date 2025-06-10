@@ -9,6 +9,7 @@ import {
 import { IoIosArrowDropleft } from "react-icons/io";
 import { FaRegHeart } from "react-icons/fa";
 import { FaShippingFast } from "react-icons/fa";
+import "./frames.css"; // Adjust the path as needed
 
 const SunglassesDetails = () => {
   const { id } = useParams();
@@ -16,17 +17,20 @@ const SunglassesDetails = () => {
   const [sunglass, setSunglass] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeImage, setActiveImage] = useState("/images/placeholder-sunglasses.jpg");
+  const [activeImage, setActiveImage] = useState(
+    "/images/placeholder-sunglasses.jpg"
+  );
 
   useEffect(() => {
     const fetchSunglassById = async () => {
       setLoading(true);
       try {
         const response = await SunGlassesService.getSunGlassById(id);
-        console.log("Sunglass by ID Response:", response);
+        // console.log("Sunglass by ID Response:", response);
 
         if (response.success) {
-          const sunglassData = response.data?.message?.data || response.data?.message;
+          const sunglassData =
+            response.data?.message?.data || response.data?.message;
           if (sunglassData) {
             setSunglass(sunglassData);
             setActiveImage(
@@ -34,21 +38,29 @@ const SunglassesDetails = () => {
                 ? sunglassData.photos[0]
                 : "/images/placeholder-sunglasses.jpg"
             );
+            console.log(sunglassData, "sunglass by id response");
           } else {
             setError("No sunglass data found");
           }
         } else {
           setError(response.message);
           console.error("Error from getSunGlassById:", response.message);
-          if (response.message.includes("access token") || response.message.includes("Unauthorized")) {
+          if (
+            response.message.includes("access token") ||
+            response.message.includes("Unauthorized")
+          ) {
             navigate("/login");
           }
         }
       } catch (error) {
-        const errorMessage = error.response?.data?.message || "Error fetching sunglass details";
+        const errorMessage =
+          error.response?.data?.message || "Error fetching sunglass details";
         setError(errorMessage);
         console.error("Fetch Sunglass by ID Error:", errorMessage);
-        if (errorMessage.includes("Unauthorized") || error.response?.status === 401) {
+        if (
+          errorMessage.includes("Unauthorized") ||
+          error.response?.status === 401
+        ) {
           navigate("/login");
         }
       } finally {
@@ -79,19 +91,21 @@ const SunglassesDetails = () => {
     );
   }
 
-  const images = sunglass.photos && sunglass.photos.length > 0
-    ? sunglass.photos
-    : ["/images/placeholder-sunglasses.jpg"];
+  const images =
+    sunglass.photos && sunglass.photos.length > 0
+      ? sunglass.photos
+      : ["/images/placeholder-sunglasses.jpg"];
 
   const ThumbnailImages = () => (
     <div className="flex flex-row sm:flex-col gap-2">
       {images.map((img, index) => (
         <img
           key={index}
-          // src={img}
+          src={img}
           alt={`Thumbnail ${index + 1}`}
-          className={`w-[129.85px] object-contain h-[94px] rounded-[5px] cursor-pointer ${activeImage === img ? "border-2 border-[#E77817]" : "border-none"
-            }`}
+          className={`w-[129.85px] object-contain h-[94px] rounded-[5px] cursor-pointer ${
+            activeImage === img ? "border-2 border-[#E77817]" : "border-none"
+          }`}
           onClick={() => setActiveImage(img)}
           onError={(e) => (e.target.src = "/images/placeholder-sunglasses.jpg")}
         />
@@ -104,22 +118,40 @@ const SunglassesDetails = () => {
       <button
         className="self-start mb-4 flex items-center font-['Poppins'] font-medium text-[24px] text-[#18181B]"
         onClick={() => navigate("/sales-panel")}
-
       >
         <IoIosArrowDropleft size={24} className="mr-[10px]" /> Back
       </button>
 
       <div className="flex sm:flex-row flex-col md:gap-x-10 gap-x-3">
         <div className="flex gap-x-5">
-          <div className="md:flex hidden sm:flex flex-col gap-2">
-            <ThumbnailImages />
+          <div className="md:flex hidden h-screen flex-col overflow-y-scroll gap-2 scrollbar-hidden">
+            {(sunglass.photos?.length > 0 ? sunglass.photos : frameImages).map(
+              (img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt={`Thumbnail ${index + 1}`}
+                  className={`w-[129.85px] object-contain h-[94px] rounded-[5px] cursor-pointer ${
+                    activeImage === img
+                      ? "border-2 border-[#E77817]"
+                      : "border-none"
+                  }`}
+                  onClick={() => setActiveImage(img)}
+                  onError={(e) =>
+                    (e.target.src = "/images/placeholder-frame.jpg")
+                  }
+                />
+              )
+            )}
           </div>
           <div className="flex-1">
             <img
-              // src={activeImage}
+              src={activeImage}
               alt={sunglass.sku}
               className="md:w-[559px] w-full sm:w-[327px] h-full sm:max-h-[290px] md:h-[494px] object-contain rounded-lg"
-              onError={(e) => (e.target.src = "/images/placeholder-sunglasses.jpg")}
+              onError={(e) =>
+                (e.target.src = "/images/placeholder-sunglasses.jpg")
+              }
             />
             <div className="mt-4">
               <button className="w-full font-['Poppins'] font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-4 py-2 rounded-md">
@@ -185,7 +217,9 @@ const SunglassesDetails = () => {
           <div className="flex gap-3 mb-4">
             <div
               className="w-[30px] h-[30px] rounded-[4px]"
-              style={{ backgroundColor: sunglass.frameColor?.name || "#334155" }}
+              style={{
+                backgroundColor: sunglass.frameColor?.name || "#334155",
+              }}
               title={sunglass.frameColor?.name || "Default Color"}
             ></div>
           </div>

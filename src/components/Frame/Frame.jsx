@@ -1,6 +1,4 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
-import { frameService } from "../../services/frameService"; // Adjust the path as needed
 import GlassesCard from "./GlassesCard"; // Adjust the path as needed
 
 const Frame = ({ frames, loading, error }) => {

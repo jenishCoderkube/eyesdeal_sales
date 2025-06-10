@@ -11,6 +11,7 @@ import TopBarSunglasses from "../../components/Sunglasses/TopBarSunglasses";
 import SunglassesDetails from "../../components/Sunglasses/SunglassesDetails";
 import Sunglasses from "../../components/Sunglasses/Sunglasses";
 import TopBarGlasses from "../../components/Frame/TopBarGlasses";
+import SunglassesPanel from "../../components/Sunglasses/SunglassesPanel"; // New component
 
 const PackagePanel = () => {
   const [activeLeftTab, setActiveLeftTab] = useState("Package");
@@ -108,25 +109,29 @@ const PackagePanel = () => {
         />
       )}
       {activeLeftTab === "Sunglasses" && (
-        <div className="flex-1 flex flex-col">
-          {isTablet ? (
-            <>
-              <div className="rounded-lg mx-4 mt-4">
-                <TopTabBar
-                  activeTab={activeTopTab}
-                  setActiveTab={setActiveTopTab}
-                />
-              </div>
-              <TopBarSunglasses />
-              {isSunglassesDetails ? <SunglassesDetails /> : <Sunglasses />}
-            </>
-          ) : (
-            <div className="flex-1 flex-col mx-4 mt-1 border border-gray-200 rounded-xl">
-              <TopBarSunglasses />
-              {isSunglassesDetails ? <SunglassesDetails /> : <Sunglasses />}
-            </div>
-          )}
-        </div>
+        // <div className="flex-1 flex flex-col">
+        //   {isTablet ? (
+        //     <>
+        //       <div className="rounded-lg mx-4 mt-4">
+        //         <TopTabBar
+        //           activeTab={activeTopTab}
+        //           setActiveTab={setActiveTopTab}
+        //         />
+        //       </div>
+        //       <TopBarSunglasses />
+        //       {isSunglassesDetails ? <SunglassesDetails /> : <Sunglasses />}
+        //     </>
+        //   ) : (
+        //     <div className="flex-1 flex flex-col">
+        //       <TopBarSunglasses />
+        //       {isSunglassesDetails ? <SunglassesDetails /> : <Sunglasses />}
+        //     </div>
+        //   )}
+        // </div>
+        <SunglassesPanel
+          activeTopTab={activeTopTab}
+          setActiveTopTab={setActiveTopTab}
+        />
       )}
     </div>
   );

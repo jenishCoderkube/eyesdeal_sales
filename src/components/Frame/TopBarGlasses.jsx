@@ -44,7 +44,6 @@ const TopBarGlasses = ({
           className="w-full pl-10 pr-4 py-2 rounded-lg md:border-none border border-gray-300 focus:outline-none md:ring-0 focus:ring-2 focus:ring-blue-500 font-poppins font-normal text-[18px] leading-[24px] text-[#667085]"
         />
       </div>
-
       {/* Dropdowns */}
       <div className="flex sm:flex-nowrap flex-wrap gap-y-3 items-center md:justify-end sm:justify-between sm:gap-x-0 gap-x-2 w-full md:space-x-4">
         {/* Frame Type Dropdown */}

@@ -1,3 +1,4 @@
+// LenseCard.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -9,8 +10,6 @@ const LenseCard = ({ lens, imageUrl }) => {
     ? `${baseUrl}${imageUrl}`
     : "/images/placeholder-sunglasses.jpg";
 
-  const random = Math.floor(Math.random() * 5) + 1;
-  console.log("random", random);
   return (
     <div
       className="bg-white rounded-xl shadow p-3 flex flex-col justify-between relative"
@@ -20,7 +19,7 @@ const LenseCard = ({ lens, imageUrl }) => {
         className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-semibold px-3 py-1 rounded"
         style={{ zIndex: 1 }}
         onClick={() => {
-          navigate(`/lens/details/${lens._id}`, { state: { lens } });
+          navigate(`/lens/details/${lens._id}`);
         }}
       >
         View
@@ -28,7 +27,6 @@ const LenseCard = ({ lens, imageUrl }) => {
       <div className="flex-1 flex justify-center items-center">
         {imageUrl ? (
           <img
-            // src={fullImageUrl}
             src={fullImageUrl}
             className="max-w-[190px] max-h-[100px] object-contain rounded-[4px]"
             onError={(e) => {

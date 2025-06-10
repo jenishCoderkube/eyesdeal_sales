@@ -1,4 +1,3 @@
-import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick-theme.css";
@@ -9,7 +8,7 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 // Custom arrow components
 const CustomPrevArrow = ({ className, onClick }) => (
   <button
-    className={`${className} mt-5 ms-5`}
+    className={`${className} mt-5 ms-5}`}
     onClick={onClick}
     aria-label="Previous Slide"
   >
@@ -19,7 +18,7 @@ const CustomPrevArrow = ({ className, onClick }) => (
 
 const CustomNextArrow = ({ className, onClick }) => (
   <button
-    className={`${className} me-3`}
+    className={`${className} me-3}`}
     onClick={onClick}
     aria-label="Next Slide"
   >
@@ -27,7 +26,7 @@ const CustomNextArrow = ({ className, onClick }) => (
   </button>
 );
 
-const LenseSlider = ({ onClose }) => {
+const LenseSlider = ({ lens, onClose }) => {
   const navigate = useNavigate();
 
   // Slider settings
@@ -58,59 +57,43 @@ const LenseSlider = ({ onClose }) => {
     ],
   };
 
-  // Array of images and corresponding titles
-  const slides = [
-    { image: "https://picsum.photos/800/400?random=1", title: "Nature Scene" },
-    { image: "https://picsum.photos/800/400?random=2", title: "Cityscape" },
-    { image: "https://picsum.photos/800/400?random=3", title: "Abstract Art" },
-    { image: "https://picsum.photos/800/400?random=4", title: "Mountain View" },
-    { image: "https://picsum.photos/800/400?random=5", title: "Ocean Breeze" },
-    { image: "https://picsum.photos/800/400?random=6", title: "Urban Life" },
-  ];
+  // Use photos from lens object or fallback to empty array
+  const slides =
+    lens?.photos?.map((photo, index) => ({
+      image: photo,
+      title: lens.sku,
+    })) || [];
+  console.log(slides, "slides");
 
   return (
-    <div className=" mx-auto w-full md:max-w-[700px] lg:max-w-[1190px] py-8">
-      <button className="text-gray-600  flex items-center" onClick={onClose}>
-        <svg
-          className="w-4 h-4 mr-2"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-        Back
-      </button>
+    <div className="mx-auto w-full md:max-w-[700px] lg:max-w-[1190px] py-8">
       <div className="relative">
-        <Slider {...settings}>
-          {slides.map((slide, index) => (
-            <div key={index} className="px-2 outline-none">
-              <div className="slick-center-title   font-poppins lg:text-[32px] md:text-[20px] text-[18px]   text-[#242424] text-center text-lg font-medium pb-5 opacity-0 transition-opacity duration-300">
-                {slide.title}
+        {slides.length > 0 ? (
+          <Slider {...settings}>
+            {slides.map((slide, index) => (
+              <div key={index} className="px-2 outline-none">
+                <div className="slick-center-title font-poppins lg:text-[32px] md:text-[20px] text-[18px] text-[#242424] text-center text-lg font-medium pb-5 opacity-0 transition-opacity duration-300">
+                  {slide.title}
+                </div>
+                <div
+                  className="transition-all duration-300 relative"
+                  style={{
+                    transform: "scale(0.8)",
+                    opacity: 0.6,
+                  }}
+                >
+                  <img
+                    src={slide.image}
+                    alt={`Slide ${index + 1}`}
+                    className="w-full h-48 md:h-64 lg:h-80 object-cover rounded-lg"
+                  />
+                </div>
               </div>
-              <div
-                className="transition-all duration-300 relative"
-                style={{
-                  transform: "scale(0.8)",
-                  opacity: 0.6,
-                }}
-              >
-                <img
-                  src={slide.image}
-                  alt={`Slide ${index + 1}`}
-                  className="w-full h-48 md:h-64 lg:h-80 object-cover rounded-lg"
-                />
-                {/* Title displayed at the top of the active image */}
-              </div>
-            </div>
-          ))}
-        </Slider>
+            ))}
+          </Slider>
+        ) : (
+          <div className="text-center text-gray-500">No images available</div>
+        )}
         {/* Override slick-center styles with Tailwind */}
         <style jsx>{`
           .slick-center div {

@@ -8,8 +8,7 @@ const SUNGLASSES_ENDPOINTS = {
 
 // Sunglasses service functions
 export const SunGlassesService = {
-  // getAllSunGlasses: async (frameType, brand, frameMaterial) => {
-  getAllSunGlasses: async () => {
+  getAllSunGlasses: async (filters = {}) => {
     try {
       const accessToken = localStorage.getItem("accessToken");
       if (!accessToken) {
@@ -19,16 +18,15 @@ export const SunGlassesService = {
         };
       }
 
-      // const params = new URLSearchParams({
-      //   frameType: frameType || "",
-      //   brand: brand || "",
-      //   frameMaterial: frameMaterial || "",
-      // }).toString();
+      // Construct query parameters
+      const params = new URLSearchParams();
+      if (filters.frameType) params.append("frameType", filters.frameType);
+      if (filters.brand) params.append("brand", filters.brand);
+      if (filters.frameMaterial)
+        params.append("frameMaterial", filters.frameMaterial);
 
       const response = await api.get(
-        // `${SUNGLASSES_ENDPOINTS.GET_ALL_SUNGLASSES()}?${params}`,
-        `${SUNGLASSES_ENDPOINTS.GET_ALL_SUNGLASSES()}`,
-
+        `${SUNGLASSES_ENDPOINTS.GET_ALL_SUNGLASSES()}?${params.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,

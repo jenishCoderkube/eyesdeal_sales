@@ -1,9 +1,11 @@
+// Lense.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { lensService } from "../../services/lensService"; // Adjust path as needed
-import { masterDataService } from "../../services/masterDataService"; // Adjust path as needed
-import LenseDetails from "./LenseDetails"; // Adjust path as needed
-import Brand from "../Brand/Brand"; // Adjust path as needed
+import { lensService } from "../../services/lensService";
+import { masterDataService } from "../../services/masterDataService";
+import LenseDetails from "./LenseDetails";
+import Brand from "../Brand/Brand";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const Lense = () => {
   const [selectedBrand, setSelectedBrand] = useState("All");
@@ -17,7 +19,6 @@ const Lense = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch brands, prescription types, and lenses
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -54,7 +55,6 @@ const Lense = () => {
     fetchData();
   }, []);
 
-  // Fetch lenses when brand or prescription type changes
   useEffect(() => {
     const fetchLenses = async () => {
       try {
@@ -82,7 +82,16 @@ const Lense = () => {
     fetchLenses();
   }, [selectedBrand, activeTab, brands]);
 
-  // Filter lenses client-side for search
+  const scrollTabs = (direction) => {
+    const container = document.getElementById("tabsContainer");
+    if (!container) return;
+    const scrollAmount = 100;
+    container.scrollBy({
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
+    });
+  };
+
   const filteredLenses = lenses.filter((lens) =>
     lens.displayName.toLowerCase().includes(search.toLowerCase())
   );
@@ -97,76 +106,57 @@ const Lense = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-full w-full">
-      {/* Main Content */}
       <div className="flex-1 p-4 sm:p-6">
-        {/* Heading */}
         <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">
           Select Lenses
         </h2>
-        {/* Row: Brand column + search/tabs */}
         <div className="flex flex-col md:flex-row items-start gap-4 sm:gap-6">
-          {/* Select Brand Column */}
           <Brand
             selectedBrand={selectedBrand}
             setSelectedBrand={(brand) => {
               setSelectedBrand(brand);
-              setViewCard(null); // Reset viewCard when changing brand
+              setViewCard(null);
             }}
             brands={brands}
           />
-
-          {/* Search and Tabs */}
           <div className="flex flex-col flex-1 w-full">
             <div className="flex flex-col sm:flex-row items-center mb-4 w-full">
               <div className="flex flex-col sm:flex-row w-full items-center bg-white border rounded-lg px-3 py-2">
+                {/* Search Input - Full Width on Mobile, 50% on Desktop */}
                 <input
                   type="text"
                   placeholder="Search barcode..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="flex-1 outline-none bg-transparent text-gray-700 placeholder-gray-400 w-full sm:w-auto"
+                  className="flex-1 outline-none bg-transparent text-gray-700 placeholder-gray-400 w-full sm:w-1/2"
                 />
-                <div className="flex flex-wrap justify-center sm:justify-end mt-2 sm:mt-0 sm:ml-4 w-full sm:w-auto">
+
+                {/* Tabs with Horizontal Scroll */}
+                <div className="relative mt-2 sm:mt-0 sm:ml-4 w-full sm:w-[70%]">
+                  {/* Scroll Buttons */}
                   <button
-                    className={`relative px-3 sm:px-6 py-1 flex items-center text-xs sm:text-sm font-medium focus:outline-none transition-colors duration-150 ${
-                      activeTab === "All" ? "text-black" : "text-gray-500"
-                    }`}
-                    style={{ background: "none" }}
-                    onClick={() => {
-                      setActiveTab("All");
-                      setViewCard(null); // Reset viewCard when changing tab
-                    }}
+                    onClick={() => scrollTabs("left")}
+                    className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white px-2"
                   >
-                    All
-                    {activeTab === "All" && (
-                      <span
-                        className="absolute left-0 right-0"
-                        style={{
-                          top: "28px",
-                          height: "2px",
-                          background: "#fb923c",
-                          borderRadius: "2px",
-                          width: "100%",
-                          display: "block",
-                          pointerEvents: "none",
-                        }}
-                      />
-                    )}
+                    <ChevronLeft className="w-5 h-5 text-gray-600" />
                   </button>
-                  {prescriptionTypes.map((tab) => (
+                  <div
+                    id="tabsContainer"
+                    className="flex flex-nowrap overflow-x-auto scrollbar-hide px-6"
+                  >
+                    {/* All Tab */}
                     <button
-                      key={tab._id}
-                      className={`relative px-3 sm:px-6 py-1 flex items-center text-xs sm:text-sm font-medium focus:outline-none transition-colors duration-150 ${
-                        activeTab === tab._id ? "text-black" : "text-gray-500"
+                      className={`relative px-3 py-1 flex items-center text-xs sm:text-sm font-medium whitespace-nowrap ${
+                        activeTab === "All" ? "text-black" : "text-gray-500"
                       }`}
                       style={{ background: "none" }}
                       onClick={() => {
-                        setActiveTab(tab._id);
-                        setViewCard(null); // Reset viewCard when changing tab
+                        setActiveTab("All");
+                        setViewCard(null);
                       }}
                     >
-                      {tab.name}
-                      {activeTab === tab._id && (
+                      All
+                      {activeTab === "All" && (
                         <span
                           className="absolute left-0 right-0"
                           style={{
@@ -176,16 +166,52 @@ const Lense = () => {
                             borderRadius: "2px",
                             width: "100%",
                             display: "block",
-                            pointerEvents: "none",
                           }}
                         />
                       )}
                     </button>
-                  ))}
+
+                    {/* Dynamic Tabs */}
+                    {prescriptionTypes.map((tab) => (
+                      <button
+                        key={tab._id}
+                        className={`relative px-3 py-1 flex items-center text-xs sm:text-sm font-medium whitespace-nowrap ${
+                          activeTab === tab._id ? "text-black" : "text-gray-500"
+                        }`}
+                        style={{ background: "none" }}
+                        onClick={() => {
+                          setActiveTab(tab._id);
+                          setViewCard(null);
+                        }}
+                      >
+                        {tab.name}
+                        {activeTab === tab._id && (
+                          <span
+                            className="absolute left-0 right-0"
+                            style={{
+                              top: "28px",
+                              height: "2px",
+                              background: "#fb923c",
+                              borderRadius: "2px",
+                              width: "100%",
+                              display: "block",
+                            }}
+                          />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Scroll Button Right */}
+                  <button
+                    onClick={() => scrollTabs("right")}
+                    className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white px-2"
+                  >
+                    <ChevronRight className="w-5 h-5 text-gray-600" />
+                  </button>
                 </div>
               </div>
             </div>
-            {/* Lenses Grid or Details */}
+
             {viewCard ? (
               <LenseDetails lens={viewCard} onClose={() => setViewCard(null)} />
             ) : loading ? (
@@ -209,9 +235,8 @@ const Lense = () => {
                       className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-semibold px-3 py-1 rounded"
                       style={{ zIndex: 1 }}
                       onClick={() => {
-                        setViewCard(lens);
-                        // Optional: Navigate to details page
-                        // navigate(`/lens/details/${lens._id}`, { state: { lens } });
+                        // Navigate to details page with lens ID
+                        navigate(`/lens/details/${lens._id}`);
                       }}
                     >
                       View
@@ -227,10 +252,10 @@ const Lense = () => {
                     </div>
                     <div className="flex items-center justify-between w-full mt-2">
                       <div className="text-sm sm:text-md font-medium text-gray-800">
-                        {lens.displayName}
+                        {lens.oldBarcode}
                       </div>
-                      <span className="bg-gray-100 px-2 py-1 rounded text-sm sm:text-md font-medium">
-                        {lens.price} ₹
+                      <span className="font-poppins text-nowrap font-normal text-[16px] bg-[#EBEBEB] px-[10px] py-[2px] rounded-md leading-[24px] tracking-[0%]">
+                        {lens.sellPrice} ₹
                       </span>
                     </div>
                   </div>

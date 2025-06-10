@@ -1,3 +1,4 @@
+// LensesPanel.jsx
 import { useState, useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -5,8 +6,8 @@ import TopTabBar from "../Sidebar/TopTabBar";
 import TopBarGlasses from "../Frame/TopBarGlasses";
 import Lense from "./Lense";
 import LenseDetails from "./LenseDetails";
-import { masterDataService } from "../../services/masterDataService"; // Adjust path as needed
-import { lensService } from "../../services/lensService"; // Adjust path as needed
+import { masterDataService } from "../../services/masterDataService";
+import { lensService } from "../../services/lensService";
 
 const LensesPanel = ({ activeTopTab, setActiveTopTab }) => {
   const [lensTypes, setLensTypes] = useState([]);
@@ -26,7 +27,6 @@ const LensesPanel = ({ activeTopTab, setActiveTopTab }) => {
   const isTablet = useMediaQuery({ query: "(max-width: 1024px)" });
   const isLenseDetails = location.pathname.startsWith("/lens/details");
 
-  // Handle filter changes
   const handleFilterChange = (newFilter) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
@@ -34,7 +34,6 @@ const LensesPanel = ({ activeTopTab, setActiveTopTab }) => {
     }));
   };
 
-  // Fetch lens data
   useEffect(() => {
     const fetchLensData = async () => {
       setLoading(true);
@@ -50,7 +49,6 @@ const LensesPanel = ({ activeTopTab, setActiveTopTab }) => {
         const [lensTypeResult, materialResult, brandResult, lensResult] =
           results;
 
-        // Process lens types
         if (
           lensTypeResult.status === "fulfilled" &&
           lensTypeResult.value.success
@@ -68,7 +66,6 @@ const LensesPanel = ({ activeTopTab, setActiveTopTab }) => {
           setError((prevError) => prevError || errorMessage);
         }
 
-        // Process materials
         if (
           materialResult.status === "fulfilled" &&
           materialResult.value.success
@@ -86,7 +83,6 @@ const LensesPanel = ({ activeTopTab, setActiveTopTab }) => {
           setError((prevError) => prevError || errorMessage);
         }
 
-        // Process brands
         if (brandResult.status === "fulfilled" && brandResult.value.success) {
           setBrands(
             Array.isArray(brandResult.value.data?.data)
@@ -101,7 +97,6 @@ const LensesPanel = ({ activeTopTab, setActiveTopTab }) => {
           setError((prevError) => prevError || errorMessage);
         }
 
-        // Process lenses
         if (lensResult.status === "fulfilled" && lensResult.value.success) {
           setLenses(
             Array.isArray(lensResult.value.data?.message?.data)
@@ -145,14 +140,14 @@ const LensesPanel = ({ activeTopTab, setActiveTopTab }) => {
               setActiveTab={setActiveTopTab}
             />
           </div>
-          <TopBarGlasses
-            frameTypes={lensTypes} // Use lensTypes instead of frameTypes
+          {/* <TopBarGlasses
+            frameTypes={lensTypes} // Ensure this is correct
             materials={materials}
             brands={brands}
             loading={loading}
             error={error}
             onFilterChange={handleFilterChange}
-          />
+          /> */}
           {isLenseDetails ? (
             <LenseDetails />
           ) : (
@@ -161,14 +156,14 @@ const LensesPanel = ({ activeTopTab, setActiveTopTab }) => {
         </>
       ) : (
         <div className="flex-1 flex flex-col mx-4 mt-1 border border-gray-200 rounded-xl">
-          <TopBarGlasses
-            frameTypes={lensTypes} // Use lensTypes instead of frameTypes
+          {/* <TopBarGlasses
+            frameTypes={lensTypes}
             materials={materials}
             brands={brands}
             loading={loading}
             error={error}
             onFilterChange={handleFilterChange}
-          />
+          /> */}
           {isLenseDetails ? (
             <LenseDetails />
           ) : (

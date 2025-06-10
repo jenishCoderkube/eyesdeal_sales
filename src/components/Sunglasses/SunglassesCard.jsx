@@ -6,11 +6,11 @@ const SunglassesCard = ({
   imageUrl,
   onClick,
 }) => {
-  const baseUrl =
-    "https://s3.ap-south-1.amazonaws.com/eyesdeal.blinklinksolutions.com/";
-  const fullImageUrl = imageUrl
-    ? `${baseUrl}${imageUrl}`
-    : "/images/placeholder-sunglasses.jpg";
+  // const baseUrl =
+  //   "https://s3.ap-south-1.amazonaws.com/eyesdeal.blinklinksolutions.com/";
+  // const fullImageUrl = imageUrl
+  //   ? `${baseUrl}${imageUrl}`
+  //   : "/images/placeholder-sunglasses.jpg";
   console.log("imageUrl", imageUrl);
 
   const random = Math.floor(Math.random() * 3) + 1;
@@ -25,8 +25,8 @@ const SunglassesCard = ({
       <div className="w-full h-[100px] rounded-[4px] relative bg-white overflow-hidden">
         {imageUrl ? (
           <img
-            // src={fullImageUrl}
-            src={`/Sunglasses${random}.png `}
+            src={imageUrl}
+            // src={`/Sunglasses${random}.png `}
             className="w-full h-full object-contain rounded-[4px]"
             onError={(e) => {
               e.target.style.display = "none";

@@ -195,16 +195,20 @@ const FrameDetails = () => {
             Features:
           </h2>
           <ul className="list-disc pl-5 mb-4">
-            <li className="font-['Poppins'] font-medium text-[16px] leading-[29px] text-[#52525B]">
-              {glass.frameMaterial?.name || "Lightweight material"}
-            </li>
-            <li className="font-['Poppins'] font-medium text-[16px] leading-[29px] text-[#52525B]">
-              Anti-glare, scratch-resistant
-            </li>
-            <li className="font-['Poppins'] font-medium text-[16px] leading-[29px] text-[#52525B]">
-              {glass.gender === "kids" ? "Kids-friendly" : "Unisex"},{" "}
-              {glass.frameShape?.name || "modern"} design
-            </li>
+            {glass.features && glass.features.length > 0 ? (
+              glass.features.map((feature, index) => (
+                <li
+                  key={index}
+                  className="font-['Poppins'] font-medium text-[16px] leading-[29px] text-[#52525B]"
+                >
+                  {feature.name}
+                </li>
+              ))
+            ) : (
+              <li className="font-['Poppins'] font-medium text-[16px] leading-[29px] text-[#52525B]">
+                No features available
+              </li>
+            )}
           </ul>
 
           <h3 className="font-jakarta font-bold text-[16px] leading-[24px] mb-2 text-[#18181B]">

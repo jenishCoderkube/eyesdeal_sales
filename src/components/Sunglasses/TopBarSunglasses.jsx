@@ -61,7 +61,7 @@ const TopBarSunglasses = ({
       <div className="relative flex items-center w-full md:w-1/4 lg:w-1/2">
         <FiSearch
           size={24}
-          className="absolute top-[10px] left-3 text-gray-400"
+          className="absolute top-[6px] left-2 text-gray-400"
         />
         <input
           type="text"
@@ -195,16 +195,6 @@ const TopBarSunglasses = ({
             </div>
           )}
         </div>
-
-        {/* Super Package Button */}
-        <button className="font-poppins text-nowrap md:border-none border border-[#E2E2E2] rounded-3xl md:px-0 px-2 font-normal md:text-[18px] text-[15px] leading-[24px] text-[#242424] py-2 hover:text-blue-600">
-          Super Package
-        </button>
-
-        {/* Premium Package Button */}
-        <button className="font-poppins text-nowrap md:border-none border border-[#E2E2E2] rounded-3xl md:px-0 px-2 font-normal md:text-[18px] text-[15px] leading-[24px] text-[#242424] py-2 hover:text-blue-600">
-          Premium fluctuating
-        </button>
       </div>
     </div>
   );

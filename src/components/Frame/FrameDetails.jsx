@@ -10,6 +10,7 @@ import { FaRegHeart } from "react-icons/fa";
 import { FaShippingFast } from "react-icons/fa";
 import { frameService } from "../../services/frameService"; // Adjust path as needed
 import "./Frames.css"; // Import your CSS file for styling
+import Loader from "../Loader/Loader";
 const frameImages = [
   "/glass_1.png",
   "/glass_2.png",
@@ -65,10 +66,8 @@ const FrameDetails = () => {
   // Handle loading state
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <h1 className="font-['Poppins'] font-medium text-[24px] text-black">
-          Loading...
-        </h1>
+      <div className="h-screen flex justify-center items-center">
+        <Loader />
       </div>
     );
   }
@@ -76,13 +75,13 @@ const FrameDetails = () => {
   // Handle error or no frame found
   if (error || !glass) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#18181B]">
-        <h1 className="font-['Poppins'] font-medium text-[24px] text-white">
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h1 className="font-['Poppins'] text-black font-medium text-[24px] ">
           {error || "Frame Not Found"}
         </h1>
         <button
           className="mt-4 font-['Poppins'] font-normal text-[16px] text-white bg-[#242424] px-4 py-2 rounded-md hover:bg-[#3a3a3a]"
-          onClick={() => navigate("/sales-panel/frames")}
+          onClick={() => navigate("/sales-panel/frame")}
         >
           Back to Frames
         </button>
@@ -99,7 +98,7 @@ const FrameDetails = () => {
         className="self-start mb-4 flex items-center font-['Poppins'] font-medium text-[24px] text-[#18181B]"
         onClick={() => navigate("/sales-panel/frame")}
       >
-        <IoIosArrowDropleft size={24} className="mr-[10px]" /> Back
+        <IoIosArrowDropleft size={24} className="mr-[4px] mt-[-3px]" /> Back
       </button>
 
       <div className="flex sm:flex-row flex-col md:gap-x-10 gap-x-3">
@@ -212,7 +211,7 @@ const FrameDetails = () => {
           </ul>
 
           <h3 className="font-jakarta font-bold text-[16px] leading-[24px] mb-2 text-[#18181B]">
-            Color: {frameColorName}
+            Store Color Available
           </h3>
 
           {colorHex && (

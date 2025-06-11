@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import GlassesCard from "./GlassesCard"; // Adjust the path as needed
+import Loader from "../Loader/Loader";
 
 const Frame = ({ frames, loading, error }) => {
   const navigate = useNavigate();
@@ -11,11 +12,11 @@ const Frame = ({ frames, loading, error }) => {
   };
 
   if (loading) {
-    return <div className="px-5 py-5">Loading...</div>;
-  }
-
-  if (error) {
-    return <div className="px-5 py-5">Error: {error}</div>;
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <Loader />
+      </div>
+    );
   }
 
   if (!frames || frames.length === 0) {

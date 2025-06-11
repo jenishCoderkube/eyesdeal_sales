@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import SunglassesCard from "./SunglassesCard";
+import Loader from "../Loader/Loader";
 
 const Sunglasses = ({ sunglasses, loading, error }) => {
   const navigate = useNavigate();
@@ -12,23 +13,25 @@ const Sunglasses = ({ sunglasses, loading, error }) => {
   };
 
   if (loading) {
-    return <div className="px-5 py-5 text-gray-700">Loading sunglasses...</div>;
-  }
-
-  if (error) {
-    return <div className="px-5 py-5 text-red-500">Error: {error}</div>;
-  }
-
-  if (!sunglasses || sunglasses.length === 0) {
     return (
-      <div className="px-5 py-5 text-gray-700">
-        No sunglasses found for the selected filters.
+      <div className="h-screen flex justify-center items-center">
+        <Loader />
+      </div>
+    );
+  }
+
+  if (!sunglasses || sunglasses.length <= 0) {
+    return (
+      <div className="h-[80vh] flex justify-center items-center">
+        <h6 className=" font-poppins text-lg text-black">
+          No sunglasses found
+        </h6>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col mx-4 mt-1 border border-gray-200 rounded-xl">
+    <div className="flex-1 flex flex-col mx-4 mt-1  rounded-xl">
       <div>
         <h1 className="font-poppins font-medium text-[24px] leading-[24px] tracking-[0] text-black w-fit pt-5">
           Select Sunglasses

@@ -10,6 +10,7 @@ import { IoIosArrowDropleft } from "react-icons/io";
 import { FaRegHeart } from "react-icons/fa";
 import { FaShippingFast } from "react-icons/fa";
 import "./frames.css"; // Adjust the path as needed
+import Loader from "../Loader/Loader";
 
 const SunglassesDetails = () => {
   const { id } = useParams();
@@ -72,7 +73,11 @@ const SunglassesDetails = () => {
   }, [id, navigate]);
 
   if (loading) {
-    return <div className="px-5 py-5">Loading...</div>;
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <Loader />;
+      </div>
+    );
   }
 
   if (error || !sunglass) {
@@ -83,7 +88,7 @@ const SunglassesDetails = () => {
         </h1>
         <button
           className="mt-4 font-['Poppins'] font-normal text-[16px] text-white bg-[#242424] px-4 py-2 rounded-md hover:bg-[#3a3a3a]"
-          onClick={() => navigate("/sales-panel")}
+          onClick={() => navigate("/sales-panel/sunglasses")}
         >
           Back to Sunglasses
         </button>
@@ -117,9 +122,9 @@ const SunglassesDetails = () => {
     <div className="flex flex-col min-h-screen px-5 py-5 bg-[#F9FAFB]">
       <button
         className="self-start mb-4 flex items-center font-['Poppins'] font-medium text-[24px] text-[#18181B]"
-        onClick={() => navigate("/sales-panel")}
+        onClick={() => navigate("/sales-panel/sunglasses")}
       >
-        <IoIosArrowDropleft size={24} className="mr-[10px]" /> Back
+        <IoIosArrowDropleft size={24} className="mr-[4px] mt-[-3px]" /> Back
       </button>
 
       <div className="flex sm:flex-row flex-col md:gap-x-10 gap-x-3">

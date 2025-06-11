@@ -6,6 +6,8 @@ import { masterDataService } from "../../services/masterDataService";
 import LenseDetails from "./LenseDetails";
 import Brand from "../Brand/Brand";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Loader from "../Loader/Loader";
+import { FiSearch } from "react-icons/fi";
 
 const Lense = () => {
   const [selectedBrand, setSelectedBrand] = useState("All");
@@ -96,40 +98,35 @@ const Lense = () => {
     lens.displayName.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (error) {
-    return (
-      <div className="flex justify-center items-center h-full text-red-500">
-        {error}
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col md:flex-row h-full w-full">
       <div className="flex-1 p-4 sm:p-6">
-        <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">
+        <h2 className="text-lg sm:text-xl font-semibold mb-4 ">
           Select Lenses
         </h2>
-        <div className="flex flex-col md:flex-row items-start gap-4 sm:gap-6">
-          <Brand
+        <div className="w-full flex flex-col md:flex-row items-start gap-4 sm:gap-1">
+          {/* <Brand
             selectedBrand={selectedBrand}
             setSelectedBrand={(brand) => {
               setSelectedBrand(brand);
               setViewCard(null);
             }}
             brands={brands}
-          />
+          /> */}
           <div className="flex flex-col flex-1 w-full">
             <div className="flex flex-col sm:flex-row items-center mb-4 w-full">
-              <div className="flex flex-col sm:flex-row w-full items-center bg-white border rounded-lg px-3 py-2">
-                {/* Search Input - Full Width on Mobile, 50% on Desktop */}
-                <input
-                  type="text"
-                  placeholder="Search barcode..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="flex-1 outline-none bg-transparent text-gray-700 placeholder-gray-400 w-full sm:w-1/2"
-                />
+              <div className="flex flex-col sm:flex-row w-full   items-center bg-white border rounded-lg px-3 py-2">
+                <div className="relative flex items-center w-full md:w-1/4 lg:w-1/2">
+                  <FiSearch
+                    size={24}
+                    className="absolute top-[6px] left-2 text-gray-400"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Search barcode..."
+                    className="w-full pl-10 pr-4 py-2 rounded-lg md:border-none border border-gray-300 focus:outline-none md:ring-0 focus:ring-2 focus:ring-blue-500 font-poppins font-normal text-[18px] leading-[24px] text-[#667085]"
+                  />
+                </div>
 
                 {/* Tabs with Horizontal Scroll */}
                 <div className="relative mt-2 sm:mt-0 sm:ml-4 w-full sm:w-[70%]">
@@ -215,8 +212,15 @@ const Lense = () => {
             {viewCard ? (
               <LenseDetails lens={viewCard} onClose={() => setViewCard(null)} />
             ) : loading ? (
-              <div className="flex justify-center items-center h-full">
-                Loading...
+              <div className="h-[80vh] flex justify-center items-center">
+                <Loader />
+              </div>
+            ) : filteredLenses?.length <= 0 ? (
+              <div className="h-[80vh] flex justify-center items-center">
+                <h6 className=" font-poppins text-lg text-black">
+                  {" "}
+                  No lenses found
+                </h6>
               </div>
             ) : (
               <div

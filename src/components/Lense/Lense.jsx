@@ -93,16 +93,6 @@ const Lense = ({ onSelectLens, selectedBrand }) => {
                   />
                 </div>
 
-                {/* Brand Clear Button */}
-                <button
-                  className=" bg-slate-200 hover:bg-white rounded-full w-60"
-                  onClick={() => {
-                    onSelectLens(null);
-                  }}
-                >
-                  Clear Brand
-                </button>
-
                 {/* Tabs with Horizontal Scroll */}
                 <div className="relative w-full sm:w-[60%] mt-2 sm:mt-0 sm:ml-auto">
                   {/* Scroll Buttons */}

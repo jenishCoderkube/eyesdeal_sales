@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiCheck } from "react-icons/fi";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 
 const TopBarSunglasses = ({
   frameTypes,
   materials,
-
   brands,
   loading,
   error,
@@ -14,6 +13,9 @@ const TopBarSunglasses = ({
   const [isFrameTypeOpen, setIsFrameTypeOpen] = useState(false);
   const [isMaterialOpen, setIsMaterialOpen] = useState(false);
   const [isBrandOpen, setIsBrandOpen] = useState(false);
+  const [selectedFrameType, setSelectedFrameType] = useState(null);
+  const [selectedMaterial, setSelectedMaterial] = useState(null);
+  const [selectedBrand, setSelectedBrand] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   // console.log("TopBarSunglasses rendered with frameTypes:", frameTypes);
@@ -22,37 +24,63 @@ const TopBarSunglasses = ({
   const handleSearch = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-    onFilterChange({ search: query }); // Trigger filter change for search
+    onFilterChange({ search: query });
   };
 
-  // Handle dropdown item clicks
-  const handleFrameTypeSelect = (id, name) => {
+  // Handle frame type selection/unselection
+  const handleFrameTypeSelect = (id) => {
+    if (selectedFrameType === id) {
+      // Unselect if the same item is clicked
+      setSelectedFrameType(null);
+      onFilterChange({ frameType: null });
+    } else {
+      setSelectedFrameType(id);
+      onFilterChange({ frameType: id });
+    }
     setIsFrameTypeOpen(false);
-    onFilterChange({ frameType: id });
   };
 
-  const handleMaterialSelect = (id, name) => {
+  // Handle material selection/unselection
+  const handleMaterialSelect = (id) => {
+    if (selectedMaterial === id) {
+      setSelectedMaterial(null);
+      onFilterChange({ frameMaterial: null });
+    } else {
+      setSelectedMaterial(id);
+      onFilterChange({ frameMaterial: id });
+    }
     setIsMaterialOpen(false);
-    onFilterChange({ frameMaterial: id });
   };
 
-  const handleBrandSelect = (id, name) => {
+  // Handle brand selection/unselection
+  const handleBrandSelect = (id) => {
+    if (selectedBrand === id) {
+      setSelectedBrand(null);
+      onFilterChange({ brand: null });
+    } else {
+      setSelectedBrand(id);
+      onFilterChange({ brand: id });
+    }
     setIsBrandOpen(false);
-    onFilterChange({ brand: id });
   };
 
-  // Reset filters
-  const handleResetFilters = () => {
-    setSearchQuery("");
+  // Handle clear selections
+  const handleClearFrameType = () => {
+    setSelectedFrameType(null);
+    onFilterChange({ frameType: null });
     setIsFrameTypeOpen(false);
+  };
+
+  const handleClearMaterial = () => {
+    setSelectedMaterial(null);
+    onFilterChange({ frameMaterial: null });
     setIsMaterialOpen(false);
+  };
+
+  const handleClearBrand = () => {
+    setSelectedBrand(null);
+    onFilterChange({ brand: null });
     setIsBrandOpen(false);
-    onFilterChange({
-      frameType: "",
-      frameMaterial: "",
-      brand: "",
-      search: "",
-    });
   };
 
   return (
@@ -66,6 +94,8 @@ const TopBarSunglasses = ({
         <input
           type="text"
           placeholder="Search barcode..."
+          value={searchQuery}
+          onChange={handleSearch}
           className="w-full pl-10 pr-4 py-2 rounded-lg md:border-none border border-gray-300 focus:outline-none md:ring-0 focus:ring-2 focus:ring-blue-500 font-poppins font-normal text-[18px] leading-[24px] text-[#667085]"
         />
       </div>
@@ -78,7 +108,10 @@ const TopBarSunglasses = ({
           onMouseLeave={() => setIsFrameTypeOpen(false)}
         >
           <button className="flex text-nowrap md:border-none border border-[#E2E2E2] rounded-3xl md:px-0 px-2 items-center font-poppins font-normal md:text-[18px] text-[15px] leading-[24px] text-[#242424] py-2">
-            Frame Type
+            {selectedFrameType
+              ? frameTypes.find((type) => type._id === selectedFrameType)
+                  ?.name || "Frame Type"
+              : "Frame Type"}
             {isFrameTypeOpen ? (
               <IoMdArrowDropup className="ml-[3px] w-5 h-5" />
             ) : (
@@ -98,15 +131,29 @@ const TopBarSunglasses = ({
                   No frame types available
                 </div>
               ) : (
-                frameTypes.map((type) => (
-                  <button
-                    key={type._id}
-                    onClick={() => handleFrameTypeSelect(type._id, type.name)}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    {type.name}
-                  </button>
-                ))
+                <>
+                  {selectedFrameType && (
+                    <button
+                      onClick={handleClearFrameType}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    >
+                      Clear
+                    </button>
+                  )}
+
+                  {frameTypes.map((type) => (
+                    <button
+                      key={type._id}
+                      onClick={() => handleFrameTypeSelect(type._id)}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                    >
+                      {selectedFrameType === type._id && (
+                        <FiCheck className="mr-2 text-blue-500" />
+                      )}
+                      {type.name}
+                    </button>
+                  ))}
+                </>
               )}
             </div>
           )}
@@ -119,7 +166,10 @@ const TopBarSunglasses = ({
           onMouseLeave={() => setIsMaterialOpen(false)}
         >
           <button className="flex md:border-none border border-[#E2E2E2] rounded-3xl md:px-0 px-2 items-center font-poppins font-normal md:text-[18px] text-[15px] leading-[24px] text-[#242424] py-2">
-            Material
+            {selectedMaterial
+              ? materials.find((mat) => mat._id === selectedMaterial)?.name ||
+                "Material"
+              : "Material"}
             {isMaterialOpen ? (
               <IoMdArrowDropup className="ml-[3px] w-5 h-5" />
             ) : (
@@ -139,17 +189,29 @@ const TopBarSunglasses = ({
                   No materials available
                 </div>
               ) : (
-                materials.map((material) => (
-                  <button
-                    key={material._id}
-                    onClick={() =>
-                      handleMaterialSelect(material._id, material.name)
-                    }
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    {material.name}
-                  </button>
-                ))
+                <>
+                  {selectedMaterial && (
+                    <button
+                      onClick={handleClearMaterial}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    >
+                      Clear
+                    </button>
+                  )}
+
+                  {materials.map((material) => (
+                    <button
+                      key={material._id}
+                      onClick={() => handleMaterialSelect(material._id)}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                    >
+                      {selectedMaterial === material._id && (
+                        <FiCheck className="mr-2 text-blue-500" />
+                      )}
+                      {material.name}
+                    </button>
+                  ))}
+                </>
               )}
             </div>
           )}
@@ -162,7 +224,10 @@ const TopBarSunglasses = ({
           onMouseLeave={() => setIsBrandOpen(false)}
         >
           <button className="flex md:border-none border border-[#E2E2E2] rounded-3xl md:px-0 px-2 items-center font-poppins font-normal md:text-[18px] text-[15px] leading-[24px] text-[#242424] py-2">
-            Brand
+            {selectedBrand
+              ? brands.find((brand) => brand._id === selectedBrand)?.name ||
+                "Brand"
+              : "Brand"}
             {isBrandOpen ? (
               <IoMdArrowDropup className="ml-[3px] w-5 h-5" />
             ) : (
@@ -182,15 +247,29 @@ const TopBarSunglasses = ({
                   No brands available
                 </div>
               ) : (
-                brands.map((brand) => (
-                  <button
-                    key={brand._id}
-                    onClick={() => handleBrandSelect(brand._id, brand.name)}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    {brand.name}
-                  </button>
-                ))
+                <>
+                  {selectedBrand && (
+                    <button
+                      onClick={handleClearBrand}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    >
+                      Clear
+                    </button>
+                  )}
+
+                  {brands.map((brand) => (
+                    <button
+                      key={brand._id}
+                      onClick={() => handleBrandSelect(brand._id)}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                    >
+                      {selectedBrand === brand._id && (
+                        <FiCheck className="mr-2 text-blue-500" />
+                      )}
+                      {brand.name}
+                    </button>
+                  ))}
+                </>
               )}
             </div>
           )}

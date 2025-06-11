@@ -36,7 +36,7 @@ const Sunglasses = ({ sunglasses, loading, error }) => {
         <h1 className="font-poppins font-medium text-[24px] leading-[24px] tracking-[0] text-black w-fit pt-5">
           Select Sunglasses
         </h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-5">
+        <div className="grid gap-4 mt-5 [grid-template-columns:repeat(auto-fit,minmax(250px,1fr))] overflow-x-auto scrollbar-hide">
           {sunglasses.map((sunglass) => (
             <SunglassesCard
               key={sunglass._id}

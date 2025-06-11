@@ -1,25 +1,25 @@
 import React from "react";
 
-const Brand = ({ selectedBrand, setSelectedBrand, brands = [] }) => {
+const Brand = ({ selectedBrand, onSelectBrand, brands = [] }) => {
   return (
-    <div className="flex flex-col items-start w-full md:w-auto">
+    <div className="flex flex-col items-start w-full md:w-auto mt-[64px] ml-8">
       <span className="inline-flex w-full max-w-[150px] text-nowrap truncate items-center justify-center bg-gray-300 text-gray-600 font-semibold rounded px-4 sm:px-7 mb-2 h-10 sm:h-[42px] select-none opacity-60">
-        {selectedBrand === "All" ? "Select Brand" : selectedBrand}
+        {selectedBrand ? selectedBrand.name : "Select Brand"}
       </span>
 
       <div className="w-[188px] max-h-[695px] overflow-y-auto scrollbar-hide mt-3">
-        <div className="grid grid-cols-2 sm:grid-cols- md:grid-cols-1 gap-2 sm:gap-3 pr-2">
+        <div className="sm:grid-cols- md:grid-cols-1 gap-2 sm:gap-3 pr-2">
           {brands && brands.length > 0 ? (
             brands.map((brand) => (
               <button
-                key={brand.name}
+                key={brand._id}
                 className={`relative rounded-lg border flex flex-col items-center justify-center bg-white ${
-                  selectedBrand === brand.name
+                  selectedBrand?._id === brand._id
                     ? "border-2 border-orange-400"
                     : ""
                 }`}
                 style={{ height: 83, width: "133%", maxWidth: 151 }}
-                onClick={() => setSelectedBrand(brand.name)}
+                onClick={() => onSelectBrand(brand)}
               >
                 {brand.logo ? (
                   <div className="relative w-full h-full flex items-center justify-center">
@@ -37,7 +37,7 @@ const Brand = ({ selectedBrand, setSelectedBrand, brands = [] }) => {
                 ) : (
                   <span className="text-gray-800">{brand.name}</span>
                 )}
-                {selectedBrand === brand.name && (
+                {selectedBrand?._id === brand._id && (
                   <div
                     className="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center"
                     style={{ marginRight: "-20px" }}

@@ -29,7 +29,7 @@ const Frame = ({ frames, loading, error }) => {
         <h1 className="font-poppins font-medium text-[24px] leading-[24px] tracking-[0] text-black w-fit pt-5">
           Select Frames
         </h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-5">
+        <div className="grid gap-4 mt-5 [grid-template-columns:repeat(auto-fit,minmax(250px,1fr))]">
           {frames.map((frame) => (
             <GlassesCard
               key={frame._id}

@@ -70,7 +70,7 @@ const routes = [
   },
   {
     title: "LensDetails",
-    path: "/lens/details/:id",
+    path: "/sales-panel/lens/:id",
     element: (
       <PrivateRoute>
         <PackagePanel />

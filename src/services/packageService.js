@@ -5,6 +5,7 @@ const PACKAGE_ENDPOINTS = {
   GET_ALL_LENSES: () => `/saleProduct/getAllLenses`,
   GET_ALL_FRAMES: () => `/saleProduct/getAllFrames`,
   CREATE_PACKAGE: () => `/salePackage`,
+  GET_LENS_BY_ID: (id) => `/saleProduct/getLensById/${id}`, // <-- NEW
 };
 
 export const packageService = {
@@ -19,6 +20,21 @@ export const packageService = {
       return {
         success: false,
         message: error.response?.data?.message || "Error fetching lenses",
+      };
+    }
+  },
+  getLensById: async (id) => {
+    try {
+      const response = await api.get(PACKAGE_ENDPOINTS.GET_LENS_BY_ID(id));
+
+      return {
+        success: true,
+        data: response.data,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Error fetching lens by ID",
       };
     }
   },

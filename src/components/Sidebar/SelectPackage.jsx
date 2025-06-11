@@ -6,31 +6,34 @@ import * as Yup from "yup";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { packageService } from "../../services/packageService";
+import LensModal from "../Package/LensModal";
+import Loader from "../Loader/Loader";
 
-const SelectPackage = () => {
+const SelectPackage = ({ activeTopTab }) => {
+  // State for managing pairs, frames, lenses, and UI
   const [pairs, setPairs] = useState([{ id: 1 }]);
   const [frames, setFrames] = useState([]);
   const [lenses, setLenses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showFrameDropdown, setShowFrameDropdown] = useState({});
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [selectedLensDataId, setSelectedLensDataId] = useState(null); // Lens data for modal
 
+  // Custom hook for mobile detection
   const useIsMobile = (breakpoint = 768) => {
     const [isMobile, setIsMobile] = useState(
       () => window.innerWidth <= breakpoint
     );
-
     useEffect(() => {
-      const handleResize = () => {
-        setIsMobile(window.innerWidth <= breakpoint);
-      };
+      const handleResize = () => setIsMobile(window.innerWidth <= breakpoint);
       window.addEventListener("resize", handleResize);
       return () => window.removeEventListener("resize", handleResize);
     }, [breakpoint]);
-
     return isMobile;
   };
   const isMobile = useIsMobile();
 
-  // Fetch frames and lenses on mount
+  // Fetch frames and lenses on component mount
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -41,10 +44,8 @@ const SelectPackage = () => {
         ]);
 
         if (frameResponse.success) {
-          console.log("come in frameResponse", frameResponse);
-
           setFrames(
-            frameResponse?.data?.message?.data?.map((frame) => ({
+            frameResponse.data.message.data.map((frame) => ({
               value: frame._id,
               label: frame.displayName,
               price: frame.sellPrice,
@@ -55,9 +56,8 @@ const SelectPackage = () => {
         }
 
         if (lensResponse.success) {
-          console.log("come in frameResponse", lensResponse);
           setLenses(
-            lensResponse?.data?.message?.data?.map((lens) => ({
+            lensResponse.data.message.data.map((lens) => ({
               value: lens._id,
               label: lens.displayName,
               price: lens.sellPrice,
@@ -67,14 +67,15 @@ const SelectPackage = () => {
           toast.error(lensResponse.message);
         }
       } catch (error) {
+        toast.error("Error fetching data");
       } finally {
         setLoading(false);
       }
     };
     fetchData();
   }, []);
-  console.log("frames", frames);
 
+  // Styles for react-select components
   const customStyles = {
     control: (provided) => ({
       ...provided,
@@ -96,7 +97,7 @@ const SelectPackage = () => {
     }),
   };
 
-  // Formik setup
+  // Formik setup for form management and validation
   const formik = useFormik({
     initialValues: {
       pairs: [{ frame: "", lens: "" }],
@@ -111,12 +112,10 @@ const SelectPackage = () => {
     }),
     onSubmit: async (values) => {
       try {
-        // Calculate total price
-        const packagePrice = values.pairs.reduce((total, pair, index) => {
+        const packagePrice = values.pairs.reduce((total, pair) => {
           const frame = frames.find((f) => f.value === pair.frame);
-          const lens = lenses.find((l) => l.value === pair.lens);
-          const pairPrice = (frame?.price || 0) + (lens?.price || 0);
-          return total + pairPrice;
+          const lens = lenses.find((l) => f.value === pair.lens);
+          return total + (frame?.price || 0) + (lens?.price || 0);
         }, 0);
 
         const payload = {
@@ -131,23 +130,14 @@ const SelectPackage = () => {
           netAmount: (packagePrice - 200).toString(),
         };
 
-        const response = await fetch(
-          "https://devnode.coderkubes.com/eyesdeal-api/salePackage",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          }
-        );
-
-        const result = await response.json();
-        if (result.success) {
-          toast.success(result.message);
-          // Reset form and pairs
+        const response = await packageService.createPackage(payload);
+        if (response.success) {
+          toast.success(response.message);
           formik.resetForm({ values: { pairs: [{ frame: "", lens: "" }] } });
           setPairs([{ id: 1 }]);
+          setShowFrameDropdown({});
         } else {
-          toast.error(result.message || "Failed to create package");
+          toast.error(response.message);
         }
       } catch (error) {
         toast.error("Error creating package");
@@ -155,7 +145,7 @@ const SelectPackage = () => {
     },
   });
 
-  // Add a new pair
+  // Add a new pair locally
   const addNewPair = () => {
     const lastPair = formik.values.pairs[pairs.length - 1];
     if (lastPair.frame && lastPair.lens) {
@@ -174,7 +164,51 @@ const SelectPackage = () => {
     }
   };
 
-  // Remove a pair
+  // Save package via API
+  const savePackage = async () => {
+    const lastPair = formik.values.pairs[pairs.length - 1];
+    if (lastPair.frame && lastPair.lens) {
+      try {
+        const packagePrice = formik.values.pairs.reduce((total, pair) => {
+          const frame = frames.find((f) => f.value === pair.frame);
+          const lens = lenses.find((l) => l.value === pair.lens);
+          return total + (frame?.price || 0) + (lens?.price || 0);
+        }, 0);
+        const firstWord = activeTopTab.trim().split(" ")[0];
+        const payload = {
+          packageType: firstWord.toLowerCase(),
+          product: formik.values.pairs.map((pair) => ({
+            frames: pair.frame,
+            lens: pair.lens,
+          })),
+          packagePrice: packagePrice.toString(),
+          preFixDiscount: "0",
+          preFixCharges: "",
+          netAmount: (packagePrice - 0).toString(),
+        };
+
+        const response = await packageService.createPackage(payload);
+        if (response.success) {
+          toast.success(response.message);
+          formik.resetForm({ values: { pairs: [{ frame: "", lens: "" }] } });
+          setPairs([{ id: 1 }]);
+          setShowFrameDropdown({});
+        } else {
+          toast.error(response.message);
+        }
+      } catch (error) {
+        toast.error("Error creating package");
+      }
+    } else {
+      formik.setTouched({
+        pairs: formik.values.pairs.map((pair, index) =>
+          index === pairs.length - 1 ? { frame: true, lens: true } : pair
+        ),
+      });
+    }
+  };
+
+  // Remove a pair locally
   const removePair = (index) => {
     if (pairs.length > 1) {
       setPairs(pairs.filter((_, i) => i !== index));
@@ -182,7 +216,35 @@ const SelectPackage = () => {
         "pairs",
         formik.values.pairs.filter((_, i) => i !== index)
       );
+      setShowFrameDropdown((prev) => {
+        const newDropdownState = { ...prev };
+        delete newDropdownState[index];
+        return newDropdownState;
+      });
     }
+  };
+
+  // Toggle frame dropdown visibility
+  const toggleFrameDropdown = (index) => {
+    setShowFrameDropdown((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  // Fetch lens details and open modal
+  const viewLensDetails = async (lensId) => {
+    formik.setTouched({
+      pairs: formik.values.pairs.map((pair, index) =>
+        index === pairs.length - 1 ? { frame: false, lens: true } : pair
+      ),
+    });
+    if (!lensId) {
+      return;
+    }
+
+    setSelectedLensDataId(lensId);
+    setIsModalOpen(true);
   };
 
   // Calculate total price for display
@@ -193,7 +255,11 @@ const SelectPackage = () => {
   }, 0);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="h-[80vh] flex justify-center items-center">
+        <Loader />
+      </div>
+    );
   }
 
   return (
@@ -219,53 +285,70 @@ const SelectPackage = () => {
                 <div className="flex items-center sm:flex-nowrap flex-wrap gap-3">
                   <button
                     className="font-poppins text-nowrap font-normal text-[18px] leading-[24px] border border-[#000000] rounded-[8px] px-3 py-2"
-                    onClick={() => {
-                      if (frames.length > 0) {
-                        formik.setFieldValue(
-                          `pairs[${index}].frame`,
-                          frames[0].value
-                        );
-                      }
-                    }}
+                    onClick={() => toggleFrameDropdown(index)}
                   >
                     + Add Frame Barcode
                   </button>
                   <span className="text-[18px]">=</span>
-                  {formik.values.pairs[index].frame && (
-                    <button
-                      className="custom-button flex justify-center w-fit px-3 gap-2 font-poppins font-normal text-[13px] leading-[24px] py-2"
-                      style={{
-                        borderRadius: "8px",
-                        border: "2px dashed #8D8D8D",
-                        color: "#000",
+                  {showFrameDropdown[index] && (
+                    <Select
+                      options={frames}
+                      styles={customStyles}
+                      placeholder="Select Frame"
+                      className="md:pr-0 pr-4 md:w-[455px] sm:w-[400px] w-[300px]"
+                      value={frames.find(
+                        (option) =>
+                          option.value === formik.values.pairs[index].frame
+                      )}
+                      onChange={(option) => {
+                        formik.setFieldValue(
+                          `pairs[${index}].frame`,
+                          option?.value || ""
+                        );
+                        toggleFrameDropdown(index);
                       }}
-                    >
-                      <div className="w-fit flex items-center text-nowrap justify-center bg-[#E8ECEF] px-3">
-                        <span>
-                          {
-                            frames.find(
-                              (f) =>
-                                f.value === formik.values.pairs[index].frame
-                            )?.label
-                          }
-                        </span>
-                        <FaTimes
-                          className="ml-2 cursor-pointer"
-                          size={12}
-                          onClick={() =>
-                            formik.setFieldValue(`pairs[${index}].frame`, "")
-                          }
-                        />
-                      </div>
-                    </button>
+                      onBlur={() => {
+                        formik.setFieldTouched(`pairs[${index}].frame`, true);
+                        toggleFrameDropdown(index);
+                      }}
+                    />
                   )}
-                  {formik.touched.pairs?.[index]?.frame &&
-                    formik.errors.pairs?.[index]?.frame && (
-                      <div className="text-red-500 text-[14px]">
-                        {formik.errors.pairs[index].frame}
-                      </div>
+                  {formik.values.pairs[index].frame &&
+                    !showFrameDropdown[index] && (
+                      <button
+                        className="custom-button flex justify-center w-fit px-3 gap-2 font-poppins font-normal text-[13px] leading-[24px] py-2"
+                        style={{
+                          borderRadius: "8px",
+                          border: "2px dashed #8D8D8D",
+                          color: "#000",
+                        }}
+                      >
+                        <div className="w-fit flex items-center text-nowrap justify-center bg-[#E8ECEF] px-3">
+                          <span>
+                            {
+                              frames.find(
+                                (f) =>
+                                  f.value === formik.values.pairs[index].frame
+                              )?.label
+                            }
+                          </span>
+                          <FaTimes
+                            className="ml-2 cursor-pointer"
+                            size={12}
+                            onClick={() =>
+                              formik.setFieldValue(`pairs[${index}].frame`, "")
+                            }
+                          />
+                        </div>
+                      </button>
                     )}
                 </div>
+                {formik.touched.pairs?.[index]?.frame &&
+                  formik.errors.pairs?.[index]?.frame && (
+                    <div className="text-red-500 text-[16px]">
+                      {formik.errors.pairs[index].frame}
+                    </div>
+                  )}
 
                 <div className="flex sm:flex-nowrap flex-wrap mt-4 w-full items-center gap-3">
                   <Select
@@ -287,7 +370,12 @@ const SelectPackage = () => {
                       formik.setFieldTouched(`pairs[${index}].lens`, true)
                     }
                   />
-                  <button className="font-poppins font-normal md:text-[18px] text-[12px] leading-[24px] w-fit md:px-6 px-5 h-[50px] rounded-[8px] flex items-center justify-center text-nowrap gap-2 bg-[#007569] text-white">
+                  <button
+                    className="font-poppins font-normal md:text-[18px] text-[12px] leading-[24px] w-fit md:px-6 px-5 h-[50px] rounded-[8px] flex items-center justify-center text-nowrap gap-2 bg-[#007569] text-white"
+                    onClick={() =>
+                      viewLensDetails(formik.values.pairs[index].lens)
+                    }
+                  >
                     <img
                       src="/eyes_icons.png"
                       alt="View Lens"
@@ -298,7 +386,7 @@ const SelectPackage = () => {
                 </div>
                 {formik.touched.pairs?.[index]?.lens &&
                   formik.errors.pairs?.[index]?.lens && (
-                    <div className="text-red-500 text-[14px]">
+                    <div className="text-red-500 mt-1 text-[16px]">
                       {formik.errors.pairs[index].lens}
                     </div>
                   )}
@@ -360,19 +448,28 @@ const SelectPackage = () => {
           <div className="flex gap-3 mt-5">
             <button
               className="flex-1 font-poppins font-normal text-[18px] leading-[24px] bg-[#007569] text-white rounded-[8px] py-2"
-              onClick={addNewPair}
+              onClick={savePackage}
             >
-              Add Another Package
+              Save Package
             </button>
             <button
               className="flex-1 font-poppins font-normal text-[18px] leading-[24px] bg-[#007569] text-white rounded-[8px] py-2"
-              onClick={formik.handleSubmit}
+              // onClick={formik.handleSubmit}
             >
               Add To Cart
             </button>
           </div>
         </div>
       </div>
+
+      {/* Lens Modal */}
+      {isModalOpen && (
+        <LensModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          lensDataId={selectedLensDataId}
+        />
+      )}
     </div>
   );
 };

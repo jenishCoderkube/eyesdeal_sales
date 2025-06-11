@@ -120,12 +120,15 @@ const TopBarGlasses = ({
                 </div>
               ) : (
                 <>
-                  <button
-                    onClick={handleClearFrameType}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Clear
-                  </button>
+                  {selectedFrameType && (
+                    <button
+                      onClick={handleClearFrameType}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    >
+                      Clear
+                    </button>
+                  )}
+
                   {frameTypes.map((type) => (
                     <button
                       key={type._id}
@@ -175,12 +178,15 @@ const TopBarGlasses = ({
                 </div>
               ) : (
                 <>
-                  <button
-                    onClick={handleClearMaterial}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Clear
-                  </button>
+                  {selectedMaterial && (
+                    <button
+                      onClick={handleClearMaterial}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    >
+                      Clear
+                    </button>
+                  )}
+
                   {materials.map((material) => (
                     <button
                       key={material._id}
@@ -232,12 +238,15 @@ const TopBarGlasses = ({
                 </div>
               ) : (
                 <>
-                  <button
-                    onClick={handleClearBrand}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Clear
-                  </button>
+                  {selectedBrand && (
+                    <button
+                      onClick={handleClearBrand}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    >
+                      Clear
+                    </button>
+                  )}
+
                   {brands.map((brand) => (
                     <button
                       key={brand._id}

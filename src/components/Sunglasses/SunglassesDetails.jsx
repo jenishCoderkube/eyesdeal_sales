@@ -9,7 +9,7 @@ import {
 import { IoIosArrowDropleft } from "react-icons/io";
 import { FaRegHeart } from "react-icons/fa";
 import { FaShippingFast } from "react-icons/fa";
-import "./frames.css"; // Adjust the path as needed
+import "./Frames.css"; // Adjust the path as needed
 import Loader from "../Loader/Loader";
 
 const SunglassesDetails = () => {

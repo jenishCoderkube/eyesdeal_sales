@@ -1,4 +1,3 @@
-// Lense.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { lensService } from "../../services/lensService";
@@ -7,15 +6,24 @@ import LenseCard from "./LenseCard";
 import { FiSearch } from "react-icons/fi";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+// Simple Loader Component
+const Loader = () => (
+  <div className="h-[80vh] flex justify-center items-center">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500"></div>
+  </div>
+);
+
 const Lense = ({ onSelectLens, selectedBrand }) => {
   const navigate = useNavigate();
   const [lenses, setLenses] = useState([]);
   const [activeTab, setActiveTab] = useState("All");
   const [search, setSearch] = useState("");
   const [prescriptionTypes, setPrescriptionTypes] = useState([]);
+  const [isLoading, setIsLoading] = useState(false); // Loading state
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true); // Start loading
       try {
         const [_, prescriptionTypeResponse] = await Promise.all([
           masterDataService.getBrands(),
@@ -27,6 +35,8 @@ const Lense = ({ onSelectLens, selectedBrand }) => {
         }
       } catch (err) {
         console.error("Error fetching data:", err);
+      } finally {
+        setIsLoading(false); // Stop loading
       }
     };
 
@@ -35,6 +45,7 @@ const Lense = ({ onSelectLens, selectedBrand }) => {
 
   useEffect(() => {
     const fetchLenses = async () => {
+      setIsLoading(true); // Start loading
       try {
         const params = {};
         if (activeTab !== "All") params.prescriptionType = activeTab;
@@ -46,6 +57,8 @@ const Lense = ({ onSelectLens, selectedBrand }) => {
         }
       } catch (err) {
         console.error("Error fetching lenses:", err);
+      } finally {
+        setIsLoading(false); // Stop loading
       }
     };
 
@@ -74,27 +87,26 @@ const Lense = ({ onSelectLens, selectedBrand }) => {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 p-4 overflow-y-auto mt-1">
-        <h2 className="text-lg sm:text-xl font-semibold mb-4">Select Lenses</h2>
         <div className="w-full flex flex-col md:flex-row items-start gap-4 sm:gap-1">
           <div className="flex flex-col flex-1 w-full">
             <div className="flex flex-col sm:flex-row items-center mb-4 w-full">
               <div className="flex flex-col sm:flex-row w-full items-center bg-white border rounded-lg px-3 py-2 gap-2 sm:gap-4 h-[44px]">
-                <div className="relative flex items-center w-full sm:w-[30%]">
+                <div className="relative flex items-center w-full sm:w-[40%] md:w-[30%]">
                   <FiSearch
                     size={24}
-                    className="absolute left-2 text-gray-400"
+                    className="absolute md:left-2 text-gray-400"
                   />
                   <input
                     type="text"
                     placeholder="Search barcode..."
-                    className="w-full pl-10 pr-4 py-2 rounded-lg md:border-none border border-gray-300 focus:outline-none md:ring-0 focus:ring-2 focus:ring-blue-500 font-poppins font-normal text-[18px] leading-[24px] text-[#667085]"
+                    className="w-full pl-10 pr-4 py-2 rounded-lg border-none border border-gray-300 focus:outline-none md:ring-0 focus:ring-2 focus:ring-blue-500 font-poppins font-normal text-[18px] leading-[24px] text-[#667085]"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
                 </div>
 
                 {/* Tabs with Horizontal Scroll */}
-                <div className="relative w-full sm:w-[60%] mt-2 sm:mt-0 sm:ml-auto">
+                <div className="relative w-full sm:w-[60%] md:w-[70%] mt-2 sm:mt-0 sm:ml-auto">
                   {/* Scroll Buttons */}
                   <button
                     onClick={() => scrollTabs("left")}
@@ -108,8 +120,10 @@ const Lense = ({ onSelectLens, selectedBrand }) => {
                   >
                     {/* All Tab */}
                     <button
-                      className={`relative px-3 py-1 flex items-center text-xs sm:text-sm font-medium whitespace-nowrap ${
-                        activeTab === "All" ? "text-black" : "text-gray-500"
+                      className={`relative px-3 py-1 flex items-center  text-xs sm:text-sm font-medium whitespace-nowrap ${
+                        activeTab === "All"
+                          ? "text-black  border-b border-red-400"
+                          : "text-gray-500"
                       }`}
                       style={{ background: "none" }}
                       onClick={() => setActiveTab("All")}
@@ -135,7 +149,9 @@ const Lense = ({ onSelectLens, selectedBrand }) => {
                       <button
                         key={tab._id}
                         className={`relative px-3 py-1 flex items-center text-xs sm:text-sm font-medium whitespace-nowrap ${
-                          activeTab === tab._id ? "text-black" : "text-gray-500"
+                          activeTab === tab._id
+                            ? "text-black  border-b border-red-400"
+                            : "text-gray-500"
                         }`}
                         style={{ background: "none" }}
                         onClick={() => setActiveTab(tab._id)}
@@ -168,15 +184,26 @@ const Lense = ({ onSelectLens, selectedBrand }) => {
               </div>
             </div>
 
-            <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(250px,1fr))]">
-              {filteredLenses.map((lens) => (
-                <LenseCard
-                  key={lens._id}
-                  lens={lens}
-                  onSelectLens={handleLensSelect}
-                />
-              ))}
-            </div>
+            {/* Conditional Rendering Based on Loading State */}
+            {isLoading ? (
+              <Loader />
+            ) : filteredLenses?.length <= 0 ? (
+              <div className="h-[80vh] flex justify-center items-center">
+                <h5 className="text-[18px] font-poppins font-medium">
+                  No Lenses Found.
+                </h5>
+              </div>
+            ) : (
+              <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(250px,1fr))]">
+                {filteredLenses.map((lens) => (
+                  <LenseCard
+                    key={lens._id}
+                    lens={lens}
+                    onSelectLens={handleLensSelect}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

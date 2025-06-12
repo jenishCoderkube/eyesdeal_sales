@@ -69,6 +69,9 @@ const LensesPanel = () => {
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
+      <h2 className="text-lg sm:text-xl font-semibold md:px-8 px-3 pt-5">
+        Select Lenses
+      </h2>
       <div className="flex-1 flex flex-row h-full">
         {/* Brand Selection - Always visible */}
         <div

@@ -18,7 +18,7 @@ const LenseCard = ({ lens, onSelectLens }) => {
         <img
           src={lens.photos?.[0] || lens.img || "/default-lens.png"}
           alt={lens.displayName}
-          className="h-14 w-14 rounded-full object-cover"
+          className="h-full max-h-[120px] w-full max-w-[264px] rounded-full object-cover"
         />
       </div>
       <div className="flex items-center justify-between w-full mt-2">

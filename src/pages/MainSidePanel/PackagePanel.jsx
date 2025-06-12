@@ -96,6 +96,18 @@ const PackagePanel = () => {
           setActiveTopTab={setActiveTopTab}
         />
       )}
+      {activeLeftTab === "Reading Glasses" && (
+        <SunglassesPanel
+          activeTopTab={activeTopTab}
+          setActiveTopTab={setActiveTopTab}
+        />
+      )}
+      {activeLeftTab === "Contact Lenses" && (
+        <LensesPanel
+          activeTopTab={activeTopTab}
+          setActiveTopTab={setActiveTopTab}
+        />
+      )}
     </div>
   );
 };

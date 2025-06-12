@@ -24,6 +24,7 @@ export const SunGlassesService = {
       if (filters.brand) params.append("brand", filters.brand);
       if (filters.frameMaterial)
         params.append("frameMaterial", filters.frameMaterial);
+      if (filters.search) params.append("search", filters.search);
 
       const response = await api.get(
         `${SUNGLASSES_ENDPOINTS.GET_ALL_SUNGLASSES()}?${params.toString()}`,

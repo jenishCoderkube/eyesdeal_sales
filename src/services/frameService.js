@@ -16,6 +16,7 @@ export const frameService = {
       if (filters.brand) params.append("brand", filters.brand);
       if (filters.frameMaterial)
         params.append("frameMaterial", filters.frameMaterial);
+      if (filters.search) params.append("search", filters.search);
 
       // Make the API call with the Bearer token in the Authorization header
       const response = await api.get(

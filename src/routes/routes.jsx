@@ -60,6 +60,24 @@ const routes = [
     ),
   },
   {
+    title: "ReadingGlassDetails",
+    path: "/reading-glass/details/:id",
+    element: (
+      <PrivateRoute>
+        <PackagePanel />
+      </PrivateRoute>
+    ),
+  },
+  {
+    title: "ContactLensDetails",
+    path: "/contact-lens/details/:id",
+    element: (
+      <PrivateRoute>
+        <PackagePanel />
+      </PrivateRoute>
+    ),
+  },
+  {
     title: "sunglassesDetails",
     path: "/sunglasses/details/:id",
     element: (

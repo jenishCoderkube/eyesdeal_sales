@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
-import { useLocation, useNavigate } from "react-router-dom";
-import { masterDataService } from "../../services/masterDataService";
-import { SunGlassesService } from "../../services/sunglassesService";
+import { useLocation } from "react-router-dom";
 import TopTabBar from "../Sidebar/TopTabBar";
 import TopBarSunglasses from "./TopBarSunglasses";
 import Sunglasses from "./Sunglasses";
 import SunglassesDetails from "./SunglassesDetails";
+import { masterDataService } from "../../services/masterDataService";
+import { SunGlassesService } from "../../services/sunglassesService";
 
 const SunglassesPanel = ({ activeTopTab, setActiveTopTab }) => {
   const [frameTypes, setFrameTypes] = useState([]);
@@ -19,10 +19,10 @@ const SunglassesPanel = ({ activeTopTab, setActiveTopTab }) => {
     frameType: "",
     frameMaterial: "",
     brand: "",
+    search: "",
   });
 
   const location = useLocation();
-  const navigate = useNavigate();
   const isTablet = useMediaQuery({ query: "(max-width: 1024px)" });
   const isSunglassesDetails = location.pathname.startsWith(
     "/sunglasses/details"
@@ -53,12 +53,6 @@ const SunglassesPanel = ({ activeTopTab, setActiveTopTab }) => {
           results;
 
         // Process frame types
-
-        console.log(
-          "Frame Types Result:",
-          sunglassesResult.value.data.message.data
-        );
-
         if (
           frameTypeResult.status === "fulfilled" &&
           frameTypeResult.value?.success
@@ -118,8 +112,10 @@ const SunglassesPanel = ({ activeTopTab, setActiveTopTab }) => {
           sunglassesResult.value?.success
         ) {
           setSunglasses(
-            Array.isArray(sunglassesResult.value.data.message.data)
+            Array.isArray(sunglassesResult.value.data?.message?.data)
               ? sunglassesResult.value.data.message.data
+              : sunglassesResult.value.data?.message?.data
+              ? [sunglassesResult.value.data.message.data]
               : []
           );
         } else {
@@ -130,23 +126,18 @@ const SunglassesPanel = ({ activeTopTab, setActiveTopTab }) => {
               "Failed to fetch sunglasses"
           );
         }
-      } catch (err) {
-        const errorMessage =
-          err.response?.data?.message || "Unexpected error fetching data";
-        setError(errorMessage);
-        if (
-          err.response?.status === 401 ||
-          errorMessage.includes("Unauthorized")
-        ) {
-          navigate("/login");
-        }
+      } catch (error) {
+        setError(
+          (prev) =>
+            prev || error.response?.data?.message || "Unexpected error occurred"
+        );
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [filters, navigate]);
+  }, [filters]);
 
   return (
     <div className="flex-1 flex flex-col">

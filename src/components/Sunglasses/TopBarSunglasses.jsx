@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { FiSearch, FiCheck } from "react-icons/fi";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
+import { debounce } from "lodash";
 
 const TopBarSunglasses = ({
   frameTypes,
@@ -18,13 +19,19 @@ const TopBarSunglasses = ({
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // console.log("TopBarSunglasses rendered with frameTypes:", frameTypes);
+  // Create a debounced search function
+  const debouncedSearch = useCallback(
+    debounce((value) => {
+      onFilterChange({ search: value });
+    }, 500),
+    [onFilterChange]
+  );
 
-  // Handle search input
-  const handleSearch = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    onFilterChange({ search: query });
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    debouncedSearch(value);
   };
 
   // Handle frame type selection/unselection
@@ -95,10 +102,11 @@ const TopBarSunglasses = ({
           type="text"
           placeholder="Search barcode..."
           value={searchQuery}
-          onChange={handleSearch}
+          onChange={handleSearchChange}
           className="w-full pl-10 pr-4 py-2 rounded-lg md:border-none border border-gray-300 focus:outline-none md:ring-0 focus:ring-2 focus:ring-blue-500 font-poppins font-normal text-[18px] leading-[24px] text-[#667085]"
         />
       </div>
+
       {/* Dropdowns */}
       <div className="flex sm:flex-nowrap flex-wrap gap-y-3 items-center md:justify-end sm:justify-between sm:gap-x-0 gap-x-2 w-full md:space-x-4">
         {/* Frame Type Dropdown */}

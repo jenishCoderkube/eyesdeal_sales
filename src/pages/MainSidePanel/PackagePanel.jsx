@@ -13,6 +13,9 @@ import Sunglasses from "../../components/Sunglasses/Sunglasses";
 import TopBarGlasses from "../../components/Frame/TopBarGlasses";
 import SunglassesPanel from "../../components/Sunglasses/SunglassesPanel"; // New component
 import PackageCom from "../../components/Package/PackageCom";
+import ContactLensPanel from "../../components/ContactLens/ContactLensPanel";
+// import GlassPanel from "../../components/ReadingGlass/GlassPanel";
+import ReadingGlassesPanel from "../../components/ReadingGlass/ReadingGlassesPanel";
 
 const PackagePanel = () => {
   const [activeLeftTab, setActiveLeftTab] = useState("Package");
@@ -55,6 +58,10 @@ const PackagePanel = () => {
       case "Package":
         navigate("/sales-panel");
         break;
+      case "Reading Glass":
+        navigate("/sales-panel/reading-glass");
+        break;
+
       case "Logout":
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
@@ -97,13 +104,13 @@ const PackagePanel = () => {
         />
       )}
       {activeLeftTab === "Reading Glasses" && (
-        <SunglassesPanel
+        <ReadingGlassesPanel
           activeTopTab={activeTopTab}
           setActiveTopTab={setActiveTopTab}
         />
       )}
       {activeLeftTab === "Contact Lenses" && (
-        <LensesPanel
+        <ContactLensPanel
           activeTopTab={activeTopTab}
           setActiveTopTab={setActiveTopTab}
         />

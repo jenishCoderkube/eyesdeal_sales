@@ -2,17 +2,17 @@ import { useState, useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useLocation, useNavigate } from "react-router-dom";
 import TopTabBar from "../Sidebar/TopTabBar";
-import TopBarGlasses from "../Frame/TopBarGlasses";
-import Frame from "../Frame/Frame";
-import FrameDetails from "../Frame/FrameDetails";
-import { masterDataService } from "../../services/masterDataService"; // Adjust path as needed
-import { frameService } from "../../services/frameService"; // Adjust path as needed
+import TopBarReadingGlasses from "./TopBarReadingGlasses";
+import ReadingGlasses from "./ReadingGlasses";
+import ReadingGlassDetails from "./ReadingGlassDetails";
+import { masterDataService } from "../../services/masterDataService";
+import { readingGlassService } from "../../services/readingGlassService";
 
-const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
+const ReadingGlassesPanel = () => {
   const [frameTypes, setFrameTypes] = useState([]);
   const [materials, setMaterials] = useState([]);
   const [brands, setBrands] = useState([]);
-  const [frames, setFrames] = useState([]);
+  const [readingGlasses, setReadingGlasses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
@@ -25,7 +25,9 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const isTablet = useMediaQuery({ query: "(max-width: 1024px)" });
-  const isFrameDetails = location.pathname.startsWith("/frame/details");
+  const isReadingGlassDetails = location.pathname.startsWith(
+    "/reading-glass/details"
+  );
 
   // Handle filter changes
   const handleFilterChange = (newFilter) => {
@@ -35,11 +37,9 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
     }));
   };
 
-  console.log("filddddddters", frames);
-
-  // Fetch frame data
+  // Fetch reading glasses data
   useEffect(() => {
-    const fetchFrameData = async () => {
+    const fetchReadingGlassData = async () => {
       setLoading(true);
       setError(null);
       try {
@@ -47,11 +47,19 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
           masterDataService.getFrameTypes(),
           masterDataService.getMaterials(),
           masterDataService.getBrands(),
-          frameService.getAllFrames(filters),
+          readingGlassService.getAllReadingGlasses(filters),
         ]);
+        console.log(results, "jyfhktghhgchgcghcghcghcgh");
+        console.log();
+        console.log();
+        console.log();
 
-        const [frameTypeResult, materialResult, brandResult, frameResult] =
-          results;
+        const [
+          frameTypeResult,
+          materialResult,
+          brandResult,
+          readingGlassResult,
+        ] = results;
 
         // Process frame types
         if (
@@ -104,20 +112,23 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
           setError((prevError) => prevError || errorMessage);
         }
 
-        // Process frames
-        if (frameResult.status === "fulfilled" && frameResult.value.success) {
-          setFrames(
-            Array.isArray(frameResult.value.data?.message?.data)
-              ? frameResult.value.data.message.data
-              : frameResult.value.data?.message?.data
-              ? [frameResult.value.data.message.data]
+        // Process reading glasses
+        if (
+          readingGlassResult.status === "fulfilled" &&
+          readingGlassResult.value.success
+        ) {
+          setReadingGlasses(
+            Array.isArray(readingGlassResult.value.data?.message?.data)
+              ? readingGlassResult.value.data.message.data
+              : readingGlassResult.value.data?.message?.data
+              ? [readingGlassResult.value.data.message.data]
               : []
           );
         } else {
           const errorMessage =
-            frameResult.value?.message ||
-            frameResult.reason?.response?.data?.message ||
-            "Error fetching frames";
+            readingGlassResult.value?.message ||
+            readingGlassResult.reason?.response?.data?.message ||
+            "Error fetching reading glasses";
           setError((prevError) => prevError || errorMessage);
         }
       } catch (error) {
@@ -135,20 +146,20 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
       }
     };
 
-    fetchFrameData();
+    fetchReadingGlassData();
   }, [filters, navigate]);
 
   return (
     <div className="flex-1 flex flex-col">
       {isTablet ? (
         <>
-          <div className="rounded-lg mx-4 mt-4">
+          {/* <div className="rounded-lg mx-4 mt-4">
             <TopTabBar
               activeTab={activeTopTab}
               setActiveTab={setActiveTopTab}
             />
-          </div>
-          <TopBarGlasses
+          </div> */}
+          <TopBarReadingGlasses
             frameTypes={frameTypes}
             materials={materials}
             brands={brands}
@@ -156,15 +167,19 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
             error={error}
             onFilterChange={handleFilterChange}
           />
-          {isFrameDetails ? (
-            <FrameDetails />
+          {isReadingGlassDetails ? (
+            <ReadingGlassDetails />
           ) : (
-            <Frame frames={frames} loading={loading} error={error} />
+            <ReadingGlasses
+              readingGlasses={readingGlasses}
+              loading={loading}
+              error={error}
+            />
           )}
         </>
       ) : (
         <div className="flex-1 flex flex-col mx-4 mt-1 border border-gray-200 rounded-xl">
-          <TopBarGlasses
+          <TopBarReadingGlasses
             frameTypes={frameTypes}
             materials={materials}
             brands={brands}
@@ -172,10 +187,14 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
             error={error}
             onFilterChange={handleFilterChange}
           />
-          {isFrameDetails ? (
-            <FrameDetails />
+          {isReadingGlassDetails ? (
+            <ReadingGlassDetails />
           ) : (
-            <Frame frames={frames} loading={loading} error={error} />
+            <ReadingGlasses
+              readingGlasses={readingGlasses}
+              loading={loading}
+              error={error}
+            />
           )}
         </div>
       )}
@@ -183,4 +202,4 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
   );
 };
 
-export default FramesPanel;
+export default ReadingGlassesPanel;

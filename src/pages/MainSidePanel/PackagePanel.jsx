@@ -5,13 +5,13 @@ import CustomerTabRow from "../../components/Sidebar/CustomerTabRow";
 import LeftSidebar from "../../components/Sidebar/LeftSidebar";
 import SelectPackage from "../../components/Sidebar/SelectPackage";
 import TopTabBar from "../../components/Sidebar/TopTabBar";
-import FramesPanel from "../../components/Frame/FramesPanel"; // New component
+import FramesPanel from "../../components/Frame/FramesPanel";
 import LensesPanel from "../../components/Lense/LensesPanel";
 import TopBarSunglasses from "../../components/Sunglasses/TopBarSunglasses";
 import SunglassesDetails from "../../components/Sunglasses/SunglassesDetails";
 import Sunglasses from "../../components/Sunglasses/Sunglasses";
 import TopBarGlasses from "../../components/Frame/TopBarGlasses";
-import SunglassesPanel from "../../components/Sunglasses/SunglassesPanel"; // New component
+import SunglassesPanel from "../../components/Sunglasses/SunglassesPanel";
 import PackageCom from "../../components/Package/PackageCom";
 import ContactLensPanel from "../../components/ContactLens/ContactLensPanel";
 // import GlassPanel from "../../components/ReadingGlass/GlassPanel";
@@ -37,6 +37,10 @@ const PackagePanel = () => {
       setActiveLeftTab("Lenses");
     } else if (path.includes("/sunglasses")) {
       setActiveLeftTab("Sunglasses");
+    } else if (path.includes("/readingGlasses")) {
+      setActiveLeftTab("Reading Glasses");
+    } else if (path.includes("/contactLenses")) {
+      setActiveLeftTab("Contact Lenses");
     } else if (path.includes("/sales-panel")) {
       setActiveLeftTab("Package");
     }
@@ -58,10 +62,12 @@ const PackagePanel = () => {
       case "Package":
         navigate("/sales-panel");
         break;
-      case "Reading Glass":
-        navigate("/sales-panel/reading-glass");
+      case "Reading Glasses":
+        navigate("/sales-panel/readingGlasses");
         break;
-
+      case "Contact Lenses":
+        navigate("/sales-panel/contactLenses");
+        break;
       case "Logout":
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");

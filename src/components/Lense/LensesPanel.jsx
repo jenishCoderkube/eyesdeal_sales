@@ -1,28 +1,43 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { FiSearch } from "react-icons/fi";
+import {
+  MdKeyboardDoubleArrowLeft,
+  MdKeyboardDoubleArrowRight,
+} from "react-icons/md";
 import { useMediaQuery } from "react-responsive";
+import { lensService } from "../../services/lensService";
 import { masterDataService } from "../../services/masterDataService";
 import Brand from "../Brand/Brand";
+import Loader from "../Loader/Loader";
 import Lense from "./Lense";
 import LenseDetails from "./LenseDetails";
-import Loader from "../Loader/Loader";
-
 const LensesPanel = () => {
   const [brands, setBrands] = useState([]);
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [selectedLens, setSelectedLens] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [search, setSearch] = useState("");
+  const [activeTab, setActiveTab] = useState("All");
+  const [prescriptionTypes, setPrescriptionTypes] = useState([]);
   const isTablet = useMediaQuery({ query: "(max-width: 1024px)" });
   const isMobile = useMediaQuery({ query: "(max-width: 640px)" });
+  const isBelow768 = useMediaQuery({ query: "(max-width: 767px)" });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const brandsResponse = await masterDataService.getBrands();
+        const [brandsResponse, prescriptionTypeResponse] = await Promise.all([
+          masterDataService.getBrands(),
+          lensService.getAllprescriptionType(),
+        ]);
 
         if (brandsResponse.success) {
           setBrands(brandsResponse.data.data);
+        }
+        if (prescriptionTypeResponse.success) {
+          setPrescriptionTypes(prescriptionTypeResponse.data.data);
         }
       } catch (err) {
         setError(err.message);
@@ -51,6 +66,16 @@ const LensesPanel = () => {
     setSelectedLens(null);
   };
 
+  const scrollTabs = (direction) => {
+    const container = document.getElementById("tabsContainer");
+    if (!container) return;
+    const scrollAmount = 100;
+    container.scrollBy({
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
+    });
+  };
+
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -69,6 +94,95 @@ const LensesPanel = () => {
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
+      {/* Search and Tabs for screens below 768px */}
+      {isBelow768 && (
+        <div className="w-full p-4 bg-white">
+          {/* Search Bar */}
+          <div className="relative flex items-center w-full mb-4">
+            <FiSearch size={24} className="absolute left-3 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search barcode..."
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-poppins font-normal text-[18px] leading-[24px] text-[#667085]"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
+          {/* Tabs with Horizontal Scroll */}
+          <div className="relative w-full">
+            <button
+              onClick={() => scrollTabs("left")}
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white px-2"
+            >
+              <MdKeyboardDoubleArrowLeft className="w-5 h-5 text-gray-600" />
+            </button>
+            <div
+              id="tabsContainer"
+              className="flex flex-nowrap overflow-x-auto scrollbar-hide px-6"
+            >
+              <button
+                className={`relative px-3 py-1 flex items-center text-xs font-medium whitespace-nowrap ${
+                  activeTab === "All"
+                    ? "text-black border-b border-red-400"
+                    : "text-gray-500"
+                }`}
+                style={{ background: "none" }}
+                onClick={() => setActiveTab("All")}
+              >
+                All
+                {activeTab === "All" && (
+                  <span
+                    className="absolute left-0 right-0"
+                    style={{
+                      top: "28px",
+                      height: "2px",
+                      background: "#fb923c",
+                      borderRadius: "2px",
+                      width: "100%",
+                      display: "block",
+                    }}
+                  />
+                )}
+              </button>
+              {prescriptionTypes.map((tab) => (
+                <button
+                  key={tab._id}
+                  className={`relative px-3 py-1 flex items-center text-xs font-medium whitespace-nowrap ${
+                    activeTab === tab._id
+                      ? "text-black border-b border-red-400"
+                      : "text-gray-500"
+                  }`}
+                  style={{ background: "none" }}
+                  onClick={() => setActiveTab(tab._id)}
+                >
+                  {tab.name}
+                  {activeTab === tab._id && (
+                    <span
+                      className="absolute left-0 right-0"
+                      style={{
+                        top: "28px",
+                        height: "2px",
+                        background: "#fb923c",
+                        borderRadius: "2px",
+                        width: "100%",
+                        display: "block",
+                      }}
+                    />
+                  )}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => scrollTabs("right")}
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white px-2"
+            >
+              <MdKeyboardDoubleArrowRight className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
+        </div>
+      )}
+
       <h2 className="text-lg sm:text-xl font-semibold md:px-8 px-3 pt-5">
         Select Lenses
       </h2>
@@ -98,6 +212,12 @@ const LensesPanel = () => {
             <Lense
               selectedBrand={selectedBrand}
               onSelectLens={handleLensSelect}
+              search={search}
+              setSearch={setSearch}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              prescriptionTypes={prescriptionTypes}
+              isBelow768={isBelow768}
             />
           )}
         </div>

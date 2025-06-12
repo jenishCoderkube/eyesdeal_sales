@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { lensService } from "../../services/lensService";
-import { masterDataService } from "../../services/masterDataService";
 import LenseCard from "./LenseCard";
 import { FiSearch } from "react-icons/fi";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  MdKeyboardDoubleArrowLeft,
+  MdKeyboardDoubleArrowRight,
+} from "react-icons/md";
+import debounce from "lodash.debounce";
 
 // Simple Loader Component
 const Loader = () => (
@@ -13,43 +17,29 @@ const Loader = () => (
   </div>
 );
 
-const Lense = ({ onSelectLens, selectedBrand }) => {
+const Lense = ({
+  onSelectLens,
+  selectedBrand,
+  search,
+  setSearch,
+  activeTab,
+  setActiveTab,
+  prescriptionTypes,
+  isBelow768,
+}) => {
   const navigate = useNavigate();
   const [lenses, setLenses] = useState([]);
-  const [activeTab, setActiveTab] = useState("All");
-  const [search, setSearch] = useState("");
-  const [prescriptionTypes, setPrescriptionTypes] = useState([]);
-  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true); // Start loading
-      try {
-        const [_, prescriptionTypeResponse] = await Promise.all([
-          masterDataService.getBrands(),
-          lensService.getAllprescriptionType(),
-        ]);
-
-        if (prescriptionTypeResponse.success) {
-          setPrescriptionTypes(prescriptionTypeResponse.data.data);
-        }
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      } finally {
-        setIsLoading(false); // Stop loading
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const fetchLenses = async () => {
-      setIsLoading(true); // Start loading
+  // Fetch lenses function
+  const fetchLenses = useCallback(
+    async (searchQuery = "") => {
+      setIsLoading(true);
       try {
         const params = {};
         if (activeTab !== "All") params.prescriptionType = activeTab;
         if (selectedBrand) params.brand = selectedBrand._id;
+        if (searchQuery.trim()) params.search = searchQuery; // Include search param if not empty
 
         const lensesResponse = await lensService.getAllLenses(params);
         if (lensesResponse.success) {
@@ -58,12 +48,33 @@ const Lense = ({ onSelectLens, selectedBrand }) => {
       } catch (err) {
         console.error("Error fetching lenses:", err);
       } finally {
-        setIsLoading(false); // Stop loading
+        setIsLoading(false);
       }
-    };
+    },
+    [activeTab, selectedBrand]
+  );
 
-    fetchLenses();
-  }, [activeTab, selectedBrand]);
+  // Debounced search function
+  const debouncedFetchLenses = useCallback(
+    debounce((query) => {
+      fetchLenses(query);
+    }, 500), // 500ms debounce delay
+    [fetchLenses]
+  );
+
+  // Effect to handle search changes
+  useEffect(() => {
+    debouncedFetchLenses(search);
+    // Cleanup debounce on unmount
+    return () => {
+      debouncedFetchLenses.cancel();
+    };
+  }, [search, debouncedFetchLenses]);
+
+  // Effect to fetch lenses when activeTab or selectedBrand changes
+  useEffect(() => {
+    fetchLenses(search);
+  }, [activeTab, selectedBrand, fetchLenses]);
 
   const scrollTabs = (direction) => {
     const container = document.getElementById("tabsContainer");
@@ -80,15 +91,12 @@ const Lense = ({ onSelectLens, selectedBrand }) => {
     if (onSelectLens) onSelectLens(lens);
   };
 
-  const filteredLenses = lenses.filter((lens) =>
-    lens.displayName.toLowerCase().includes(search.toLowerCase())
-  );
-
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 p-4 overflow-y-auto mt-1">
-        <div className="w-full flex flex-col md:flex-row items-start gap-4 sm:gap-1">
-          <div className="flex flex-col flex-1 w-full">
+        <div className="flex flex-col w-full">
+          {/* Search and Tabs for screens 768px and above */}
+          {!isBelow768 && (
             <div className="flex flex-col sm:flex-row items-center mb-4 w-full">
               <div className="flex flex-col sm:flex-row w-full items-center bg-white border rounded-lg px-3 py-2 gap-2 sm:gap-4 h-[44px]">
                 <div className="relative flex items-center w-full sm:w-[40%] md:w-[30%]">
@@ -107,22 +115,20 @@ const Lense = ({ onSelectLens, selectedBrand }) => {
 
                 {/* Tabs with Horizontal Scroll */}
                 <div className="relative w-full sm:w-[60%] md:w-[70%] mt-2 sm:mt-0 sm:ml-auto">
-                  {/* Scroll Buttons */}
                   <button
                     onClick={() => scrollTabs("left")}
                     className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white px-2"
                   >
-                    <ChevronLeft className="w-5 h-5 text-gray-600" />
+                    <MdKeyboardDoubleArrowLeft className="w-5 h-5 text-gray-600" />
                   </button>
                   <div
                     id="tabsContainer"
                     className="flex flex-nowrap overflow-x-auto scrollbar-hide px-6"
                   >
-                    {/* All Tab */}
                     <button
-                      className={`relative px-3 py-1 flex items-center  text-xs sm:text-sm font-medium whitespace-nowrap ${
+                      className={`relative px-3 py-1 flex items-center text-xs sm:text-sm font-medium whitespace-nowrap ${
                         activeTab === "All"
-                          ? "text-black  border-b border-red-400"
+                          ? "text-black border-b border-red-400"
                           : "text-gray-500"
                       }`}
                       style={{ background: "none" }}
@@ -143,14 +149,12 @@ const Lense = ({ onSelectLens, selectedBrand }) => {
                         />
                       )}
                     </button>
-
-                    {/* Dynamic Tabs */}
                     {prescriptionTypes.map((tab) => (
                       <button
                         key={tab._id}
                         className={`relative px-3 py-1 flex items-center text-xs sm:text-sm font-medium whitespace-nowrap ${
                           activeTab === tab._id
-                            ? "text-black  border-b border-red-400"
+                            ? "text-black border-b border-red-400"
                             : "text-gray-500"
                         }`}
                         style={{ background: "none" }}
@@ -173,38 +177,37 @@ const Lense = ({ onSelectLens, selectedBrand }) => {
                       </button>
                     ))}
                   </div>
-                  {/* Scroll Button Right */}
                   <button
                     onClick={() => scrollTabs("right")}
                     className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white px-2"
                   >
-                    <ChevronRight className="w-5 h-5 text-gray-600" />
+                    <MdKeyboardDoubleArrowRight className="w-5 h-5 text-gray-600" />
                   </button>
                 </div>
               </div>
             </div>
+          )}
 
-            {/* Conditional Rendering Based on Loading State */}
-            {isLoading ? (
-              <Loader />
-            ) : filteredLenses?.length <= 0 ? (
-              <div className="h-[80vh] flex justify-center items-center">
-                <h5 className="text-[18px] font-poppins font-medium">
-                  No Lenses Found.
-                </h5>
-              </div>
-            ) : (
-              <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(250px,1fr))]">
-                {filteredLenses.map((lens) => (
-                  <LenseCard
-                    key={lens._id}
-                    lens={lens}
-                    onSelectLens={handleLensSelect}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Lenses Grid */}
+          {isLoading ? (
+            <Loader />
+          ) : lenses?.length <= 0 ? (
+            <div className="h-[80vh] flex justify-center items-center">
+              <h5 className="text-[18px] font-poppins font-medium">
+                No Lenses Found.
+              </h5>
+            </div>
+          ) : (
+            <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(250px,1fr))]">
+              {lenses.map((lens) => (
+                <LenseCard
+                  key={lens._id}
+                  lens={lens}
+                  onSelectLens={handleLensSelect}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

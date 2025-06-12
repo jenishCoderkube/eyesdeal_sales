@@ -107,7 +107,8 @@ const Brand = ({ selectedBrand, onSelectBrand, brands = [] }) => {
               </button>
             ))
           ) : (
-            <div className="text-gray-500">No brands available</div>
+            // <div className="text-gray-500">No brands available</div>
+            <></>
           )}
         </div>
       </div>

@@ -95,6 +95,42 @@ const routes = [
       </PrivateRoute>
     ),
   },
+  {
+    title: "LensDetails",
+    path: "/sales-panel/readingGlasses",
+    element: (
+      <PrivateRoute>
+        <PackagePanel />
+      </PrivateRoute>
+    ),
+  },
+  {
+    title: "LensDetails",
+    path: "/sales-panel/readingGlasses/:id",
+    element: (
+      <PrivateRoute>
+        <PackagePanel />
+      </PrivateRoute>
+    ),
+  },
+  {
+    title: "ContactLenses",
+    path: "/sales-panel/contactLenses",
+    element: (
+      <PrivateRoute>
+        <PackagePanel />
+      </PrivateRoute>
+    ),
+  },
+  {
+    title: "ContactLenses",
+    path: "/sales-panel/contactLenses/:id",
+    element: (
+      <PrivateRoute>
+        <PackagePanel />
+      </PrivateRoute>
+    ),
+  },
 ];
 
 export default routes;

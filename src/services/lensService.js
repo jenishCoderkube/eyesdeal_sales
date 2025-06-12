@@ -7,30 +7,19 @@ const LENS_ENDPOINTS = {
     if (params?.brand) queryParams.append("brand", params.brand);
     if (params?.prescriptionType)
       queryParams.append("prescriptionType", params.prescriptionType);
+    if (params?.search) queryParams.append("search", params.search); // Added search parameter
     return `/saleProduct/getAllLenses${
       queryParams.toString() ? `?${queryParams.toString()}` : ""
     }`;
   },
   GET_ALL_PRESCRIPTIONTYPE: () => `saleProduct/master/prescriptionType`,
-  GET_LENS_BY_ID: (id) => `/saleProduct/getLensById/${id}`, // <-- NEW
+  GET_LENS_BY_ID: (id) => `/saleProduct/getLensById/${id}`,
 };
 
 export const lensService = {
   getAllLenses: async (params = {}) => {
     try {
-      const accessToken = localStorage.getItem("accessToken");
-      if (!accessToken) {
-        return {
-          success: false,
-          message: "No access token found. Please log in.",
-        };
-      }
-
-      const response = await api.get(LENS_ENDPOINTS.GET_ALL_LENSES(params), {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await api.get(LENS_ENDPOINTS.GET_ALL_LENSES(params));
 
       return {
         success: true,
@@ -46,22 +35,7 @@ export const lensService = {
 
   getAllprescriptionType: async () => {
     try {
-      const accessToken = localStorage.getItem("accessToken");
-      if (!accessToken) {
-        return {
-          success: false,
-          message: "No access token found. Please log in.",
-        };
-      }
-
-      const response = await api.get(
-        LENS_ENDPOINTS.GET_ALL_PRESCRIPTIONTYPE(),
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      const response = await api.get(LENS_ENDPOINTS.GET_ALL_PRESCRIPTIONTYPE());
 
       return {
         success: true,
@@ -77,19 +51,7 @@ export const lensService = {
 
   getLensById: async (id) => {
     try {
-      const accessToken = localStorage.getItem("accessToken");
-      if (!accessToken) {
-        return {
-          success: false,
-          message: "No access token found. Please log in.",
-        };
-      }
-
-      const response = await api.get(LENS_ENDPOINTS.GET_LENS_BY_ID(id), {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await api.get(LENS_ENDPOINTS.GET_LENS_BY_ID(id));
 
       return {
         success: true,

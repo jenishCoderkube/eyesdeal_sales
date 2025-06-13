@@ -5,13 +5,16 @@ const CONTACT_LENS_ENDPOINTS = {
   GET_ALL_CONTACT_LENSES: (params) => {
     const queryParams = new URLSearchParams();
     if (params?.brand) queryParams.append("brand", params.brand);
-    if (params?.prescriptionType)
-      queryParams.append("prescriptionType", params.prescriptionType);
+    if (params?.disposabilityType)
+      queryParams.append("disposability", params.disposabilityType);
+    if (params?.search) queryParams.append("search", params.search);
     return `/saleProduct/getAllContactLens${
       queryParams.toString() ? `?${queryParams.toString()}` : ""
     }`;
   },
   GET_CONTACT_LENS_BY_ID: (id) => `/saleProduct/getContactLensById/${id}`,
+  GET_ALL_DISPOSABILITY: () => `saleProduct/master/disposability
+ `,
 };
 
 // Contact Lens service functions
@@ -44,6 +47,22 @@ export const contactLensService = {
         success: false,
         message:
           error.response?.data?.message || "Error fetching contact lenses",
+      };
+    }
+  },
+
+   getAllDisposability: async () => {
+    try {
+      const response = await api.get(CONTACT_LENS_ENDPOINTS.GET_ALL_DISPOSABILITY());
+
+      return {
+        success: true,
+        data: response.data,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Error fetching lenses",
       };
     }
   },

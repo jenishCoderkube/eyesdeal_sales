@@ -121,8 +121,8 @@ const ReadingGlassesPanel = () => {
             Array.isArray(readingGlassResult.value.data?.message?.data)
               ? readingGlassResult.value.data.message.data
               : readingGlassResult.value.data?.message?.data
-              ? [readingGlassResult.value.data.message.data]
-              : []
+                ? [readingGlassResult.value.data.message.data]
+                : []
           );
         } else {
           const errorMessage =

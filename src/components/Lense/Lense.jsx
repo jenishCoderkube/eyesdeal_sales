@@ -99,22 +99,22 @@ const Lense = ({
           {!isBelow768 && (
             <div className="flex flex-col sm:flex-row items-center mb-4 w-full">
               <div className="flex flex-col sm:flex-row w-full items-center bg-white border rounded-lg px-3 py-2 gap-2 sm:gap-4 h-[44px]">
-                <div className="relative flex items-center w-full sm:w-[40%] md:w-[30%]">
+                <div className="relative flex items-center w-full sm:w-[40%] lg:w-[30%]">
                   <FiSearch
                     size={24}
-                    className="absolute md:left-2 text-gray-400"
+                    className="absolute lg:left-2 text-gray-400"
                   />
                   <input
                     type="text"
                     placeholder="Search barcode..."
-                    className="w-full pl-10 pr-4 py-2 rounded-lg border-none border border-gray-300 focus:outline-none md:ring-0 focus:ring-2 focus:ring-blue-500 font-poppins font-normal text-[18px] leading-[24px] text-[#667085]"
+                    className="w-full pl-10 pr-4 py-2 rounded-lg border-none border border-gray-300 focus:outline-none lg:ring-0 focus:ring-2 focus:ring-blue-500 font-poppins font-normal text-[18px] leading-[24px] text-[#667085]"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
                 </div>
 
                 {/* Tabs with Horizontal Scroll */}
-                <div className="relative w-full sm:w-[60%] md:w-[70%] mt-2 sm:mt-0 sm:ml-auto">
+                <div className="relative w-full sm:w-[60%] lg:w-[70%] mt-2 sm:mt-0 sm:ml-auto">
                   <button
                     onClick={() => scrollTabs("left")}
                     className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white px-2"
@@ -198,7 +198,7 @@ const Lense = ({
               </h5>
             </div>
           ) : (
-            <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(250px,1fr))]">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
               {lenses.map((lens) => (
                 <LenseCard
                   key={lens._id}

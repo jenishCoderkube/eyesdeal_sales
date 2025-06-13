@@ -2,13 +2,13 @@ import React from "react";
 
 const Brand = ({ selectedBrand, onSelectBrand, brands = [] }) => {
   return (
-    <div className="flex flex-col items-start w-full md:w-auto mt-6 ml-3 md:ml-8">
+    <div className="flex flex-col items-start w-full lg:w-auto mt-6 ml-3 lg:ml-8">
       <span className="inline-flex w-full max-w-[150px] text-nowrap truncate items-center justify-center bg-gray-300 text-gray-600 font-semibold rounded px-4 sm:px-7 mb-2 h-10 sm:h-[42px] select-none opacity-60">
         {selectedBrand ? selectedBrand.name : "Select Brand"}
       </span>
 
       <div className="w-[188px] max-h-[695px] overflow-y-auto scrollbar-hide mt-3">
-        <div className="sm:grid-cols- md:grid-cols-1 gap-2 sm:gap-3 pr-2">
+        <div className="sm:grid-cols- lg:grid-cols-1 gap-2 sm:gap-3 pr-2">
           {/* Clear Brand Button */}
           <button
             className={`relative rounded-lg border flex flex-col items-center justify-center bg-white ${

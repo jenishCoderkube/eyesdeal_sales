@@ -103,14 +103,14 @@ const FrameDetails = () => {
 
       <div className="flex sm:flex-row flex-col md:gap-x-10 gap-x-3">
         <div className="flex gap-x-5">
-          <div className="md:flex hidden h-screen flex-col overflow-y-scroll gap-2 scrollbar-hidden">
+          <div className="lg:flex hidden h-screen flex-col overflow-y-scroll gap-2 scrollbar-hidden">
             {(glass.photos?.length > 0 ? glass.photos : frameImages).map(
               (img, index) => (
                 <img
                   key={index}
                   src={img}
                   alt={`Thumbnail ${index + 1}`}
-                  className={`w-[129.85px] object-contain h-[94px] rounded-[5px] cursor-pointer ${
+                  className={`w-[129.85px]  object-contain h-[94px] rounded-[5px] cursor-pointer ${
                     activeImage === img
                       ? "border-2 border-[#E77817]"
                       : "border-none"
@@ -128,10 +128,10 @@ const FrameDetails = () => {
             <img
               src={activeImage}
               alt={glass.displayName}
-              className="md:w-[559px] w-full sm:w-[327px] h-full sm:max-h-[290px] md:h-[494px] object-contain rounded-lg"
+              className="md:w-[559px] w-full sm:w-[327px] h-full max-h-[300px] sm:max-h-[290px] md:h-[494px] object-contain rounded-lg"
               onError={(e) => (e.target.src = "/images/placeholder-frame.jpg")}
             />
-            <div className="md:hidden grid grid-cols-3 flex-wrap gap-2">
+            <div className="lg:hidden grid grid-cols-3 flex-wrap gap-2">
               {(glass.photos?.length > 0 ? glass.photos : frameImages).map(
                 (img, index) => (
                   <img
@@ -152,14 +152,14 @@ const FrameDetails = () => {
               )}
             </div>
             <div className="mt-4">
-              <button className="w-full font-['Poppins'] font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-4 py-2 rounded-md">
+              <button className="w-full font-['Poppins'] sm:text-nowrap font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-4 py-2 rounded-md">
                 Select Lens
               </button>
               <div className="flex sm:flex-nowrap flex-wrap mt-3 gap-2">
-                <button className="flex-1 font-['Poppins'] font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-4 py-2 rounded-md">
+                <button className="flex-1 font-['Poppins'] sm:text-nowrap font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-4 py-2 rounded-md">
                   Buy Frame Only
                 </button>
-                <button className="flex-1 font-['Poppins'] text-nowrap font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-2 py-2 rounded-md">
+                <button className="flex-1 font-['Poppins'] sm:text-nowrap text-nowrap font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-2 py-2 rounded-md">
                   Add To Package
                 </button>
               </div>

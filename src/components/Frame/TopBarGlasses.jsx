@@ -78,35 +78,35 @@ const TopBarGlasses = ({
   };
 
   return (
-    <div className="flex md:flex-nowrap md:gap-y-0 gap-y-3 flex-wrap items-center justify-between w-full p-2 border-b border-gray-200 bg-white">
+    <div className="flex lg:flex-nowrap lg:gap-y-0 gap-y-3 flex-wrap items-center justify-between w-full p-2 border-b border-gray-200 bg-white">
       {/* Search Bar */}
-      <div className="relative flex items-center w-full md:w-1/4 lg:w-1/2">
+      <div className="relative flex items-center lg:px-0 px-2 w-full xl:w-1/4 lg:w-1/2">
         <FiSearch
           size={24}
-          className="absolute top-[6px] left-2 text-gray-400"
+          className="absolute top-[8px] lg:left-2 left-4 text-gray-400"
         />
         <input
           type="text"
           placeholder="Search barcode..."
           value={searchQuery}
           onChange={handleSearchChange}
-          className="w-full pl-10 pr-4 py-2 rounded-lg md:border-none border border-gray-300 focus:outline-none md:ring-0 focus:ring-2 focus:ring-blue-500 font-poppins font-normal text-[18px] leading-[24px] text-[#667085]"
+          className="w-full pl-10 pr-4 py-2 rounded-lg lg:border-none border border-gray-300 focus:outline-none lg:ring-0 focus:ring-2 focus:ring-blue-500 font-poppins font-normal text-[18px] leading-[24px] text-[#667085]"
         />
       </div>
 
       {/* Dropdowns */}
-      <div className="flex sm:flex-nowrap flex-wrap gap-y-3 items-center md:justify-end sm:justify-between sm:gap-x-0 gap-x-2 w-full md:space-x-4">
+      <div className="flex sm:flex-nowrap flex-wrap gap-y-3 lg:px-0 px-2 items-center xl:justify-end lg:justify-between  gap-x-2 w-full lg:space-x-4">
         {/* Frame Type Dropdown */}
         <div className="relative">
           <button
             onClick={() => setIsFrameTypeOpen(!isFrameTypeOpen)}
-            className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50"
+            className="flex items-center gap-2 lg:px-0 px-4 py-2 border lg:border-none rounded-3xl lg:rounded-lg hover:bg-gray-50"
           >
             <span>Frame Type</span>
             {isFrameTypeOpen ? (
-              <IoMdArrowDropup className="text-gray-500" />
+              <IoMdArrowDropup className="text-gray-500 lg:w-[25px] w-[20px] lg:h-[25px] h-[20px]" />
             ) : (
-              <IoMdArrowDropdown className="text-gray-500" />
+              <IoMdArrowDropdown className="text-gray-500 lg:w-[25px] w-[20px] lg:h-[25px] h-[20px]" />
             )}
           </button>
           {isFrameTypeOpen && (
@@ -135,7 +135,7 @@ const TopBarGlasses = ({
                     <button
                       key={type._id}
                       onClick={() => handleFrameTypeSelect(type._id)}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                      className=" w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                     >
                       {selectedFrameType === type._id && (
                         <FiCheck className="mr-2 text-blue-500" />
@@ -153,13 +153,13 @@ const TopBarGlasses = ({
         <div className="relative">
           <button
             onClick={() => setIsMaterialOpen(!isMaterialOpen)}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="flex items-center gap-2 lg:px-0 px-4 py-2 border lg:border-none rounded-3xl border-gray-300 lg:rounded-lg hover:bg-gray-50"
           >
             <span>Material</span>
             {isMaterialOpen ? (
-              <IoMdArrowDropup className="text-gray-500" />
+              <IoMdArrowDropup className="text-gray-500 lg:w-[25px] w-[20px] lg:h-[25px] h-[20px]" />
             ) : (
-              <IoMdArrowDropdown className="text-gray-500" />
+              <IoMdArrowDropdown className="text-gray-500 lg:w-[25px] w-[20px] lg:h-[25px] h-[20px]" />
             )}
           </button>
           {isMaterialOpen && (
@@ -210,13 +210,13 @@ const TopBarGlasses = ({
         <div className="relative">
           <button
             onClick={() => setIsBrandOpen(!isBrandOpen)}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="flex items-center gap-2 lg:px-0 px-4 py-2 border lg:border-none border-gray-300 rounded-3xl lg:rounded-lg hover:bg-gray-50"
           >
             <span>Brand</span>
             {isBrandOpen ? (
-              <IoMdArrowDropup className="text-gray-500" />
+              <IoMdArrowDropup className="text-gray-500 lg:w-[25px] w-[20px] lg:h-[25px] h-[20px]" />
             ) : (
-              <IoMdArrowDropdown className="text-gray-500" />
+              <IoMdArrowDropdown className="text-gray-500 lg:w-[25px] w-[20px] lg:h-[25px] h-[20px]" />
             )}
           </button>
           {isBrandOpen && (

@@ -268,7 +268,7 @@ const SelectPackage = ({ activeTopTab }) => {
       <h1 className="font-medium w-fit px-5 pt-5 text-[24px] leading-[24px] tracking-[0] text-black font-poppins">
         Select Package
       </h1>
-      <div className="flex flex-col md:flex-row gap-5 px-5 pt-5 w-full mx-auto">
+      <div className="flex flex-col lg:flex-row gap-5 px-5 pt-5 w-full mx-auto">
         <button
           className="font-poppins font-normal text-[18px] leading-[24px] bg-[#007569] text-white rounded-[8px] px-4 py-2"
           onClick={addNewPair}
@@ -276,9 +276,9 @@ const SelectPackage = ({ activeTopTab }) => {
           Add Another Pair
         </button>
       </div>
-      <div className="flex flex-col md:flex-row gap-5 p-5 w-full mx-auto">
+      <div className="flex flex-col lg:flex-row gap-5 p-5 w-full mx-auto">
         {/* Left Section */}
-        <div className="flex-1 md:w-1/2 w-full">
+        <div className="flex-1 lg:w-1/2 w-full">
           {pairs.map((pair, index) => (
             <div key={pair.id}>
               <div className="p-5 mb-5">
@@ -295,7 +295,7 @@ const SelectPackage = ({ activeTopTab }) => {
                       options={frames}
                       styles={customStyles}
                       placeholder="Select Frame"
-                      className="md:pr-0 pr-4 md:w-[455px] sm:w-[400px] w-[300px]"
+                      className="lg:pr-0 pr-4 lg:w-[455px] sm:w-[400px] w-[300px]"
                       value={frames.find(
                         (option) =>
                           option.value === formik.values.pairs[index].frame
@@ -355,7 +355,7 @@ const SelectPackage = ({ activeTopTab }) => {
                     options={lenses}
                     styles={customStyles}
                     placeholder="Select Lens"
-                    className="md:pr-0 pr-4 md:w-[455px] sm:w-[400px] w-[300px]"
+                    className="lg:pr-0 pr-4 lg:w-[455px] sm:w-[400px] w-[300px]"
                     value={lenses.find(
                       (option) =>
                         option.value === formik.values.pairs[index].lens
@@ -371,7 +371,7 @@ const SelectPackage = ({ activeTopTab }) => {
                     }
                   />
                   <button
-                    className="font-poppins font-normal md:text-[18px] text-[12px] leading-[24px] w-fit md:px-6 px-5 h-[50px] rounded-[8px] flex items-center justify-center text-nowrap gap-2 bg-[#007569] text-white"
+                    className="font-poppins font-normal lg:text-[18px] text-[12px] leading-[24px] w-fit lg:px-6 px-5 h-[50px] rounded-[8px] flex items-center justify-center text-nowrap gap-2 bg-[#007569] text-white"
                     onClick={() =>
                       viewLensDetails(formik.values.pairs[index].lens)
                     }
@@ -396,7 +396,7 @@ const SelectPackage = ({ activeTopTab }) => {
                     Price
                   </h6>
                   =
-                  <span className="font-poppins font-normal text-nowrap text-[18px] leading-[24px] bg-[#E77817] text-white rounded-[8px] px-3 py-2">
+                  <span className="font-poppins font-normal  w-fit min-w-[50px] text-nowrap text-[18px] leading-[24px] bg-[#E77817] text-white rounded-[8px] px-3 py-2">
                     {(() => {
                       const frame = frames.find(
                         (f) => f.value === formik.values.pairs[index].frame
@@ -426,7 +426,7 @@ const SelectPackage = ({ activeTopTab }) => {
         </div>
 
         {/* Right Section */}
-        <div className="md:w-1/2 w-full md:mt-20 mt-5">
+        <div className="lg:w-1/2 w-full lg:mt-20 mt-5">
           <div className="border border-[#DDDDDD] rounded-[15px] p-5">
             <div className="font-poppins font-normal text-[16px] border-b pb-2 leading-[16px] flex justify-between mt-3">
               <span>Package Price</span>

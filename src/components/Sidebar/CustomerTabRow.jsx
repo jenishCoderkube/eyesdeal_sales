@@ -3,7 +3,7 @@ import { FiSearch, FiPlus } from "react-icons/fi";
 
 const CustomerTabRow = () => {
   return (
-    <div className="w-full h-auto px-2 flex flex-col gap-[15px] items-center justify-center md:hidden">
+    <div className="w-full h-auto px-2 flex flex-col gap-[15px] items-center justify-center lg:hidden">
       {/* Top Row: Search, Name, Mobile, Add New Customer */}
       <div className="w-full flex flex-row sm:flex-nowrap flex-wrap sm:gap-[15px] gap-2 items-center justify-between">
         <div className="relative w-full sm:max-w-[200px]">

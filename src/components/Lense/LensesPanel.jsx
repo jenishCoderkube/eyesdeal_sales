@@ -22,7 +22,7 @@ const LensesPanel = () => {
   const [prescriptionTypes, setPrescriptionTypes] = useState([]);
   const isTablet = useMediaQuery({ query: "(max-width: 1024px)" });
   const isMobile = useMediaQuery({ query: "(max-width: 640px)" });
-  const isBelow768 = useMediaQuery({ query: "(max-width: 767px)" });
+  const isBelow768 = useMediaQuery({ query: "(max-width: 1024px)" });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -110,80 +110,42 @@ const LensesPanel = () => {
           </div>
 
           {/* Tabs with Horizontal Scroll */}
-          <div className="relative w-full">
-            <button
-              onClick={() => scrollTabs("left")}
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white px-2"
-            >
-              <MdKeyboardDoubleArrowLeft className="w-5 h-5 text-gray-600" />
-            </button>
+          <div className="relative w-full flex flex-wrap">
             <div
               id="tabsContainer"
-              className="flex flex-nowrap overflow-x-auto scrollbar-hide px-6"
+              className="flex flex-wrap gap-3 scrollbar-hide"
             >
               <button
-                className={`relative px-3 py-1 flex items-center text-xs font-medium whitespace-nowrap ${
+                className={`relative px-3 border py-1 flex items-center text-xs font-medium whitespace-nowrap ${
                   activeTab === "All"
-                    ? "text-black border-b border-red-400"
-                    : "text-gray-500"
+                    ? "text-black   border-[#E77817] lg:rounded-none rounded-md"
+                    : "text-gray-500 border-[#E9E9E9] rounded-md"
                 }`}
                 style={{ background: "none" }}
                 onClick={() => setActiveTab("All")}
               >
                 All
-                {activeTab === "All" && (
-                  <span
-                    className="absolute left-0 right-0"
-                    style={{
-                      top: "28px",
-                      height: "2px",
-                      background: "#fb923c",
-                      borderRadius: "2px",
-                      width: "100%",
-                      display: "block",
-                    }}
-                  />
-                )}
               </button>
               {prescriptionTypes.map((tab) => (
                 <button
                   key={tab._id}
-                  className={`relative px-3 py-1 flex items-center text-xs font-medium whitespace-nowrap ${
+                  className={`relative px-3 border py-1 flex items-center text-xs font-medium whitespace-nowrap ${
                     activeTab === tab._id
-                      ? "text-black border-b border-red-400"
-                      : "text-gray-500"
+                      ? "text-black   border-[#E77817] lg:rounded-none rounded-md"
+                      : "text-gray-500 border-[#E9E9E9] rounded-md"
                   }`}
                   style={{ background: "none" }}
                   onClick={() => setActiveTab(tab._id)}
                 >
                   {tab.name}
-                  {activeTab === tab._id && (
-                    <span
-                      className="absolute left-0 right-0"
-                      style={{
-                        top: "28px",
-                        height: "2px",
-                        background: "#fb923c",
-                        borderRadius: "2px",
-                        width: "100%",
-                        display: "block",
-                      }}
-                    />
-                  )}
                 </button>
               ))}
             </div>
-            <button
-              onClick={() => scrollTabs("right")}
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white px-2"
-            >
-              <MdKeyboardDoubleArrowRight className="w-5 h-5 text-gray-600" />
-            </button>
           </div>
         </div>
       )}
 
-      <h2 className="text-lg sm:text-xl font-semibold md:px-8 px-3 pt-5">
+      <h2 className="text-lg sm:text-xl font-semibold lg:px-8 md:px-4 px-3 pt-5">
         Select Lenses
       </h2>
       <div className="flex-1 flex flex-row h-full">

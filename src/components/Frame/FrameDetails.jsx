@@ -9,6 +9,10 @@ import { IoIosArrowDropleft } from "react-icons/io";
 import { FaRegHeart } from "react-icons/fa";
 import { FaShippingFast } from "react-icons/fa";
 import { frameService } from "../../services/frameService"; // Adjust path as needed
+import { cartService } from "../../services/cartService";
+import { useDispatch } from "react-redux";
+import { setFrameId } from "../../store/FrameLens/frameLensSlice";
+import { toast } from "react-toastify";
 import "./Frames.css"; // Import your CSS file for styling
 import Loader from "../Loader/Loader";
 const frameImages = [
@@ -32,10 +36,12 @@ const colorMap = {
 const FrameDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [glass, setGlass] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeImage, setActiveImage] = useState(null);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Fetch frame data by ID
   useEffect(() => {
@@ -91,6 +97,48 @@ const FrameDetails = () => {
 
   const frameColorName = glass?.frameColor?.name || "Unknown";
   const colorHex = colorMap[frameColorName] || "#000000"; // Default to black if color not in map
+
+  const handleSelectLens = () => {
+    dispatch(setFrameId(id));
+    navigate("/sales-panel/lens");
+  };
+
+  const handleAddToCart = async () => {
+    try {
+      setIsAddingToCart(true);
+      const cartItems = [
+        {
+          product: id,
+        },
+      ];
+
+      const response = await cartService.addToCart(cartItems);
+
+      if (response.success) {
+        toast.success("Added to cart successfully!");
+        navigate("/cart");
+      } else {
+        // Handle specific error cases
+        if (response.message === "Items already in the cart") {
+          toast.warning("This frame is already in your cart");
+        } else {
+          toast.error(response.message || "Failed to add to cart");
+        }
+      }
+    } catch (error) {
+      // Handle network or other errors
+      if (error.response?.status === 401) {
+        toast.error("Please login to continue");
+        navigate("/login");
+      } else if (error.response?.status === 403) {
+        toast.error("You don't have permission to perform this action");
+      } else {
+        toast.error("Error adding to cart. Please try again later.");
+      }
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen px-5 py-5 bg-[#F9FAFB]">
@@ -152,12 +200,19 @@ const FrameDetails = () => {
               )}
             </div>
             <div className="mt-4">
-              <button className="w-full font-['Poppins'] sm:text-nowrap font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-4 py-2 rounded-md">
+              <button
+                onClick={handleSelectLens}
+                className="w-full font-['Poppins'] sm:text-nowrap font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-4 py-2 rounded-md"
+              >
                 Select Lens
               </button>
               <div className="flex sm:flex-nowrap flex-wrap mt-3 gap-2">
-                <button className="flex-1 font-['Poppins'] sm:text-nowrap font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-4 py-2 rounded-md">
-                  Buy Frame Only
+                <button
+                  onClick={handleAddToCart}
+                  disabled={isAddingToCart}
+                  className="flex-1 font-['Poppins'] sm:text-nowrap font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-4 py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isAddingToCart ? "Adding to Cart..." : "Buy Frame Only"}
                 </button>
                 <button className="flex-1 font-['Poppins'] sm:text-nowrap text-nowrap font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-2 py-2 rounded-md">
                   Add To Package
@@ -224,8 +279,12 @@ const FrameDetails = () => {
           )}
 
           <div className="flex items-center w-full justify-start gap-x-2">
-            <button className="flex justify-center items-center w-full md:w-[336px] text-center bg-[#007569] text-white font-poppins font-normal text-[16px] leading-[24px] capitalize px-4 py-[15px] rounded-md">
-              Add To Cart
+            <button
+              onClick={handleAddToCart}
+              disabled={isAddingToCart}
+              className="flex justify-center items-center w-full md:w-[336px] text-center bg-[#007569] text-white font-poppins font-normal text-[16px] leading-[24px] capitalize px-4 py-[15px] rounded-md"
+            >
+              {isAddingToCart ? "Adding to Cart..." : "Add To Cart"}
             </button>
             <div className="w-[59px] h-[53px] border border-[#E5E7EB] rounded-md flex items-center justify-center cursor-pointer">
               <FaRegHeart size={20} height={16} />

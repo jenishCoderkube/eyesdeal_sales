@@ -3,17 +3,26 @@ import { FiSearch } from "react-icons/fi";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import LenseSlider from "./Slider/LenseSlider";
 import { lensService } from "../../services/lensService";
+import { cartService } from "../../services/cartService";
 import { useMediaQuery } from "react-responsive";
+import { useDispatch, useSelector } from "react-redux";
+import { setLensId } from "../../store/FrameLens/frameLensSlice";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import {
   MdKeyboardDoubleArrowLeft,
   MdKeyboardDoubleArrowRight,
 } from "react-icons/md";
 
 const LenseDetails = ({ lens, onClose }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const frameId = useSelector((state) => state.frameLens.frameId);
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("All");
   const [prescriptionTypes, setPrescriptionTypes] = useState([]);
   const [error, setError] = useState(null);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Media queries for responsive design
   const isBelow768 = useMediaQuery({ query: "(max-width: 767px)" });
@@ -42,6 +51,48 @@ const LenseDetails = ({ lens, onClose }) => {
       left: direction === "left" ? -scrollAmount : scrollAmount,
       behavior: "smooth",
     });
+  };
+
+  const handleAddToCart = async () => {
+    if (!lens || !lens._id) return;
+
+    try {
+      setIsAddingToCart(true);
+      dispatch(setLensId(lens._id));
+
+      const cartItems = [
+        {
+          product: frameId,
+          lens: lens._id,
+        },
+      ];
+
+      const response = await cartService.addToCart(cartItems);
+
+      if (response.success) {
+        toast.success("Added to cart successfully!");
+        navigate("/cart");
+      } else {
+        // Handle specific error cases
+        if (response.message === "Items already in the cart") {
+          toast.warning("This item is already in your cart");
+        } else {
+          toast.error(response.message || "Failed to add to cart");
+        }
+      }
+    } catch (error) {
+      // Handle network or other errors
+      if (error.response?.status === 401) {
+        toast.error("Please login to continue");
+        navigate("/login");
+      } else if (error.response?.status === 403) {
+        toast.error("You don't have permission to perform this action");
+      } else {
+        toast.error("Error adding to cart. Please try again later.");
+      }
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
   if (error || !lens) {
@@ -168,10 +219,11 @@ const LenseDetails = ({ lens, onClose }) => {
           {/* Add to Cart Button */}
           <div className="flex justify-center max-w-[85%] w-full mt-8">
             <button
-              className="w-full max-w-xs sm:max-w-sm lg:max-w-md bg-teal-600 text-white font-poppins font-medium text-base sm:text-lg py-3 sm:py-4 rounded-lg hover:bg-teal-700 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500"
-              // onClick={() => console.log("Add to Cart clicked")} // Replace with actual cart logic
+              className="w-full max-w-xs sm:max-w-sm lg:max-w-md bg-teal-600 text-white font-poppins font-medium text-base sm:text-lg py-3 sm:py-4 rounded-lg hover:bg-teal-700 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleAddToCart}
+              disabled={isAddingToCart}
             >
-              Add To Cart
+              {isAddingToCart ? "Adding to Cart..." : "Add To Cart"}
             </button>
           </div>
         </div>

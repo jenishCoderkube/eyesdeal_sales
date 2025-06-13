@@ -9,6 +9,7 @@ const LenseDetails = ({ lens, onClose }) => {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("All");
   const [prescriptionTypes, setPrescriptionTypes] = useState([]);
+  const [error, setError] = useState(null);
 
   // Media queries for responsive design
   const isBelow768 = useMediaQuery({ query: "(max-width: 767px)" });
@@ -39,10 +40,18 @@ const LenseDetails = ({ lens, onClose }) => {
     });
   };
 
-  if (!lens) {
+  if (error || !lens) {
     return (
-      <div className="flex justify-center items-center h-full text-gray-600 font-poppins text-lg">
-        Lens not found
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h1 className="font-['Poppins'] text-black font-medium text-[24px]">
+          {error || "Contact Lens Not Found"}
+        </h1>
+        <button
+          className="mt-4 font-['Poppins'] font-normal text-[16px] text-white bg-[#242424] px-4 py-2 rounded-md hover:bg-[#3a3a3a]"
+          onClick={() => navigate("/sales-panel/contact-lens")}
+        >
+          Back to Contact Lenses
+        </button>
       </div>
     );
   }
@@ -128,7 +137,7 @@ const LenseDetails = ({ lens, onClose }) => {
           <div className="flex justify-center mt-8">
             <button
               className="w-full max-w-xs sm:max-w-sm lg:max-w-md bg-teal-600 text-white font-poppins font-medium text-base sm:text-lg py-3 sm:py-4 rounded-lg hover:bg-teal-700 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500"
-              onClick={() => console.log("Add to Cart clicked")} // Replace with actual cart logic
+              // onClick={() => console.log("Add to Cart clicked")} // Replace with actual cart logic
             >
               Add To Cart
             </button>

@@ -1,43 +1,33 @@
 import React from "react";
 
-const GlassesCard = ({
-  title = "I-GOG Frames",
-  price = "800 ₹",
-  imageUrl = null,
-  onClick,
-}) => {
-  const random = Math.floor(Math.random() * 4) + 1;
-  //   console.log("random", random);
-
+const GlassesCard = ({lens, onSelectLens}) => {
+//  console.log(lens, "lens in glasses card");
+ 
   return (
-    <div
-      className="w-full md:max-w-[269.4px] h-[173px] rounded-[15px] bg-white px-3 py-2 flex flex-col justify-between cursor-pointer hover:border hover:border-[#E77817] transition-all duration-300 ease-in-out"
-      onClick={onClick}
+      <div
+      className="bg-white rounded-xl shadow p-3 sm:p-4 flex flex-col justify-between relative w-full max-w-[264px] mx-auto"
+      style={{ minWidth: "200px", height: "auto", minHeight: "160px" }}
     >
-      <div className="w-full h-[100px] rounded-[4px] relative bg-white overflow-hidden">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            // src={`/glass_${random}.png `}
-            className="w-full h-full object-cover rounded-[4px]"
-            onError={(e) => {
-              e.target.style.display = "none";
-              const fallback = e.target.nextSibling;
-              if (fallback) fallback.style.display = "flex";
-            }}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-white rounded-[4px]">
-            <p className="text-gray-400">Image not found</p>
-          </div>
-        )}
+      <button
+        className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-orange-500 text-white text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 rounded"
+        style={{ zIndex: 1 }}
+        onClick={() => onSelectLens(lens)}
+      >
+        View
+      </button>
+      <div className="flex-1 flex justify-center items-center mt-6 sm:mt-8">
+        <img
+          src={lens.photos?.[0] || lens.img || "/default-lens.png"}
+          alt={lens.displayName}
+          className="h-[100px] sm:h-[120px] w-full max-w-[200px] sm:max-w-[240px] rounded-full object-cover"
+        />
       </div>
-      <div className="flex justify-between items-center">
-        <span className="font-poppins font-normal text-[16px] leading-[24px] tracking-[0%]">
-          {title}
-        </span>
-        <span className="font-poppins text-nowrap font-normal text-[16px] bg-[#EBEBEB] px-[10px] py-[2px] rounded-md leading-[24px] tracking-[0%]">
-          {price}
+      <div className="flex items-center justify-between w-full mt-2 sm:mt-3">
+        <div className="text-xs sm:text-sm md:text-md font-medium text-gray-800">
+          {lens.oldBarcode}
+        </div>
+        <span className="font-poppins font-normal text-xs sm:text-sm bg-[#EBEBEB] px-2 sm:px-3 py-1 rounded-md leading-tight sm:leading-[24px] tracking-[0%]">
+          {lens.sellPrice} ₹
         </span>
       </div>
     </div>

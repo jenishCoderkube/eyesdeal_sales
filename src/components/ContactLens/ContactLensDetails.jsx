@@ -1,51 +1,46 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { IoIosArrowDropleft } from "react-icons/io";
+import { FiSearch } from "react-icons/fi";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import LenseSlider from "./Slider/LenseSlider";
 import { contactLensService } from "../../services/contactLensService";
-import Loader from "../Loader/Loader";
+import { useMediaQuery } from "react-responsive";
 
-const ContactLensDetails = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [lens, setLens] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [activeImage, setActiveImage] = useState(null);
 
+const ContactLensDetails = ({lens, onClose }) => {
+  const [search, setSearch] = useState("");
+  const [activeTab, setActiveTab] = useState("All");
+  const [disposabilityTypes, setdisposabilityTypes] = useState([]);
+  const[error, setError] = useState(null);
+ 
   // Fetch contact lens data by ID
+    const isBelow768 = useMediaQuery({ query: "(max-width: 767px)" });
+    const isBelow1024 = useMediaQuery({ query: "(max-width: 1023px)" });
+
   useEffect(() => {
-    const fetchContactLens = async () => {
-      try {
-        setLoading(true);
-        const response = await contactLensService.getContactLensById(id);
-        if (response.success) {
-          const lensData = response.data.message.data;
-          setLens(lensData);
-          setActiveImage(lensData.photos?.[0] || null);
-        } else {
-          setError(response.message || "Failed to fetch contact lens details");
-        }
-      } catch (err) {
-        setError(err.message || "Unexpected error occurred");
-        if (err.message.includes("Unauthorized")) {
-          navigate("/login");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
+     const fetchdisposabilityTypes = async () => {
+          try {
+            const response = await contactLensService.getAllDisposability();
+            if (response.success) {
+              setdisposabilityTypes(response.data.data);
+            }
+          } catch (err) {
+            console.error("Error fetching prescription types:", err);
+          }
+        };
+    
+        fetchdisposabilityTypes();
+      }, []);
+ 
+    const scrollTabs = (direction) => {
+    const container = document.getElementById("tabsContainer");
+    if (!container) return;
+    const scrollAmount = isBelow768 ? 80 : 100;
+    container.scrollBy({
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
+    });
+  };
 
-    fetchContactLens();
-  }, [id, navigate]);
-
-  // Handle loading state
-  if (loading) {
-    return (
-      <div className="h-screen flex justify-center items-center">
-        <Loader />
-      </div>
-    );
-  }
 
   // Handle error or no lens found
   if (error || !lens) {
@@ -65,91 +60,90 @@ const ContactLensDetails = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen px-5 py-5 bg-[#F9FAFB]">
-      <button
-        className="self-start mb-4 flex items-center font-['Poppins'] font-medium text-[24px] text-[#18181B]"
-        onClick={() => navigate("/sales-panel/contact-lens")}
-      >
-        <IoIosArrowDropleft size={24} className="mr-[4px] mt-[-3px]" /> Back
-      </button>
-
-      <div className="flex sm:flex-row flex-col md:gap-x-10 gap-x-3">
-        <div className="flex gap-x-5">
-          <div className="md:flex hidden h-screen flex-col overflow-y-scroll gap-2 scrollbar-hidden">
-            {lens.photos?.map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt={`Thumbnail ${index + 1}`}
-                className={`w-[129.85px] object-contain h-[94px] rounded-[5px] cursor-pointer ${
-                  activeImage === img
-                    ? "border-2 border-[#E77817]"
-                    : "border-none"
-                }`}
-                onClick={() => setActiveImage(img)}
-                onError={(e) =>
-                  (e.target.src = "/images/placeholder-frame.jpg")
-                }
-              />
-            ))}
+    <div className="px-4 sm:px-6 lg:px-8 py-6 bg-gray-50 min-h-screen">
+      <div className="max-w-5xl mx-auto">
+        {/* Search and Tabs Section */}
+        <div className="flex flex-col sm:flex-row items-center bg-white border border-gray-200 rounded-lg shadow-sm px-4 py-3 gap-3 sm:gap-6 mb-6">
+          <div className="relative w-full sm:w-1/3">
+            <FiSearch
+              size={isBelow768 ? 20 : 24}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            />
+            <input
+              type="text"
+              placeholder="Search barcode..."
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none font-poppins text-sm sm:text-base text-gray-700 placeholder-gray-400"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
 
-          <div className="flex-1">
-            <img
-              src={activeImage}
-              alt={lens.displayName}
-              className="md:w-[559px] w-full sm:w-[327px] h-full sm:max-h-[290px] md:h-[494px] object-contain rounded-lg"
-              onError={(e) => (e.target.src = "/images/placeholder-frame.jpg")}
-            />
-            <div className="md:hidden grid grid-cols-3 flex-wrap gap-2">
-              {lens.photos?.map((img, index) => (
-                <img
-                  key={index}
-                  src={img}
-                  alt={`Thumbnail ${index + 1}`}
-                  className={`w-[100px] object-contain h-[50px] rounded-[5px] cursor-pointer ${
-                    activeImage === img
-                      ? "border-2 border-[#E77817]"
-                      : "border-none"
-                  }`}
-                  onClick={() => setActiveImage(img)}
-                  onError={(e) =>
-                    (e.target.src = "/images/placeholder-frame.jpg")
-                  }
-                />
+          {/* Tabs with Horizontal Scroll */}
+          <div className="relative w-full sm:w-2/3 mt-3 sm:mt-0">
+            <button
+              onClick={() => scrollTabs("left")}
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-sm hover:bg-gray-100 transition-colors"
+              aria-label="Scroll tabs left"
+            >
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+            </button>
+            <div
+              id="tabsContainer"
+              className="flex overflow-x-auto scrollbar-hide px-8 py-2 snap-x"
+            >
+              <button
+                className={`flex-shrink-0 px-4 py-2 text-xs sm:text-sm font-medium whitespace-nowrap ${
+                  activeTab === "All"
+                    ? "text-black border-b-2 border-orange-400"
+                    : "text-gray-500 hover:text-gray-700"
+                } snap-start`}
+                onClick={() => setActiveTab("All")}
+              >
+                All
+              </button>
+              {disposabilityTypes.map((tab) => (
+                <button
+                  key={tab._id}
+                  className={`flex-shrink-0 px-4 py-2 text-xs sm:text-sm font-medium whitespace-nowrap ${
+                    activeTab === tab._id
+                      ? "text-black border-b-2 border-orange-400"
+                      : "text-gray-500 hover:text-gray-700"
+                  } snap-start`}
+                  onClick={() => setActiveTab(tab._id)}
+                >
+                  {tab.name}
+                </button>
               ))}
             </div>
+            <button
+              onClick={() => scrollTabs("right")}
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-sm hover:bg-gray-100 transition-colors"
+              aria-label="Scroll tabs right"
+            >
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+            </button>
           </div>
         </div>
 
-        <div className="flex-1 mt-4 sm:mt-0">
-          <h1 className="font-['Poppins'] text-[24px] font-medium text-black">
-            {lens.displayName}
-          </h1>
-          <p className="font-['Poppins'] text-[16px] font-normal text-[#71717A] mt-2">
-            {lens.description}
-          </p>
-          <div className="mt-4">
-            <h2 className="font-['Poppins'] text-[18px] font-medium text-black">
-              Specifications
-            </h2>
-            <div className="mt-2 space-y-2">
-              <p className="font-['Poppins'] text-[16px] font-normal text-[#71717A]">
-                SKU: {lens.sku}
-              </p>
-              <p className="font-['Poppins'] text-[16px] font-normal text-[#71717A]">
-                Brand: {lens.brand?.name || "N/A"}
-              </p>
-              <p className="font-['Poppins'] text-[16px] font-normal text-[#71717A]">
-                Type: {lens.type?.name || "N/A"}
-              </p>
-              <p className="font-['Poppins'] text-[16px] font-normal text-[#71717A]">
-                Material: {lens.material?.name || "N/A"}
-              </p>
-              <p className="font-['Poppins'] text-[16px] font-normal text-[#71717A]">
-                Price: ₹{lens.sellPrice}
-              </p>
-            </div>
+        {/* Lens Details Card */}
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-8">
+          <LenseSlider onClose={onClose} lens={lens} />
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-6">
+            <h6 className="font-poppins font-medium text-base sm:text-lg text-gray-800">
+              Sub Total
+            </h6>
+            <span className="font-poppins font-semibold text-base sm:text-lg bg-orange-500 text-white rounded-lg px-4 py-2">
+              {lens.sellPrice} ₹
+            </span>
+          </div>
+          {/* Add to Cart Button */}
+          <div className="flex justify-center mt-8">
+            <button
+              className="w-full max-w-xs sm:max-w-sm lg:max-w-md bg-teal-600 text-white font-poppins font-medium text-base sm:text-lg py-3 sm:py-4 rounded-lg hover:bg-teal-700 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500"
+              // onClick={() => console.log("Add to Cart clicked")} // Replace with actual cart logic
+            >
+              Add To Cart
+            </button>
           </div>
         </div>
       </div>

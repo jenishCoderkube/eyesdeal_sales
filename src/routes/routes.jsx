@@ -131,6 +131,15 @@ const routes = [
       </PrivateRoute>
     ),
   },
+  {
+    title: "Cart",
+    path: "/sales-panel/cart",
+    element: (
+      <PrivateRoute>
+        <PackagePanel />
+      </PrivateRoute>
+    ),
+  },
 ];
 
 export default routes;

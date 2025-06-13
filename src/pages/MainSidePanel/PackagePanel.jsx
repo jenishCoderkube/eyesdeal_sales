@@ -16,6 +16,7 @@ import PackageCom from "../../components/Package/PackageCom";
 import ContactLensPanel from "../../components/ContactLens/ContactLensPanel";
 // import GlassPanel from "../../components/ReadingGlass/GlassPanel";
 import ReadingGlassesPanel from "../../components/ReadingGlass/ReadingGlassesPanel";
+import CartPanel from "../../components/CartComponent/Cartpanel";
 
 const PackagePanel = () => {
   const [activeLeftTab, setActiveLeftTab] = useState("Package");
@@ -43,6 +44,8 @@ const PackagePanel = () => {
       setActiveLeftTab("Contact Lenses");
     } else if (path.includes("/sales-panel")) {
       setActiveLeftTab("Package");
+    } else if (path.includes("/cart")) {
+      setActiveLeftTab("cart");
     }
   }, [location.pathname]);
 
@@ -120,6 +123,10 @@ const PackagePanel = () => {
           activeTopTab={activeTopTab}
           setActiveTopTab={setActiveTopTab}
         />
+      )}
+       {activeLeftTab === "Accessories" && (
+        <CartPanel  
+          />
       )}
     </div>
   );

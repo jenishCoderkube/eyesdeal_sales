@@ -1,6 +1,8 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Brand = ({ selectedBrand, onSelectBrand, brands = [] }) => {
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col items-start w-full lg:w-auto mt-6 ml-3 lg:ml-8">
       <span className="inline-flex w-full max-w-[150px] text-nowrap truncate items-center justify-center bg-gray-300 text-gray-600 font-semibold rounded px-4 sm:px-7 mb-2 h-10 sm:h-[42px] select-none opacity-60">
@@ -15,7 +17,11 @@ const Brand = ({ selectedBrand, onSelectBrand, brands = [] }) => {
               !selectedBrand ? "border-2 border-orange-400" : ""
             }`}
             style={{ height: 83, width: "133%", maxWidth: 151 }}
-            onClick={() => onSelectBrand(null)}
+            onClick={() => {
+              onSelectBrand(null);
+
+              navigate("/sales-panel/lens");
+            }}
           >
             <span className="text-gray-800">All</span>
             {!selectedBrand && (
@@ -58,7 +64,10 @@ const Brand = ({ selectedBrand, onSelectBrand, brands = [] }) => {
                     : ""
                 }`}
                 style={{ height: 83, width: "133%", maxWidth: 151 }}
-                onClick={() => onSelectBrand(brand)}
+                onClick={() => {
+                  onSelectBrand(brand);
+                  navigate("/sales-panel/lens");
+                }}
               >
                 {brand.logo ? (
                   <div className="relative w-full h-full flex items-center justify-center">

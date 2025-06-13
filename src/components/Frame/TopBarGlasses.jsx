@@ -192,7 +192,7 @@ const TopBarGlasses = ({
                     <button
                       key={material._id}
                       onClick={() => handleMaterialSelect(material._id)}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                     >
                       {selectedMaterial === material._id && (
                         <FiCheck className="mr-2 text-blue-500" />

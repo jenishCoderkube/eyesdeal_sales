@@ -2,7 +2,7 @@ import React from "react";
 
 const CartCard = ({ cartItems, onRemove }) => {
   return (
-    <div className="flex-1 space-y-4 bg-gray-100 p-4">
+    <div className="flex-1 w-full space-y-4 bg-gray-100 p-4">
       {cartItems.length === 0 ? (
         <p className="text-center text-gray-600 font-poppins text-sm">
           Your cart is empty.
@@ -32,6 +32,12 @@ const CartCard = ({ cartItems, onRemove }) => {
                 <p className="text-xs sm:text-sm text-gray-500">
                   SKU: {product.sku}
                 </p>
+                {item.lens?.productName && (
+                  <p className="text-xs sm:text-sm text-gray-500">
+                    Lens SKU: {item.lens.sku}
+                  </p>
+                )}
+
                 <p className="text-sm sm:text-base font-medium text-gray-900">
                   SRP: ₹{product.sellPrice}
                 </p>

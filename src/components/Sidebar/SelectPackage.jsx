@@ -3,11 +3,11 @@ import Select from "react-select";
 import { FaTimes } from "react-icons/fa";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import { packageService } from "../../services/packageService";
 import LensModal from "../Package/LensModal";
 import Loader from "../Loader/Loader";
+import { useNavigate } from "react-router-dom";
 
 const SelectPackage = ({ activeTopTab }) => {
   // State for managing pairs, frames, lenses, and UI
@@ -19,6 +19,7 @@ const SelectPackage = ({ activeTopTab }) => {
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
   const [selectedLensDataId, setSelectedLensDataId] = useState(null); // Lens data for modal
 
+  const navigate = useNavigate();
   // Custom hook for mobile detection
   const useIsMobile = (breakpoint = 768) => {
     const [isMobile, setIsMobile] = useState(
@@ -264,7 +265,6 @@ const SelectPackage = ({ activeTopTab }) => {
 
   return (
     <div>
-      <ToastContainer />
       <h1 className="font-medium w-fit px-5 pt-5 text-[24px] leading-[24px] tracking-[0] text-black font-poppins">
         Select Package
       </h1>
@@ -455,6 +455,9 @@ const SelectPackage = ({ activeTopTab }) => {
             <button
               className="flex-1 font-poppins font-normal text-[18px] leading-[24px] bg-[#007569] text-white rounded-[8px] py-2"
               // onClick={formik.handleSubmit}
+              onClick={() => {
+                navigate("/sales-panel/accessories");
+              }}
             >
               Add To Cart
             </button>

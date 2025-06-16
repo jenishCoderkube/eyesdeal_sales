@@ -72,7 +72,7 @@ export const cartService = {
     }
   },
 
-  removeCartItems: async (cartId, cartItemIds) => {
+  removeCartItems: async (cartItemIds) => {
     try {
       const accessToken = localStorage.getItem("accessToken");
       if (!accessToken) {
@@ -85,7 +85,6 @@ export const cartService = {
       const response = await api.patch(
         CART_ENDPOINTS.REMOVE_CART_ITEMS(),
         {
-          cartId,
           cartItemId: cartItemIds,
         },
         {

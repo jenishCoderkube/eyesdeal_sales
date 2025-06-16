@@ -106,70 +106,72 @@ const CartPanel = () => {
   }
 
   return (
-    <div className="w-full flex flex-col sm:flex-row gap-4 bg-white">
-      <CartCard cartItems={cartItems} onRemove={handleRemoveItem} />
-      <div className="w-full sm:w-64 bg-gray-50 rounded-lg p-4 space-y-3">
-        {[
-          { label: "Location", value: summary.location },
-          { label: "Total QTY", value: summary.totalQty },
-          { label: "Total AMT", value: `₹${summary.totalAmt}` },
-          { label: "Total DISC", value: `₹${summary.totalDisc}` },
-          { label: "Flat DISC", value: `₹${summary.flatDisc}` },
-          { label: "Other Charges", value: `₹${summary.otherCharges}` },
-          { label: "Net Amount", value: `₹${summary.netAmount}` },
-          { label: "Coupon Apply", value: summary.coupon },
-          { label: "Sales REP", value: summary.salesRep },
-        ].map(({ label, value }) => (
-          <div
-            key={label}
-            className="w-full py-2 px-3 bg-white rounded text-xs sm:text-sm font-medium flex justify-between"
-          >
-            <span>{label}</span>
-            <span>{value}</span>
-          </div>
-        ))}
-        <button className="bg-[#007569] hover:bg-emerald-800 text-[16px] text-white font-normal font-poppins py-2 px-4 rounded-lg w-full">
-          Place Order
-        </button>
-      </div>
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center mt-8 w-full">
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={handlePageChange}
-            renderItem={(item) => (
-              <PaginationItem
-                {...item}
-                sx={{
-                  "&.Mui-selected": {
-                    backgroundColor: "#1976d2",
-                    color: "white",
-                    border: "1px solid #bbdefb",
-                    fontWeight: 500,
-                  },
-                  "&:hover": {
-                    backgroundColor: "#f5f5f5",
-                    border: "1px solid #bdbdbd",
-                  },
-                  border: "1px solid #e0e0e0",
-                  borderRadius: "4px",
-                  margin: "0 4px",
-                  padding: "8px 12px",
-                  fontFamily: "'Poppins', sans-serif",
-                  fontSize: "14px",
-                  color: "#424242",
-                  transition: "all 0.2s",
-                  "&.Mui-disabled": {
-                    opacity: 0.5,
-                    cursor: "not-allowed",
-                  },
-                }}
-              />
-            )}
-          />
+    <div className="w-full">
+      <div className="w-full flex flex-col sm:flex-row gap-4 bg-white">
+        <CartCard cartItems={cartItems} onRemove={handleRemoveItem} />
+        <div className="w-full sm:w-64 bg-gray-50 rounded-lg p-4 space-y-3">
+          {[
+            { label: "Location", value: summary.location },
+            { label: "Total QTY", value: summary.totalQty },
+            { label: "Total AMT", value: `₹${summary.totalAmt}` },
+            { label: "Total DISC", value: `₹${summary.totalDisc}` },
+            { label: "Flat DISC", value: `₹${summary.flatDisc}` },
+            { label: "Other Charges", value: `₹${summary.otherCharges}` },
+            { label: "Net Amount", value: `₹${summary.netAmount}` },
+            { label: "Coupon Apply", value: summary.coupon },
+            { label: "Sales REP", value: summary.salesRep },
+          ].map(({ label, value }) => (
+            <div
+              key={label}
+              className="w-full py-2 px-3 bg-white rounded text-xs sm:text-sm font-medium flex justify-between"
+            >
+              <span>{label}</span>
+              <span>{value}</span>
+            </div>
+          ))}
+          <button className="bg-[#007569] hover:bg-emerald-800 text-[16px] text-white font-normal font-poppins py-2 px-4 rounded-lg w-full">
+            Place Order
+          </button>
         </div>
-      )}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center mt-8 w-full">
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              renderItem={(item) => (
+                <PaginationItem
+                  {...item}
+                  sx={{
+                    "&.Mui-selected": {
+                      backgroundColor: "#1976d2",
+                      color: "white",
+                      border: "1px solid #bbdefb",
+                      fontWeight: 500,
+                    },
+                    "&:hover": {
+                      backgroundColor: "#f5f5f5",
+                      border: "1px solid #bdbdbd",
+                    },
+                    border: "1px solid #e0e0e0",
+                    borderRadius: "4px",
+                    margin: "0 4px",
+                    padding: "8px 12px",
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: "14px",
+                    color: "#424242",
+                    transition: "all 0.2s",
+                    "&.Mui-disabled": {
+                      opacity: 0.5,
+                      cursor: "not-allowed",
+                    },
+                  }}
+                />
+              )}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

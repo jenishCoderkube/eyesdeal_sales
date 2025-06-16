@@ -8,6 +8,7 @@ import { packageService } from "../../services/packageService";
 import LensModal from "../Package/LensModal";
 import Loader from "../Loader/Loader";
 import { useNavigate } from "react-router-dom";
+import { cartService } from "../../services/cartService";
 
 const SelectPackage = ({ activeTopTab }) => {
   // State for managing pairs, frames, lenses, and UI
@@ -199,6 +200,72 @@ const SelectPackage = ({ activeTopTab }) => {
         }
       } catch (error) {
         toast.error("Error creating package");
+      }
+    } else {
+      formik.setTouched({
+        pairs: formik.values.pairs.map((pair, index) =>
+          index === pairs.length - 1 ? { frame: true, lens: true } : pair
+        ),
+      });
+    }
+  };
+
+  const addToCart = async () => {
+    const lastPair = formik.values.pairs[pairs.length - 1];
+    if (lastPair.frame && lastPair.lens) {
+      try {
+        // Calculate package price
+        const packagePrice = formik.values.pairs.reduce((total, pair) => {
+          const frame = frames.find((f) => f.value === pair.frame);
+          const lens = lenses.find((l) => l.value === pair.lens);
+          return total + (frame?.price || 0) + (lens?.price || 0);
+        }, 0);
+
+        const firstWord = activeTopTab.trim().split(" ")[0];
+        const packagePayload = {
+          packageType: firstWord.toLowerCase(),
+          product: formik.values.pairs.map((pair) => ({
+            frames: pair.frame,
+            lens: pair.lens,
+          })),
+          packagePrice: packagePrice.toString(),
+          preFixDiscount: "0",
+          preFixCharges: "",
+          netAmount: (packagePrice - 0).toString(),
+        };
+
+        // Create package
+        const packageResponse = await packageService.createPackage(
+          packagePayload
+        );
+        if (!packageResponse.success) {
+          toast.error(packageResponse.message || "Error creating package");
+          return;
+        }
+
+        // Prepare cart payload
+        const cartPayload = [
+          formik.values.pairs.map((pair) => ({
+            product: pair.frame,
+            lens: pair.lens,
+          })),
+        ];
+
+        // Add to cart
+        const cartResponse = await cartService.addToCart(cartPayload);
+        if (cartResponse.success) {
+          toast.success("Items added to cart successfully");
+          // Reset form and state
+          formik.resetForm({ values: { pairs: [{ frame: "", lens: "" }] } });
+          setPairs([{ id: 1 }]);
+          setShowFrameDropdown({});
+          navigate("/sales-panel/accessories");
+        } else {
+          toast.error(cartResponse.message || "Error adding items to cart");
+        }
+      } catch (error) {
+        toast.error("An unexpected error occurred");
+        console.error("Add to cart error:", error);
       }
     } else {
       formik.setTouched({
@@ -455,9 +522,7 @@ const SelectPackage = ({ activeTopTab }) => {
             <button
               className="flex-1 font-poppins font-normal text-[18px] leading-[24px] bg-[#007569] text-white rounded-[8px] py-2"
               // onClick={formik.handleSubmit}
-              onClick={() => {
-                navigate("/sales-panel/accessories");
-              }}
+              onClick={addToCart}
             >
               Add To Cart
             </button>

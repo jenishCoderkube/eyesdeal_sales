@@ -1,5 +1,5 @@
-import React from 'react';
-import CartCards from './CartCard';
+import React from "react";
+import CartCards from "./CartCard";
 
 const CartPanel = () => {
   return (
@@ -7,15 +7,15 @@ const CartPanel = () => {
       <CartCards />
       <div className="w-[200px] sm:w-64 bg-gray-50 rounded-lg p-4 space-y-3 border">
         {[
-          'Location',
-          'Total QTY',
-          'Total AMT',
-          'Total DISC',
-          'Flat DISC',
-          'Other Charges',
-          'Net Amount',
-          'Coupon Apply',
-          'Sales REP',
+          "Location",
+          "Total QTY",
+          "Total AMT",
+          "Total DISC",
+          "Flat DISC",
+          "Other Charges",
+          "Net Amount",
+          "Coupon Apply",
+          "Sales REP",
         ].map((label) => (
           <div
             key={label}

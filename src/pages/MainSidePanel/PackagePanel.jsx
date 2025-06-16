@@ -124,10 +124,7 @@ const PackagePanel = () => {
           setActiveTopTab={setActiveTopTab}
         />
       )}
-       {activeLeftTab === "Accessories" && (
-        <CartPanel  
-          />
-      )}
+      {activeLeftTab === "Accessories" && <CartPanel />}
     </div>
   );
 };

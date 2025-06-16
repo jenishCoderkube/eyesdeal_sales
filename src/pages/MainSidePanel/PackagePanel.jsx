@@ -10,7 +10,7 @@ import LeftSidebar from "../../components/Sidebar/LeftSidebar";
 import SunglassesPanel from "../../components/Sunglasses/SunglassesPanel";
 // import GlassPanel from "../../components/ReadingGlass/GlassPanel";
 import ReadingGlassesPanel from "../../components/ReadingGlass/ReadingGlassesPanel";
-import CartPanel from "../../components/CartComponent/Cartpanel";
+import CartPanel from "../../components/CartComponent/CartPanel.jsx";
 
 const PackagePanel = () => {
   const [activeLeftTab, setActiveLeftTab] = useState("Package");

@@ -71,7 +71,8 @@ const Frame = ({
                 imageUrl={
                   frame.photos && frame.photos.length > 0
                     ? frame.photos[0]
-                    : "/placeholder-image.jpg" // Fallback image
+                    : null
+                  // Fallback image
                 }
                 active={true}
                 onClick={() => handleCardClick(frame._id, frame)}
@@ -128,7 +129,7 @@ const Frame = ({
               onPageChange={handlePageChange}
               containerClassName="flex items-center space-x-2"
               pageLinkClassName="flex items-center justify-center px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 transition-colors duration-200 font-poppins text-sm cursor-pointer shadow-sm w-full h-full"
-              activeLinkClassName="bg-blue-600 text-white border-blue-700 hover:bg-blue-700 hover:border-blue-800 shadow-md"
+              activeLinkClassName="border-[1px] border-blue-200 bg-blue-700 text-white font-medium"
               previousLinkClassName={`flex items-center justify-center px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 transition-colors duration-200 shadow-sm w-full h-full ${
                 currentPage === 1
                   ? "opacity-50 cursor-not-allowed"

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import SunglassesCard from "./SunglassesCard"; // Adjust path as needed
 import Loader from "../Loader/Loader";
-import ReactPaginate from "react-paginate";
+import { Pagination, PaginationItem } from "@mui/material";
 
 const Sunglasses = ({
   sunglasses,
@@ -19,8 +19,8 @@ const Sunglasses = ({
     });
   };
 
-  const handlePageChange = ({ selected }) => {
-    setCurrentPage(selected + 1); // ReactPaginate uses 0-based index
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value); // Material-UI Pagination uses 1-based index
   };
 
   // Render loading state
@@ -82,66 +82,39 @@ const Sunglasses = ({
         {/* Pagination Controls */}
         {totalPages > 1 && (
           <div className="flex justify-center items-center mt-8">
-            <ReactPaginate
-              previousLabel={
-                <div className="flex items-center justify-center space-x-1">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                  <span>Previous</span>
-                </div>
-              }
-              nextLabel={
-                <div className="flex items-center justify-center space-x-1">
-                  <span>Next</span>
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </div>
-              }
-              breakLabel="..."
-              pageCount={totalPages}
-              marginPagesDisplayed={2}
-              pageRangeDisplayed={3}
-              onPageChange={handlePageChange}
-              containerClassName="flex items-center space-x-2"
-              pageLinkClassName="flex items-center justify-center px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 transition-colors duration-200 font-poppins text-sm cursor-pointer shadow-sm w-full h-full"
-              activeLinkClassName="border-[1px] border-blue-200 bg-blue-700 text-white font-medium"
-              previousLinkClassName={`flex items-center justify-center px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 transition-colors duration-200 shadow-sm w-full h-full ${
-                currentPage === 1
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-gray-100 hover:border-gray-400"
-              }`}
-              nextLinkClassName={`flex items-center justify-center px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 transition-colors duration-200 shadow-sm w-full h-full ${
-                currentPage === totalPages
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-gray-100 hover:border-gray-400"
-              }`}
-              breakClassName="flex items-center justify-center px-4 py-2 text-gray-700 font-poppins text-sm"
-              disabledClassName="opacity-50 cursor-not-allowed"
-              forcePage={currentPage - 1} // Adjust for 0-based index
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              renderItem={(item) => (
+                <PaginationItem
+                  {...item}
+                  sx={{
+                    "&.Mui-selected": {
+                      backgroundColor: "#1976d2",
+                      color: "white",
+                      border: "1px solid #bbdefb",
+                      fontWeight: 500,
+                    },
+                    "&:hover": {
+                      backgroundColor: "#f5f5f5",
+                      border: "1px solid #bdbdbd",
+                    },
+                    border: "1px solid #e0e0e0",
+                    borderRadius: "4px",
+                    margin: "0 4px",
+                    padding: "8px 12px",
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: "14px",
+                    color: "#424242",
+                    transition: "all 0.2s",
+                    "&.Mui-disabled": {
+                      opacity: 0.5,
+                      cursor: "not-allowed",
+                    },
+                  }}
+                />
+              )}
             />
           </div>
         )}

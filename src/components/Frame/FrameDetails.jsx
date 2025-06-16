@@ -116,7 +116,7 @@ const FrameDetails = () => {
 
       if (response.success) {
         toast.success("Added to cart successfully!");
-        navigate("/cart");
+        navigate("/sales-panel/accessories");
       } else {
         // Handle specific error cases
         if (response.message === "Items already in the cart") {

@@ -68,17 +68,15 @@ const LenseDetails = ({ lens, onClose }) => {
       ];
 
       const response = await cartService.addToCart(cartItems);
+      console.log("response", response);
 
       if (response.success) {
         toast.success("Added to cart successfully!");
-        navigate("/cart");
+        navigate("/sales-panel/accessories");
       } else {
-        // Handle specific error cases
-        if (response.message === "Items already in the cart") {
-          toast.warning("This item is already in your cart");
-        } else {
-          toast.error(response.message || "Failed to add to cart");
-        }
+        console.log("Failed to add to cart");
+
+        toast.error(response.message || "Failed to add to cart");
       }
     } catch (error) {
       // Handle network or other errors

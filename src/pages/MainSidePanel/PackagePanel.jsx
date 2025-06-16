@@ -36,10 +36,10 @@ const PackagePanel = () => {
       setActiveLeftTab("Reading Glasses");
     } else if (path.includes("/contactLenses")) {
       setActiveLeftTab("Contact Lenses");
+    } else if (path.includes("/accessories")) {
+      setActiveLeftTab("Accessories");
     } else if (path.includes("/sales-panel")) {
       setActiveLeftTab("Package");
-    } else if (path.includes("/cart")) {
-      setActiveLeftTab("cart");
     }
   }, [location.pathname]);
 
@@ -64,6 +64,9 @@ const PackagePanel = () => {
         break;
       case "Contact Lenses":
         navigate("/sales-panel/contactLenses");
+        break;
+      case "Accessories":
+        navigate("/sales-panel/accessories");
         break;
       case "Logout":
         localStorage.removeItem("accessToken");

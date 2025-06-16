@@ -20,7 +20,7 @@ const Brand = ({ selectedBrand, onSelectBrand, brands = [] }) => {
             onClick={() => {
               onSelectBrand(null);
 
-              navigate("/sales-panel/lens");
+              // navigate("/sales-panel/lens");
             }}
           >
             <span className="text-gray-800">All</span>
@@ -66,7 +66,7 @@ const Brand = ({ selectedBrand, onSelectBrand, brands = [] }) => {
                 style={{ height: 83, width: "133%", maxWidth: 151 }}
                 onClick={() => {
                   onSelectBrand(brand);
-                  navigate("/sales-panel/lens");
+                  // navigate("/sales-panel/lens");
                 }}
               >
                 {brand.logo ? (

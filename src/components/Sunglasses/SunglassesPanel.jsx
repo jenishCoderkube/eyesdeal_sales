@@ -1,28 +1,32 @@
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import TopTabBar from "../Sidebar/TopTabBar";
-import TopBarSunglasses from "./TopBarSunglasses";
 import Sunglasses from "./Sunglasses";
 import SunglassesDetails from "./SunglassesDetails";
 import { masterDataService } from "../../services/masterDataService";
 import { SunGlassesService } from "../../services/sunglassesService";
+import TopBarGlasses from "../Frame/TopBarGlasses";
 
 const SunglassesPanel = ({ activeTopTab, setActiveTopTab }) => {
   const [frameTypes, setFrameTypes] = useState([]);
   const [materials, setMaterials] = useState([]);
   const [brands, setBrands] = useState([]);
-  const [sunglasses, setSunglasses] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [sunglasses, setSunglasses] = useState(null); // Initialize as null
+  const [loading, setLoading] = useState(true); // Start with loading true
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [filters, setFilters] = useState({
     frameType: "",
     frameMaterial: "",
     brand: "",
     search: "",
   });
+  const PAGE_LIMIT = 10; // Number of sunglasses per page
 
   const location = useLocation();
+  const navigate = useNavigate();
   const isTablet = useMediaQuery({ query: "(max-width: 1024px)" });
   const isSunglassesDetails = location.pathname.startsWith(
     "/sunglasses/details"
@@ -34,6 +38,8 @@ const SunglassesPanel = ({ activeTopTab, setActiveTopTab }) => {
       ...prevFilters,
       ...newFilter,
     }));
+    setCurrentPage(1); // Reset to page 1 on filter change
+    setSunglasses(null); // Reset sunglasses during fetch
   };
 
   // Fetch data
@@ -41,103 +47,89 @@ const SunglassesPanel = ({ activeTopTab, setActiveTopTab }) => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
+      setSunglasses(null); // Reset sunglasses during fetch
       try {
-        const results = await Promise.allSettled([
+        const results = await Promise.all([
           masterDataService.getFrameTypes(),
           masterDataService.getMaterials(),
           masterDataService.getBrands(),
-          SunGlassesService.getAllSunGlasses(filters),
+          SunGlassesService.getAllSunGlasses({
+            ...filters,
+            page: currentPage,
+            limit: PAGE_LIMIT,
+          }),
         ]);
 
         const [frameTypeResult, materialResult, brandResult, sunglassesResult] =
           results;
 
         // Process frame types
-        if (
-          frameTypeResult.status === "fulfilled" &&
-          frameTypeResult.value?.success
-        ) {
+        if (frameTypeResult.success) {
           setFrameTypes(
-            Array.isArray(frameTypeResult.value.data?.data)
-              ? frameTypeResult.value.data.data
+            Array.isArray(frameTypeResult.data?.data)
+              ? frameTypeResult.data.data
               : []
           );
         } else {
-          setError(
-            (prev) =>
-              prev ||
-              frameTypeResult.reason?.response?.data?.message ||
-              "Failed to fetch frame types"
+          throw new Error(
+            frameTypeResult.message || "Failed to fetch frame types"
           );
         }
 
         // Process materials
-        if (
-          materialResult.status === "fulfilled" &&
-          materialResult.value?.success
-        ) {
+        if (materialResult.success) {
           setMaterials(
-            Array.isArray(materialResult.value.data?.data)
-              ? materialResult.value.data.data
+            Array.isArray(materialResult.data?.data)
+              ? materialResult.data.data
               : []
           );
         } else {
-          setError(
-            (prev) =>
-              prev ||
-              materialResult.reason?.response?.data?.message ||
-              "Failed to fetch materials"
+          throw new Error(
+            materialResult.message || "Failed to fetch materials"
           );
         }
 
         // Process brands
-        if (brandResult.status === "fulfilled" && brandResult.value?.success) {
+        if (brandResult.success) {
           setBrands(
-            Array.isArray(brandResult.value.data?.data)
-              ? brandResult.value.data.data
-              : []
+            Array.isArray(brandResult.data?.data) ? brandResult.data.data : []
           );
         } else {
-          setError(
-            (prev) =>
-              prev ||
-              brandResult.reason?.response?.data?.message ||
-              "Failed to fetch brands"
-          );
+          throw new Error(brandResult.message || "Failed to fetch brands");
         }
 
         // Process sunglasses
-        if (
-          sunglassesResult.status === "fulfilled" &&
-          sunglassesResult.value?.success
-        ) {
+        if (sunglassesResult.success) {
           setSunglasses(
-            Array.isArray(sunglassesResult.value.data?.message?.data)
-              ? sunglassesResult.value.data.message.data
-              : sunglassesResult.value.data?.message?.data
-              ? [sunglassesResult.value.data.message.data]
+            Array.isArray(sunglassesResult.data?.message?.data)
+              ? sunglassesResult.data.message.data
+              : sunglassesResult.data?.message?.data
+              ? [sunglassesResult.data.message.data]
               : []
           );
+          setTotalPages(sunglassesResult.data?.message?.totalPages || 1);
         } else {
-          setError(
-            (prev) =>
-              prev ||
-              sunglassesResult.reason?.response?.data?.message ||
-              "Failed to fetch sunglasses"
+          throw new Error(
+            sunglassesResult.message || "Failed to fetch sunglasses"
           );
         }
       } catch (error) {
-        setError(
-          (prev) =>
-            prev || error.response?.data?.message || "Unexpected error occurred"
-        );
+        const errorMessage = error.message || "Unexpected error occurred";
+        setError(errorMessage);
+        setSunglasses([]);
+        if (
+          errorMessage.includes("Unauthorized") ||
+          error.response?.status === 401
+        ) {
+          navigate("/login");
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [filters]);
+  }, [filters, currentPage, navigate]);
 
   return (
     <div className="flex-1 flex flex-col">
@@ -149,7 +141,7 @@ const SunglassesPanel = ({ activeTopTab, setActiveTopTab }) => {
               setActiveTab={setActiveTopTab}
             />
           </div>
-          <TopBarSunglasses
+          <TopBarGlasses
             frameTypes={frameTypes}
             materials={materials}
             brands={brands}
@@ -164,12 +156,15 @@ const SunglassesPanel = ({ activeTopTab, setActiveTopTab }) => {
               sunglasses={sunglasses}
               loading={loading}
               error={error}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              totalPages={totalPages}
             />
           )}
         </>
       ) : (
         <div className="flex-1 flex flex-col mx-4 mt-1 border border-gray-200 rounded-xl">
-          <TopBarSunglasses
+          <TopBarGlasses
             frameTypes={frameTypes}
             materials={materials}
             brands={brands}
@@ -184,6 +179,9 @@ const SunglassesPanel = ({ activeTopTab, setActiveTopTab }) => {
               sunglasses={sunglasses}
               loading={loading}
               error={error}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              totalPages={totalPages}
             />
           )}
         </div>

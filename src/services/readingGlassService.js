@@ -10,6 +10,14 @@ const READING_GLASS_ENDPOINTS = {
 export const readingGlassService = {
   getAllReadingGlasses: async (filters = {}) => {
     try {
+      const accessToken = localStorage.getItem("accessToken");
+      if (!accessToken) {
+        return {
+          success: false,
+          message: "No access token found. Please log in.",
+        };
+      }
+
       // Construct query parameters
       const params = new URLSearchParams();
       if (filters.frameType) params.append("frameType", filters.frameType);
@@ -17,17 +25,23 @@ export const readingGlassService = {
       if (filters.frameMaterial)
         params.append("frameMaterial", filters.frameMaterial);
       if (filters.search) params.append("search", filters.search);
+      if (filters.page) params.append("page", filters.page);
+      if (filters.limit) params.append("limit", filters.limit);
 
       const url = `${READING_GLASS_ENDPOINTS.GET_ALL_READING_GLASSES()}?${params.toString()}`;
       console.log("Request URL:", url);
       console.log("Request Headers:", {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
         Accept: "application/json",
       });
 
       // Make the API call
-      const response = await api.get(url);
+      const response = await api.get(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
       return {
         success: true,

@@ -7,7 +7,9 @@ const LENS_ENDPOINTS = {
     if (params?.brand) queryParams.append("brand", params.brand);
     if (params?.prescriptionType)
       queryParams.append("prescriptionType", params.prescriptionType);
-    if (params?.search) queryParams.append("search", params.search); // Added search parameter
+    if (params?.search) queryParams.append("search", params.search);
+    if (params?.page) queryParams.append("page", params.page);
+    if (params?.limit) queryParams.append("limit", params.limit);
     return `/saleProduct/getAllLenses${
       queryParams.toString() ? `?${queryParams.toString()}` : ""
     }`;
@@ -20,7 +22,6 @@ export const lensService = {
   getAllLenses: async (params = {}) => {
     try {
       const response = await api.get(LENS_ENDPOINTS.GET_ALL_LENSES(params));
-
       return {
         success: true,
         data: response.data,
@@ -36,7 +37,6 @@ export const lensService = {
   getAllprescriptionType: async () => {
     try {
       const response = await api.get(LENS_ENDPOINTS.GET_ALL_PRESCRIPTIONTYPE());
-
       return {
         success: true,
         data: response.data,
@@ -52,7 +52,6 @@ export const lensService = {
   getLensById: async (id) => {
     try {
       const response = await api.get(LENS_ENDPOINTS.GET_LENS_BY_ID(id));
-
       return {
         success: true,
         data: response.data,

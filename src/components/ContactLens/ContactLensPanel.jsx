@@ -19,7 +19,6 @@ const ContactLensPanel = () => {
   const [activeTab, setActiveTab] = useState("All");
   const [disposabilityTypes, setdisposabilityTypes] = useState([]);
 
-
   const isTablet = useMediaQuery({ query: "(max-width: 1024px)" });
   const isMobile = useMediaQuery({ query: "(max-width: 640px)" });
   const isBelow768 = useMediaQuery({ query: "(max-width: 1024px)" });
@@ -33,7 +32,6 @@ const ContactLensPanel = () => {
           contactLensService.getAllDisposability(),
         ]);
         console.log("Brands Response:", disposabilityeResponse);
-        
 
         if (brandsResponse.success) {
           setBrands(brandsResponse.data.data);
@@ -67,8 +65,6 @@ const ContactLensPanel = () => {
   const handleBack = () => {
     setSelectedLens(null);
   };
-
-
 
   const scrollTabs = (direction) => {
     const container = document.getElementById("tabsContainer");
@@ -120,10 +116,11 @@ const ContactLensPanel = () => {
               className="flex flex-wrap gap-3 scrollbar-hide"
             >
               <button
-                className={`relative px-3 border py-1 flex items-center text-xs font-medium whitespace-nowrap ${activeTab === "All"
+                className={`relative px-3 border py-1 flex items-center text-xs font-medium whitespace-nowrap ${
+                  activeTab === "All"
                     ? "text-black   border-[#E77817] lg:rounded-none rounded-md"
                     : "text-gray-500 border-[#E9E9E9] rounded-md"
-                  }`}
+                }`}
                 style={{ background: "none" }}
                 onClick={() => setActiveTab("All")}
               >
@@ -132,10 +129,11 @@ const ContactLensPanel = () => {
               {disposabilityTypes.map((tab) => (
                 <button
                   key={tab._id}
-                  className={`relative px-3 border py-1 flex items-center text-xs font-medium whitespace-nowrap ${activeTab === tab._id
+                  className={`relative px-3 border py-1 flex items-center text-xs font-medium whitespace-nowrap ${
+                    activeTab === tab._id
                       ? "text-black   border-[#E77817] lg:rounded-none rounded-md"
                       : "text-gray-500 border-[#E9E9E9] rounded-md"
-                    }`}
+                  }`}
                   style={{ background: "none" }}
                   onClick={() => setActiveTab(tab._id)}
                 >
@@ -151,12 +149,12 @@ const ContactLensPanel = () => {
         Select Contact Lenses
       </h2>
 
-
       <div className="flex-1 flex flex-row h-full">
         {/* Brand Selection - Always visible */}
         <div
-          className={`${isMobile ? "w-1/3" : isTablet ? "w-1/4" : "w-1/8"
-            } flex-shrink-0 overflow-y-auto`}
+          className={`${
+            isMobile ? "w-1/3" : isTablet ? "w-1/4" : "w-1/8"
+          } flex-shrink-0 overflow-y-auto`}
         >
           <Brand
             brands={brands}
@@ -167,8 +165,9 @@ const ContactLensPanel = () => {
 
         {/* Main Content Area */}
         <div
-          className={`${isMobile ? "w-2/3" : isTablet ? "w-3/4" : "w-4/5"
-            } flex-1 overflow-hidden`}
+          className={`${
+            isMobile ? "w-2/3" : isTablet ? "w-3/4" : "w-4/5"
+          } flex-1 overflow-hidden`}
         >
           {selectedLens ? (
             <ContactLensDetails lens={selectedLens} onClose={handleBack} />
@@ -176,7 +175,7 @@ const ContactLensPanel = () => {
             <ContactLens
               selectedBrand={selectedBrand}
               onSelectLens={handleLensSelect}
-               search={search}
+              search={search}
               setSearch={setSearch}
               activeTab={activeTab}
               setActiveTab={setActiveTab}

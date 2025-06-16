@@ -132,8 +132,8 @@ const routes = [
     ),
   },
   {
-    title: "Cart",
-    path: "/sales-panel/cart",
+    title: "Accessories",
+    path: "/sales-panel/accessories",
     element: (
       <PrivateRoute>
         <PackagePanel />

@@ -1,20 +1,18 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { lensService } from "../../services/lensService";
-import { masterDataService } from "../../services/masterDataService";
+import { contactLensService } from "../../services/contactLensService";
+import ContactLensCard from "./ContactLensCard";
+import { FiSearch } from "react-icons/fi";
 import {
   MdKeyboardDoubleArrowLeft,
   MdKeyboardDoubleArrowRight,
 } from "react-icons/md";
-import ContactLensCard from "./ContactLensCard";
-import { FiSearch } from "react-icons/fi";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import Loader from "../Loader/Loader";
-import { contactLensService } from "../../services/contactLensService";
 import debounce from "lodash.debounce";
+import ReactPaginate from "react-paginate";
+import Loader from "../Loader/Loader";
 
-const ContactLens = ({ 
-   onSelectLens,
+const ContactLens = ({
+  onSelectLens,
   selectedBrand,
   search,
   setSearch,
@@ -22,54 +20,80 @@ const ContactLens = ({
   setActiveTab,
   disposabilityTypes,
   isBelow768,
- }) => {
+}) => {
   const navigate = useNavigate();
-  const [lenses, setLenses] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [lenses, setLenses] = useState(null); // Initialize as null
+  const [isLoading, setIsLoading] = useState(true); // Start with loading true
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const PAGE_LIMIT = 10; // Number of lenses per page
 
-const FetchContactLens=useCallback(
- async (searchQuery = "") => {
+  // Fetch contact lenses function
+  const fetchContactLens = useCallback(
+    async (searchQuery = "", page = 1) => {
       setIsLoading(true);
+      setError(null);
+      setLenses(null); // Reset lenses during fetch
       try {
-        const params = {};
+        const params = {
+          page,
+          limit: PAGE_LIMIT,
+        };
         if (activeTab !== "All") params.disposabilityType = activeTab;
         if (selectedBrand) params.brand = selectedBrand._id;
-        if (searchQuery.trim()) params.search = searchQuery; // Include search param if not empty
+        if (searchQuery.trim()) params.search = searchQuery;
 
-        const lensesResponse = await contactLensService.getAllContactLenses(params);
+        const lensesResponse = await contactLensService.getAllContactLenses(
+          params
+        );
         if (lensesResponse.success) {
-          setLenses(lensesResponse.data.message.data);
+          setLenses(
+            Array.isArray(lensesResponse.data.message.data)
+              ? lensesResponse.data.message.data
+              : lensesResponse.data.message.data
+              ? [lensesResponse.data.message.data]
+              : []
+          );
+          setTotalPages(lensesResponse.data.message.totalPages || 1);
+        } else {
+          throw new Error(
+            lensesResponse.message || "Error fetching contact lenses"
+          );
         }
       } catch (err) {
-        console.error("Error fetching lenses:", err);
+        setError(err.message || "Error fetching contact lenses");
+        setLenses([]);
       } finally {
         setIsLoading(false);
       }
     },
     [activeTab, selectedBrand]
-  )
+  );
 
+  // Debounced search function
   const debouncedFetchContactLenses = useCallback(
     debounce((query) => {
-      FetchContactLens(query);
-    }, 500), // 500ms debounce delay
-    [FetchContactLens]
+      fetchContactLens(query, 1); // Reset to page 1 on search
+      setCurrentPage(1);
+    }, 500),
+    [fetchContactLens]
   );
 
   // Effect to handle search changes
   useEffect(() => {
     debouncedFetchContactLenses(search);
-    // Cleanup debounce on unmount
     return () => {
       debouncedFetchContactLenses.cancel();
     };
   }, [search, debouncedFetchContactLenses]);
 
+  // Effect to fetch lenses when activeTab, selectedBrand, or currentPage changes
   useEffect(() => {
-    FetchContactLens(search);
-  }, [activeTab, selectedBrand, FetchContactLens]);
+    fetchContactLens(search, currentPage);
+  }, [activeTab, selectedBrand, currentPage, fetchContactLens]);
 
-   const scrollTabs = (direction) => {
+  const scrollTabs = (direction) => {
     const container = document.getElementById("tabsContainer");
     if (!container) return;
     const scrollAmount = 100;
@@ -80,15 +104,16 @@ const FetchContactLens=useCallback(
   };
 
   const handleLensSelect = (lens) => {
-    // console.log(lens,"jaysgcasdycjdav");
-    
     navigate(`/sales-panel/contactLenses/${lens._id}`);
     if (onSelectLens) onSelectLens(lens);
   };
 
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected + 1); // ReactPaginate uses 0-based index
+  };
 
   return (
-     <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full">
       <div className="flex-1 p-4 overflow-y-auto mt-1">
         <div className="flex flex-col w-full">
           {/* Search and Tabs for screens 768px and above */}
@@ -186,24 +211,100 @@ const FetchContactLens=useCallback(
 
           {/* Lenses Grid */}
           {isLoading ? (
-            <Loader />
-          ) : lenses?.length <= 0 ? (
+            <div className="h-[90vh] flex justify-center items-center">
+              <Loader />
+            </div>
+          ) : error ? (
             <div className="h-[80vh] flex justify-center items-center">
-              <h5 className="text-[18px] font-poppins font-medium">
-                No Lenses Found.
+              <h5 className="text-[18px] font-poppins font-medium text-red-600">
+                {error}
               </h5>
             </div>
-          ) : (
-            <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-              {lenses.map((lens) => (
-                <ContactLensCard
-                  key={lens._id}
-                  lens={lens}
-                  onSelectLens={handleLensSelect}
-                />
-              ))}
+          ) : lenses && lenses.length === 0 ? (
+            <div className="h-[80vh] flex justify-center items-center">
+              <h5 className="text-[18px] font-poppins font-medium">
+                No Contact Lenses Found.
+              </h5>
             </div>
-          )}
+          ) : lenses && lenses.length > 0 ? (
+            <>
+              <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                {lenses.map((lens) => (
+                  <ContactLensCard
+                    key={lens._id}
+                    lens={lens}
+                    onSelectLens={handleLensSelect}
+                  />
+                ))}
+              </div>
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center mt-8">
+                  <ReactPaginate
+                    previousLabel={
+                      <div className="flex items-center justify-center space-x-1">
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M15 19l-7-7 7-7"
+                          />
+                        </svg>
+                        <span>Previous</span>
+                      </div>
+                    }
+                    nextLabel={
+                      <div className="flex items-center justify-center space-x-1">
+                        <span>Next</span>
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </div>
+                    }
+                    breakLabel="..."
+                    pageCount={totalPages}
+                    marginPagesDisplayed={2}
+                    pageRangeDisplayed={3}
+                    onPageChange={handlePageChange}
+                    containerClassName="flex items-center space-x-2"
+                    pageLinkClassName="flex items-center justify-center px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 transition-colors duration-200 font-poppins text-sm cursor-pointer shadow-sm w-full h-full"
+                    activeLinkClassName="bg-blue-600 text-white border-blue-700 hover:bg-blue-700 hover:border-blue-800 shadow-md"
+                    previousLinkClassName={`flex items-center justify-center px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 transition-colors duration-200 shadow-sm w-full h-full ${
+                      currentPage === 1
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:bg-gray-100 hover:border-gray-400"
+                    }`}
+                    nextLinkClassName={`flex items-center justify-center px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 transition-colors duration-200 shadow-sm w-full h-full ${
+                      currentPage === totalPages
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:bg-gray-100 hover:border-gray-400"
+                    }`}
+                    breakClassName="flex items-center justify-center px-4 py-2 text-gray-700 font-poppins text-sm"
+                    disabledClassName="opacity-50 cursor-not-allowed"
+                    forcePage={currentPage - 1} // Adjust for 0-based index
+                  />
+                </div>
+              )}
+            </>
+          ) : null}
         </div>
       </div>
     </div>

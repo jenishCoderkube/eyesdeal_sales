@@ -206,7 +206,7 @@ const LenseDetails = ({ lens, onClose }) => {
         </div>
 
         {/* Lens Details Card */}
-        <div className="bg-white rounded-lg shadow-md p-4 ">
+        <div className="bg-white rounded-lg  p-4 ">
           <LenseSlider onClose={onClose} lens={lens} />
           <div className="flex flex-col sm:flex-row max-w-[85%] w-full justify-center items-center gap-4 mt-6">
             <h6 className="font-poppins font-medium text-base sm:text-lg text-gray-800">

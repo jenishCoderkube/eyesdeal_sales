@@ -5,33 +5,32 @@ import LenseSlider from "./Slider/LenseSlider";
 import { contactLensService } from "../../services/contactLensService";
 import { useMediaQuery } from "react-responsive";
 
-
-const ContactLensDetails = ({lens, onClose }) => {
+const ContactLensDetails = ({ lens, onClose }) => {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("All");
   const [disposabilityTypes, setdisposabilityTypes] = useState([]);
-  const[error, setError] = useState(null);
- 
+  const [error, setError] = useState(null);
+
   // Fetch contact lens data by ID
-    const isBelow768 = useMediaQuery({ query: "(max-width: 767px)" });
-    const isBelow1024 = useMediaQuery({ query: "(max-width: 1023px)" });
+  const isBelow768 = useMediaQuery({ query: "(max-width: 767px)" });
+  const isBelow1024 = useMediaQuery({ query: "(max-width: 1023px)" });
 
   useEffect(() => {
-     const fetchdisposabilityTypes = async () => {
-          try {
-            const response = await contactLensService.getAllDisposability();
-            if (response.success) {
-              setdisposabilityTypes(response.data.data);
-            }
-          } catch (err) {
-            console.error("Error fetching prescription types:", err);
-          }
-        };
-    
-        fetchdisposabilityTypes();
-      }, []);
- 
-    const scrollTabs = (direction) => {
+    const fetchdisposabilityTypes = async () => {
+      try {
+        const response = await contactLensService.getAllDisposability();
+        if (response.success) {
+          setdisposabilityTypes(response.data.data);
+        }
+      } catch (err) {
+        console.error("Error fetching prescription types:", err);
+      }
+    };
+
+    fetchdisposabilityTypes();
+  }, []);
+
+  const scrollTabs = (direction) => {
     const container = document.getElementById("tabsContainer");
     if (!container) return;
     const scrollAmount = isBelow768 ? 80 : 100;
@@ -40,7 +39,6 @@ const ContactLensDetails = ({lens, onClose }) => {
       behavior: "smooth",
     });
   };
-
 
   // Handle error or no lens found
   if (error || !lens) {

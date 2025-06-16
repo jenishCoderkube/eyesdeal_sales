@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { FiSearch, FiCheck } from "react-icons/fi";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { debounce } from "lodash";
@@ -18,6 +18,11 @@ const TopBarGlasses = ({
   const [selectedMaterial, setSelectedMaterial] = useState(null);
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Refs for dropdown containers
+  const frameTypeRef = useRef(null);
+  const materialRef = useRef(null);
+  const brandRef = useRef(null);
 
   // Create a debounced search function
   const debouncedSearch = useCallback(
@@ -77,6 +82,48 @@ const TopBarGlasses = ({
     setIsFrameTypeOpen(false);
   };
 
+  // Toggle dropdowns and close others
+  const toggleFrameType = () => {
+    setIsFrameTypeOpen(!isFrameTypeOpen);
+    setIsMaterialOpen(false);
+    setIsBrandOpen(false);
+  };
+
+  const toggleMaterial = () => {
+    setIsMaterialOpen(!isMaterialOpen);
+    setIsFrameTypeOpen(false);
+    setIsBrandOpen(false);
+  };
+
+  const toggleBrand = () => {
+    setIsBrandOpen(!isBrandOpen);
+    setIsFrameTypeOpen(false);
+    setIsMaterialOpen(false);
+  };
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        frameTypeRef.current &&
+        !frameTypeRef.current.contains(event.target) &&
+        materialRef.current &&
+        !materialRef.current.contains(event.target) &&
+        brandRef.current &&
+        !brandRef.current.contains(event.target)
+      ) {
+        setIsFrameTypeOpen(false);
+        setIsMaterialOpen(false);
+        setIsBrandOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className="flex lg:flex-nowrap lg:gap-y-0 gap-y-3 flex-wrap items-center justify-between w-full p-2 border-b border-gray-200 bg-white">
       {/* Search Bar */}
@@ -95,11 +142,11 @@ const TopBarGlasses = ({
       </div>
 
       {/* Dropdowns */}
-      <div className="flex sm:flex-nowrap flex-wrap gap-y-3 lg:px-0 px-2 items-center xl:justify-end lg:justify-between  gap-x-2 w-full lg:space-x-4">
+      <div className="flex sm:flex-nowrap flex-wrap gap-y-3 lg:px-0 px-2 items-center xl:justify-end lg:justify-between gap-x-2 w-full lg:space-x-4">
         {/* Frame Type Dropdown */}
-        <div className="relative">
+        <div className="relative" ref={frameTypeRef}>
           <button
-            onClick={() => setIsFrameTypeOpen(!isFrameTypeOpen)}
+            onClick={toggleFrameType}
             className="flex items-center gap-2 lg:px-0 px-4 py-2 border lg:border-none rounded-3xl lg:rounded-lg hover:bg-gray-50"
           >
             <span>Frame Type</span>
@@ -110,7 +157,7 @@ const TopBarGlasses = ({
             )}
           </button>
           {isFrameTypeOpen && (
-            <div className="absolute z-10 mt-0 w-40 bg-white border  rounded-lg shadow-lg max-h-[300px] overflow-y-auto">
+            <div className="absolute z-10 mt-0 w-40 bg-white border rounded-lg shadow-lg max-h-[300px] overflow-y-auto">
               {loading ? (
                 <div className="px-4 py-2 text-sm text-gray-700">
                   Loading...
@@ -135,7 +182,7 @@ const TopBarGlasses = ({
                     <button
                       key={type._id}
                       onClick={() => handleFrameTypeSelect(type._id)}
-                      className=" w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                     >
                       {selectedFrameType === type._id && (
                         <FiCheck className="mr-2 text-blue-500" />
@@ -150,9 +197,9 @@ const TopBarGlasses = ({
         </div>
 
         {/* Material Dropdown */}
-        <div className="relative">
+        <div className="relative" ref={materialRef}>
           <button
-            onClick={() => setIsMaterialOpen(!isMaterialOpen)}
+            onClick={toggleMaterial}
             className="flex items-center gap-2 lg:px-0 px-4 py-2 border lg:border-none rounded-3xl border-gray-300 lg:rounded-lg hover:bg-gray-50"
           >
             <span>Material</span>
@@ -163,7 +210,7 @@ const TopBarGlasses = ({
             )}
           </button>
           {isMaterialOpen && (
-            <div className="absolute z-10 mt-0 w-40 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[300px] overflow-y-auto">
+            <div className="absolute right-0 z-10 mt-0 w-40 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[300px] overflow-y-auto">
               {loading ? (
                 <div className="px-4 py-2 text-sm text-gray-700">
                   Loading...
@@ -207,9 +254,9 @@ const TopBarGlasses = ({
         </div>
 
         {/* Brand Dropdown */}
-        <div className="relative">
+        <div className="relative" ref={brandRef}>
           <button
-            onClick={() => setIsBrandOpen(!isBrandOpen)}
+            onClick={toggleBrand}
             className="flex items-center gap-2 lg:px-0 px-4 py-2 border lg:border-none border-gray-300 rounded-3xl lg:rounded-lg hover:bg-gray-50"
           >
             <span>Brand</span>
@@ -220,7 +267,7 @@ const TopBarGlasses = ({
             )}
           </button>
           {isBrandOpen && (
-            <div className="absolute z-10 mt-0 w-40 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[300px] overflow-y-auto">
+            <div className="absolute right-0 z-10 mt-0 w-40 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[300px] overflow-y-auto">
               {loading ? (
                 <div className="px-4 py-2 text-sm text-gray-700">
                   Loading...

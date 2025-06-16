@@ -12,9 +12,11 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
   const [frameTypes, setFrameTypes] = useState([]);
   const [materials, setMaterials] = useState([]);
   const [brands, setBrands] = useState([]);
-  const [frames, setFrames] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [frames, setFrames] = useState(null); // Initialize as null to differentiate from empty data
+  const [loading, setLoading] = useState(true); // Start with loading true
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [filters, setFilters] = useState({
     frameType: "",
     frameMaterial: "",
@@ -33,100 +35,60 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
       ...prevFilters,
       ...newFilter,
     }));
+    setCurrentPage(1); // Reset to first page on filter change
   };
 
-  console.log("filddddddters", frames);
-
-  // Fetch frame data
+  // Fetch master data (frame types, materials, brands)
   useEffect(() => {
-    const fetchFrameData = async () => {
+    const fetchMasterData = async () => {
       setLoading(true);
       setError(null);
       try {
-        const results = await Promise.allSettled([
-          masterDataService.getFrameTypes(),
-          masterDataService.getMaterials(),
-          masterDataService.getBrands(),
-          frameService.getAllFrames(filters),
-        ]);
-
-        const [frameTypeResult, materialResult, brandResult, frameResult] =
-          results;
+        const [frameTypeResult, materialResult, brandResult] =
+          await Promise.all([
+            masterDataService.getFrameTypes(),
+            masterDataService.getMaterials(),
+            masterDataService.getBrands(),
+          ]);
 
         // Process frame types
-        if (
-          frameTypeResult.status === "fulfilled" &&
-          frameTypeResult.value.success
-        ) {
+        if (frameTypeResult.success) {
           setFrameTypes(
-            Array.isArray(frameTypeResult.value.data?.data)
-              ? frameTypeResult.value.data.data
+            Array.isArray(frameTypeResult.data?.data)
+              ? frameTypeResult.data.data
               : []
           );
         } else {
-          const errorMessage =
-            frameTypeResult.value?.message ||
-            frameTypeResult.reason?.response?.data?.message ||
-            "Error fetching frame types";
-          setError((prevError) => prevError || errorMessage);
+          throw new Error(
+            frameTypeResult.message || "Error fetching frame types"
+          );
         }
 
         // Process materials
-        if (
-          materialResult.status === "fulfilled" &&
-          materialResult.value.success
-        ) {
+        if (materialResult.success) {
           setMaterials(
-            Array.isArray(materialResult.value.data?.data)
-              ? materialResult.value.data.data
+            Array.isArray(materialResult.data?.data)
+              ? materialResult.data.data
               : []
           );
         } else {
-          const errorMessage =
-            materialResult.value?.message ||
-            materialResult.reason?.response?.data?.message ||
-            "Error fetching materials";
-          setError((prevError) => prevError || errorMessage);
+          throw new Error(materialResult.message || "Error fetching materials");
         }
 
         // Process brands
-        if (brandResult.status === "fulfilled" && brandResult.value.success) {
+        if (brandResult.success) {
           setBrands(
-            Array.isArray(brandResult.value.data?.data)
-              ? brandResult.value.data.data
-              : []
+            Array.isArray(brandResult.data?.data) ? brandResult.data.data : []
           );
         } else {
-          const errorMessage =
-            brandResult.value?.message ||
-            brandResult.reason?.response?.data?.message ||
-            "Error fetching brands";
-          setError((prevError) => prevError || errorMessage);
+          throw new Error(brandResult.message || "Error fetching brands");
         }
-
-        // Process frames
-        if (frameResult.status === "fulfilled" && frameResult.value.success) {
-          setFrames(
-            Array.isArray(frameResult.value.data?.message?.data)
-              ? frameResult.value.data.message.data
-              : frameResult.value.data?.message?.data
-              ? [frameResult.value.data.message.data]
-              : []
-          );
-        } else {
-          const errorMessage =
-            frameResult.value?.message ||
-            frameResult.reason?.response?.data?.message ||
-            "Error fetching frames";
-          setError((prevError) => prevError || errorMessage);
-        }
-      } catch (error) {
-        const errorMessage =
-          error.response?.data?.message || "Unexpected error fetching data";
+      } catch (err) {
+        const errorMessage = err.message || "Unexpected error fetching data";
         setError(errorMessage);
         if (
           errorMessage.includes("Unauthorized") ||
-          error.response?.status === 401
+          err.response?.status === 401
         ) {
           navigate("/login");
         }
@@ -135,8 +97,49 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
       }
     };
 
-    fetchFrameData();
-  }, [filters, navigate]);
+    fetchMasterData();
+  }, [navigate]);
+
+  // Fetch frames based on filters and page
+  useEffect(() => {
+    const getAllFrames = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const frameResult = await frameService.getAllFrames({
+          ...filters,
+          page: currentPage,
+        });
+
+        if (frameResult.success) {
+          setFrames(
+            Array.isArray(frameResult.data?.message?.data)
+              ? frameResult.data.message.data
+              : frameResult.data?.message?.data
+              ? [frameResult.data.message.data]
+              : []
+          );
+          setTotalPages(frameResult.data?.message?.totalPages || 1);
+        } else {
+          throw new Error(frameResult.message || "Error fetching frames");
+        }
+      } catch (err) {
+        const errorMessage = err.message || "Error fetching frames";
+        setError(errorMessage);
+        setFrames([]); // Set frames to empty array on error
+        if (
+          errorMessage.includes("Unauthorized") ||
+          err.response?.status === 401
+        ) {
+          navigate("/login");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getAllFrames();
+  }, [filters, currentPage, navigate]);
 
   return (
     <div className="flex-1 flex flex-col">
@@ -159,7 +162,14 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
           {isFrameDetails ? (
             <FrameDetails />
           ) : (
-            <Frame frames={frames} loading={loading} error={error} />
+            <Frame
+              frames={frames}
+              loading={loading}
+              error={error}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              totalPages={totalPages}
+            />
           )}
         </>
       ) : (
@@ -175,7 +185,14 @@ const FramesPanel = ({ activeTopTab, setActiveTopTab }) => {
           {isFrameDetails ? (
             <FrameDetails />
           ) : (
-            <Frame frames={frames} loading={loading} error={error} />
+            <Frame
+              frames={frames}
+              loading={loading}
+              error={error}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              totalPages={totalPages}
+            />
           )}
         </div>
       )}

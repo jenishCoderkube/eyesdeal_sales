@@ -8,13 +8,14 @@ const CONTACT_LENS_ENDPOINTS = {
     if (params?.disposabilityType)
       queryParams.append("disposability", params.disposabilityType);
     if (params?.search) queryParams.append("search", params.search);
+    if (params?.page) queryParams.append("page", params.page);
+    if (params?.limit) queryParams.append("limit", params.limit);
     return `/saleProduct/getAllContactLens${
       queryParams.toString() ? `?${queryParams.toString()}` : ""
     }`;
   },
   GET_CONTACT_LENS_BY_ID: (id) => `/saleProduct/getContactLensById/${id}`,
-  GET_ALL_DISPOSABILITY: () => `saleProduct/master/disposability
- `,
+  GET_ALL_DISPOSABILITY: () => `saleProduct/master/disposability`,
 };
 
 // Contact Lens service functions
@@ -51,9 +52,11 @@ export const contactLensService = {
     }
   },
 
-   getAllDisposability: async () => {
+  getAllDisposability: async () => {
     try {
-      const response = await api.get(CONTACT_LENS_ENDPOINTS.GET_ALL_DISPOSABILITY());
+      const response = await api.get(
+        CONTACT_LENS_ENDPOINTS.GET_ALL_DISPOSABILITY()
+      );
 
       return {
         success: true,

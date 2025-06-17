@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { SunGlassesService } from "../../services/sunglassesService"; // Adjust the path as needed
+import { cartService } from "../../services/cartService";
 import {
   AiOutlineHeart,
   AiOutlineSafetyCertificate,
@@ -9,6 +10,7 @@ import {
 import { IoIosArrowDropleft } from "react-icons/io";
 import { FaRegHeart } from "react-icons/fa";
 import { FaShippingFast } from "react-icons/fa";
+import { toast } from "react-toastify";
 import "./Frames.css"; // Adjust the path as needed
 import Loader from "../Loader/Loader";
 
@@ -21,6 +23,7 @@ const SunglassesDetails = () => {
   const [activeImage, setActiveImage] = useState(
     "/images/placeholder-sunglasses.jpg"
   );
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   useEffect(() => {
     const fetchSunglassById = async () => {
@@ -71,6 +74,43 @@ const SunglassesDetails = () => {
 
     fetchSunglassById();
   }, [id, navigate]);
+
+  const handleAddToCart = async () => {
+    try {
+      setIsAddingToCart(true);
+      const cartItems = [
+        {
+          product: id,
+        },
+      ];
+
+      const response = await cartService.addToCart(cartItems);
+
+      if (response.success) {
+        toast.success("Added to cart successfully!");
+        navigate("/sales-panel/accessories");
+      } else {
+        // Handle specific error cases
+        if (response.message === "Items already in the cart") {
+          toast.warning("This sunglass is already in your cart");
+        } else {
+          toast.error(response.message || "Failed to add to cart");
+        }
+      }
+    } catch (error) {
+      // Handle network or other errors
+      if (error.response?.status === 401) {
+        toast.error("Please login to continue");
+        navigate("/login");
+      } else if (error.response?.status === 403) {
+        toast.error("You don't have permission to perform this action");
+      } else {
+        toast.error("Error adding to cart. Please try again later.");
+      }
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -163,8 +203,12 @@ const SunglassesDetails = () => {
                 Add Power Sunglasses
               </button>
               <div className="flex sm:flex-nowrap flex-wrap mt-3 gap-2">
-                <button className="flex-1 font-['Poppins'] font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-4 py-2 rounded-md">
-                  Buy Sunglasses
+                <button
+                  onClick={handleAddToCart}
+                  disabled={isAddingToCart}
+                  className="flex-1 font-['Poppins'] font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-4 py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isAddingToCart ? "Adding to Cart..." : "Buy Sunglasses"}
                 </button>
                 <button className="flex-1 font-['Poppins'] text-nowrap font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-2 py-2 rounded-md">
                   Add To Combo
@@ -229,8 +273,12 @@ const SunglassesDetails = () => {
             ></div>
           </div>
           <div className="flex items-center w-full justify-start gap-x-2">
-            <button className="flex justify-center items-center w-full md:w-[336px] text-center bg-[#007569] text-white font-poppins font-normal text-[16px] leading-[24px] capitalize px-4 py-[15px] rounded-md">
-              Add To Cart
+            <button
+              onClick={handleAddToCart}
+              disabled={isAddingToCart}
+              className="flex justify-center items-center w-full md:w-[336px] text-center bg-[#007569] text-white font-poppins font-normal text-[16px] leading-[24px] capitalize px-4 py-[15px] rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isAddingToCart ? "Adding to Cart..." : "Add To Cart"}
             </button>
             <div className="w-[59px] h-[53px] border border-[#E5E7EB] rounded-md flex items-center justify-center cursor-pointer">
               <FaRegHeart size={20} height={16} />

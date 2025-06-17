@@ -3,13 +3,25 @@ import { FiSearch } from "react-icons/fi";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import LenseSlider from "./Slider/LenseSlider";
 import { contactLensService } from "../../services/contactLensService";
+import { cartService } from "../../services/cartService";
 import { useMediaQuery } from "react-responsive";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setContactLensId,
+  clearFrameLens,
+} from "../../store/FrameLens/frameLensSlice";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const ContactLensDetails = ({ lens, onClose }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const readingGlassId = useSelector((state) => state.frameLens.readingGlassId);
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("All");
   const [disposabilityTypes, setdisposabilityTypes] = useState([]);
   const [error, setError] = useState(null);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Fetch contact lens data by ID
   const isBelow768 = useMediaQuery({ query: "(max-width: 767px)" });
@@ -38,6 +50,67 @@ const ContactLensDetails = ({ lens, onClose }) => {
       left: direction === "left" ? -scrollAmount : scrollAmount,
       behavior: "smooth",
     });
+  };
+
+  const handleAddToCart = async () => {
+    if (!lens || !lens._id) return;
+
+    try {
+      setIsAddingToCart(true);
+      dispatch(setContactLensId(lens._id));
+
+      // If there's no reading glass ID in the slice, clear all data and add only the contact lens
+      if (!readingGlassId) {
+        dispatch(clearFrameLens());
+        const cartItems = [
+          {
+            lens: lens._id,
+          },
+        ];
+
+        const response = await cartService.addToCart(cartItems);
+        console.log("response", response);
+
+        if (response.success) {
+          toast.success("Added to cart successfully!");
+          navigate("/sales-panel/accessories");
+        } else {
+          console.log("Failed to add to cart");
+          toast.error(response.message || "Failed to add to cart");
+        }
+      } else {
+        // If there's a reading glass ID, add reading glass + contact lens combination
+        const cartItems = [
+          {
+            product: readingGlassId,
+            lens: lens._id,
+          },
+        ];
+
+        const response = await cartService.addToCart(cartItems);
+        console.log("response", response);
+
+        if (response.success) {
+          toast.success("Added to cart successfully!");
+          navigate("/sales-panel/accessories");
+        } else {
+          console.log("Failed to add to cart");
+          toast.error(response.message || "Failed to add to cart");
+        }
+      }
+    } catch (error) {
+      // Handle network or other errors
+      if (error.response?.status === 401) {
+        toast.error("Please login to continue");
+        navigate("/login");
+      } else if (error.response?.status === 403) {
+        toast.error("You don't have permission to perform this action");
+      } else {
+        toast.error("Error adding to cart. Please try again later.");
+      }
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
   // Handle error or no lens found
@@ -76,47 +149,47 @@ const ContactLensDetails = ({ lens, onClose }) => {
             />
           </div>
 
-          {/* Tabs with Horizontal Scroll */}
-          <div className="relative w-full sm:w-2/3 mt-3 sm:mt-0">
+          {/* Tabs Section */}
+          <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-2/3">
             <button
               onClick={() => scrollTabs("left")}
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-sm hover:bg-gray-100 transition-colors"
-              aria-label="Scroll tabs left"
+              className="p-1 sm:p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             </button>
+
             <div
               id="tabsContainer"
-              className="flex overflow-x-auto scrollbar-hide px-8 py-2 snap-x"
+              className="flex gap-2 sm:gap-4 overflow-x-auto scrollbar-hide flex-1"
             >
               <button
-                className={`flex-shrink-0 px-4 py-2 text-xs sm:text-sm font-medium whitespace-nowrap ${
-                  activeTab === "All"
-                    ? "text-black border-b-2 border-orange-400"
-                    : "text-gray-500 hover:text-gray-700"
-                } snap-start`}
                 onClick={() => setActiveTab("All")}
+                className={`px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base font-medium whitespace-nowrap transition-colors ${
+                  activeTab === "All"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
               >
                 All
               </button>
-              {disposabilityTypes.map((tab) => (
+              {disposabilityTypes.map((type) => (
                 <button
-                  key={tab._id}
-                  className={`flex-shrink-0 px-4 py-2 text-xs sm:text-sm font-medium whitespace-nowrap ${
-                    activeTab === tab._id
-                      ? "text-black border-b-2 border-orange-400"
-                      : "text-gray-500 hover:text-gray-700"
-                  } snap-start`}
-                  onClick={() => setActiveTab(tab._id)}
+                  key={type._id}
+                  onClick={() => setActiveTab(type.name)}
+                  className={`px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base font-medium whitespace-nowrap transition-colors ${
+                    activeTab === type.name
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
                 >
-                  {tab.name}
+                  {type.name}
                 </button>
               ))}
             </div>
+
             <button
               onClick={() => scrollTabs("right")}
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-sm hover:bg-gray-100 transition-colors"
-              aria-label="Scroll tabs right"
+              className="p-1 sm:p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             </button>
@@ -137,10 +210,11 @@ const ContactLensDetails = ({ lens, onClose }) => {
           {/* Add to Cart Button */}
           <div className="flex justify-center mt-8">
             <button
-              className="w-full max-w-xs sm:max-w-sm lg:max-w-md bg-teal-600 text-white font-poppins font-medium text-base sm:text-lg py-3 sm:py-4 rounded-lg hover:bg-teal-700 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500"
-              // onClick={() => console.log("Add to Cart clicked")} // Replace with actual cart logic
+              className="w-full max-w-xs sm:max-w-sm lg:max-w-md bg-teal-600 text-white font-poppins font-medium text-base sm:text-lg py-3 sm:py-4 rounded-lg hover:bg-teal-700 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleAddToCart}
+              disabled={isAddingToCart}
             >
-              Add To Cart
+              {isAddingToCart ? "Adding to Cart..." : "Add To Cart"}
             </button>
           </div>
         </div>

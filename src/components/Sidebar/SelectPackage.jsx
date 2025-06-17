@@ -244,12 +244,10 @@ const SelectPackage = ({ activeTopTab }) => {
         }
 
         // Prepare cart payload
-        const cartPayload = [
-          formik.values.pairs.map((pair) => ({
-            product: pair.frame,
-            lens: pair.lens,
-          })),
-        ];
+        const cartPayload = formik.values.pairs.map((pair) => ({
+          product: pair.frame,
+          lens: pair.lens,
+        }));
 
         // Add to cart
         const cartResponse = await cartService.addToCart(cartPayload);

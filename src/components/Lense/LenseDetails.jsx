@@ -6,7 +6,10 @@ import { lensService } from "../../services/lensService";
 import { cartService } from "../../services/cartService";
 import { useMediaQuery } from "react-responsive";
 import { useDispatch, useSelector } from "react-redux";
-import { setLensId } from "../../store/FrameLens/frameLensSlice";
+import {
+  setLensId,
+  clearFrameLens,
+} from "../../store/FrameLens/frameLensSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
@@ -60,23 +63,44 @@ const LenseDetails = ({ lens, onClose }) => {
       setIsAddingToCart(true);
       dispatch(setLensId(lens._id));
 
-      const cartItems = [
-        {
-          product: frameId,
-          lens: lens._id,
-        },
-      ];
+      // If there's no frame ID in the slice, clear all frame/lens data and add only the lens
+      if (!frameId) {
+        dispatch(clearFrameLens());
+        const cartItems = [
+          {
+            lens: lens._id,
+          },
+        ];
 
-      const response = await cartService.addToCart(cartItems);
-      console.log("response", response);
+        const response = await cartService.addToCart(cartItems);
+        console.log("response", response);
 
-      if (response.success) {
-        toast.success("Added to cart successfully!");
-        navigate("/sales-panel/accessories");
+        if (response.success) {
+          toast.success("Added to cart successfully!");
+          navigate("/sales-panel/accessories");
+        } else {
+          console.log("Failed to add to cart");
+          toast.error(response.message || "Failed to add to cart");
+        }
       } else {
-        console.log("Failed to add to cart");
+        // If there's a frame ID, add frame + lens combination
+        const cartItems = [
+          {
+            product: frameId,
+            lens: lens._id,
+          },
+        ];
 
-        toast.error(response.message || "Failed to add to cart");
+        const response = await cartService.addToCart(cartItems);
+        console.log("response", response);
+
+        if (response.success) {
+          toast.success("Added to cart successfully!");
+          navigate("/sales-panel/accessories");
+        } else {
+          console.log("Failed to add to cart");
+          toast.error(response.message || "Failed to add to cart");
+        }
       }
     } catch (error) {
       // Handle network or other errors

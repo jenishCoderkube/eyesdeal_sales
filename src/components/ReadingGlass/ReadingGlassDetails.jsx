@@ -5,35 +5,41 @@ import { FaRegHeart } from "react-icons/fa";
 import { FaShippingFast } from "react-icons/fa";
 import { AiOutlineSafetyCertificate, AiOutlineUser } from "react-icons/ai";
 import { readingGlassService } from "../../services/readingGlassService";
+import { cartService } from "../../services/cartService";
+import { useDispatch } from "react-redux";
+import { setReadingGlassId } from "../../store/FrameLens/frameLensSlice";
+import { toast } from "react-toastify";
 import Loader from "../Loader/Loader";
 // import "./Frames.css"; // Adjust the path as needed
 
 const ReadingGlassDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [glass, setGlass] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeImage, setActiveImage] = useState(
     "/images/placeholder-frame.jpg"
   );
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
-const colorMap = {
-  Blue: "#0000FF", // Updated for the API response
-  "DA Brown": "#A0522D",
-  "Transparent Green": "#059669",
-  Black: "#000000",
-  "Transparent Pink": "#FFC0CB",
-  "Transparent Brown": "#A52A2A",
-  "Transparent Purple": "#A020F0",
-};
+  const colorMap = {
+    Blue: "#0000FF", // Updated for the API response
+    "DA Brown": "#A0522D",
+    "Transparent Green": "#059669",
+    Black: "#000000",
+    "Transparent Pink": "#FFC0CB",
+    "Transparent Brown": "#A52A2A",
+    "Transparent Purple": "#A020F0",
+  };
 
-const ReadingGlassImages = [
-  "/glass_1.png",
-  "/glass_2.png",
-  "/glass_3.png",
-  "/glass_4.png",
-];
+  const ReadingGlassImages = [
+    "/glass_1.png",
+    "/glass_2.png",
+    "/glass_3.png",
+    "/glass_4.png",
+  ];
 
   useEffect(() => {
     const fetchReadingGlass = async () => {
@@ -89,10 +95,70 @@ const ReadingGlassImages = [
     );
   }
 
-    const frameColorName = glass?.frameColor?.name || "Unknown";
+  // Handle error or no reading glass found
+  if (error || !glass) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h1 className="font-['Poppins'] text-black font-medium text-[24px] ">
+          {error || "Reading Glass Not Found"}
+        </h1>
+        <button
+          className="mt-4 font-['Poppins'] font-normal text-[16px] text-white bg-[#242424] px-4 py-2 rounded-md hover:bg-[#3a3a3a]"
+          onClick={() => navigate("/sales-panel/readingGlasses")}
+        >
+          Back to Reading Glasses
+        </button>
+      </div>
+    );
+  }
+
+  const frameColorName = glass?.frameColor?.name || "Unknown";
   const colorHex = colorMap[frameColorName] || "#000000";
+
+  const handleSelectLens = () => {
+    dispatch(setReadingGlassId(id));
+    navigate("/sales-panel/contactLenses");
+  };
+
+  const handleAddToCart = async () => {
+    try {
+      setIsAddingToCart(true);
+      const cartItems = [
+        {
+          product: id,
+        },
+      ];
+
+      const response = await cartService.addToCart(cartItems);
+
+      if (response.success) {
+        toast.success("Added to cart successfully!");
+        navigate("/sales-panel/accessories");
+      } else {
+        // Handle specific error cases
+        if (response.message === "Items already in the cart") {
+          toast.warning("This reading glass is already in your cart");
+        } else {
+          toast.error(response.message || "Failed to add to cart");
+        }
+      }
+    } catch (error) {
+      // Handle network or other errors
+      if (error.response?.status === 401) {
+        toast.error("Please login to continue");
+        navigate("/login");
+      } else if (error.response?.status === 403) {
+        toast.error("You don't have permission to perform this action");
+      } else {
+        toast.error("Error adding to cart. Please try again later.");
+      }
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
+
   return (
-<div className="flex flex-col min-h-screen px-5 py-5 bg-[#F9FAFB]">
+    <div className="flex flex-col min-h-screen px-5 py-5 bg-[#F9FAFB]">
       <button
         className="self-start mb-4 flex items-center font-['Poppins'] font-medium text-[24px] text-[#18181B]"
         onClick={() => navigate("/sales-panel/readingGlasses")}
@@ -131,32 +197,40 @@ const ReadingGlassImages = [
               onError={(e) => (e.target.src = "/images/placeholder-frame.jpg")}
             />
             <div className="lg:hidden grid grid-cols-3 flex-wrap gap-2">
-              {(glass.photos?.length > 0 ? glass.photos : ReadingGlassImages).map(
-                (img, index) => (
-                  <img
-                    key={index}
-                    src={img}
-                    alt={`Thumbnail ${index + 1}`}
-                    className={`w-[100px] object-contain   h-[50px] rounded-[5px] cursor-pointer ${
-                      activeImage === img
-                        ? "border-2 border-[#E77817]"
-                        : "border-none"
-                    }`}
-                    onClick={() => setActiveImage(img)}
-                    onError={(e) =>
-                      (e.target.src = "/images/placeholder-frame.jpg")
-                    }
-                  />
-                )
-              )}
+              {(glass.photos?.length > 0
+                ? glass.photos
+                : ReadingGlassImages
+              ).map((img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt={`Thumbnail ${index + 1}`}
+                  className={`w-[100px] object-contain   h-[50px] rounded-[5px] cursor-pointer ${
+                    activeImage === img
+                      ? "border-2 border-[#E77817]"
+                      : "border-none"
+                  }`}
+                  onClick={() => setActiveImage(img)}
+                  onError={(e) =>
+                    (e.target.src = "/images/placeholder-frame.jpg")
+                  }
+                />
+              ))}
             </div>
             <div className="mt-4">
-              <button className="w-full font-['Poppins'] sm:text-nowrap font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-4 py-2 rounded-md">
+              <button
+                onClick={handleSelectLens}
+                className="w-full font-['Poppins'] sm:text-nowrap font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-4 py-2 rounded-md"
+              >
                 Select Lens
               </button>
               <div className="flex sm:flex-nowrap flex-wrap mt-3 gap-2">
-                <button className="flex-1 font-['Poppins'] sm:text-nowrap font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-4 py-2 rounded-md">
-                  Buy Frame Only
+                <button
+                  onClick={handleAddToCart}
+                  disabled={isAddingToCart}
+                  className="flex-1 font-['Poppins'] sm:text-nowrap font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-4 py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isAddingToCart ? "Adding to Cart..." : "Buy Frame Only"}
                 </button>
                 <button className="flex-1 font-['Poppins'] sm:text-nowrap text-nowrap font-normal text-[16px] leading-[24px] capitalize text-[#242424] border border-[#AAAAAA] px-2 py-2 rounded-md">
                   Add To Package
@@ -223,8 +297,12 @@ const ReadingGlassImages = [
           )}
 
           <div className="flex items-center w-full justify-start gap-x-2">
-            <button className="flex justify-center items-center w-full md:w-[336px] text-center bg-[#007569] text-white font-poppins font-normal text-[16px] leading-[24px] capitalize px-4 py-[15px] rounded-md">
-              Add To Cart
+            <button
+              onClick={handleAddToCart}
+              disabled={isAddingToCart}
+              className="flex justify-center items-center w-full md:w-[336px] text-center bg-[#007569] text-white font-poppins font-normal text-[16px] leading-[24px] capitalize px-4 py-[15px] rounded-md"
+            >
+              {isAddingToCart ? "Adding to Cart..." : "Add To Cart"}
             </button>
             <div className="w-[59px] h-[53px] border border-[#E5E7EB] rounded-md flex items-center justify-center cursor-pointer">
               <FaRegHeart size={20} height={16} />
@@ -252,7 +330,6 @@ const ReadingGlassImages = [
         </div>
       </div>
     </div>
-
   );
 };
 

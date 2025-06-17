@@ -104,7 +104,6 @@ const ContactLens = ({
   };
 
   const handleLensSelect = (lens) => {
-    navigate(`/sales-panel/contactLenses/${lens._id}`);
     if (onSelectLens) onSelectLens(lens);
   };
 

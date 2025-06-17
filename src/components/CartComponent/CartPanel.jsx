@@ -133,7 +133,7 @@ const CartPanel = () => {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full lg:max-w-[1400px]">
       <div className="w-full flex flex-col sm:flex-row gap-4 bg-white">
         <CartCard cartItems={cartItems} onRemove={handleRemoveItem} />
         <div className="w-full sm:w-64 bg-gray-50 rounded-lg p-4 space-y-3">

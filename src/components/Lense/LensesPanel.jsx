@@ -5,13 +5,17 @@ import {
   MdKeyboardDoubleArrowRight,
 } from "react-icons/md";
 import { useMediaQuery } from "react-responsive";
+import { useDispatch } from "react-redux";
+import { clearFrameLens } from "../../store/FrameLens/frameLensSlice";
 import { lensService } from "../../services/lensService";
 import { masterDataService } from "../../services/masterDataService";
 import Brand from "../Brand/Brand";
 import Loader from "../Loader/Loader";
 import Lense from "./Lense";
 import LenseDetails from "./LenseDetails";
+
 const LensesPanel = () => {
+  const dispatch = useDispatch();
   const [brands, setBrands] = useState([]);
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [selectedLens, setSelectedLens] = useState(null);
@@ -23,6 +27,11 @@ const LensesPanel = () => {
   const isTablet = useMediaQuery({ query: "(max-width: 1024px)" });
   const isMobile = useMediaQuery({ query: "(max-width: 640px)" });
   const isBelow768 = useMediaQuery({ query: "(max-width: 1024px)" });
+
+  // Clear Redux frame/lens data when accessing lenses page directly
+  useEffect(() => {
+    dispatch(clearFrameLens());
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchData = async () => {

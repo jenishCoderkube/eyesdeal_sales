@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
+import { useParams, useNavigate } from "react-router-dom";
 import Brand from "../Brand/Brand";
 import ContactLens from "./ContactLens";
 import ContactLensDetails from "./ContactLensDetails";
@@ -19,9 +20,45 @@ const ContactLensPanel = () => {
   const [activeTab, setActiveTab] = useState("All");
   const [disposabilityTypes, setdisposabilityTypes] = useState([]);
 
+  const { id } = useParams();
+  const navigate = useNavigate();
   const isTablet = useMediaQuery({ query: "(max-width: 1024px)" });
   const isMobile = useMediaQuery({ query: "(max-width: 640px)" });
   const isBelow768 = useMediaQuery({ query: "(max-width: 1024px)" });
+
+  // Fetch contact lens details if ID is provided in URL
+  useEffect(() => {
+    const fetchContactLensDetails = async () => {
+      if (id) {
+        try {
+          setLoading(true);
+          const response = await contactLensService.getContactLensById(id);
+          if (response.success) {
+            const lensData =
+              response.data?.message?.data || response.data?.message;
+            if (lensData) {
+              setSelectedLens(lensData);
+            } else {
+              setError("No contact lens data found");
+            }
+          } else {
+            setError(
+              response.message || "Failed to fetch contact lens details"
+            );
+          }
+        } catch (error) {
+          const errorMessage =
+            error.response?.data?.message ||
+            "Error fetching contact lens details";
+          setError(errorMessage);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchContactLensDetails();
+  }, [id]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,8 +83,11 @@ const ContactLensPanel = () => {
       }
     };
 
-    fetchData();
-  }, []);
+    // Only fetch general data if we don't have an ID (not viewing specific lens)
+    if (!id) {
+      fetchData();
+    }
+  }, [id]);
 
   const handleBrandSelect = (brand) => {
     setSelectedBrand(brand);
@@ -64,6 +104,10 @@ const ContactLensPanel = () => {
 
   const handleBack = () => {
     setSelectedLens(null);
+    // If we came from a URL with ID, navigate back to the contact lenses list
+    if (id) {
+      navigate("/sales-panel/contactLenses");
+    }
   };
 
   const scrollTabs = (direction) => {
@@ -95,7 +139,7 @@ const ContactLensPanel = () => {
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       {/* Search and Tabs for screens below 768px */}
-      {isBelow768 && (
+      {isBelow768 && !selectedLens && (
         <div className="w-full p-4 bg-white">
           {/* Search Bar */}
           <div className="relative flex items-center w-full mb-4">
@@ -145,28 +189,38 @@ const ContactLensPanel = () => {
         </div>
       )}
 
-      <h2 className="text-lg sm:text-xl font-semibold md:px-8 px-3 pt-5">
-        Select Contact Lenses
-      </h2>
+      {!selectedLens && (
+        <h2 className="text-lg sm:text-xl font-semibold md:px-8 px-3 pt-5">
+          Select Contact Lenses
+        </h2>
+      )}
 
       <div className="flex-1 flex flex-row h-full">
-        {/* Brand Selection - Always visible */}
-        <div
-          className={`${
-            isMobile ? "w-1/3" : isTablet ? "w-1/4" : "w-1/8"
-          } flex-shrink-0 overflow-y-auto`}
-        >
-          <Brand
-            brands={brands}
-            selectedBrand={selectedBrand}
-            onSelectBrand={handleBrandSelect}
-          />
-        </div>
+        {/* Brand Selection - Always visible when not viewing specific lens */}
+        {!selectedLens && (
+          <div
+            className={`${
+              isMobile ? "w-1/3" : isTablet ? "w-1/4" : "w-1/8"
+            } flex-shrink-0 overflow-y-auto`}
+          >
+            <Brand
+              brands={brands}
+              selectedBrand={selectedBrand}
+              onSelectBrand={handleBrandSelect}
+            />
+          </div>
+        )}
 
         {/* Main Content Area */}
         <div
           className={`${
-            isMobile ? "w-2/3" : isTablet ? "w-3/4" : "w-4/5"
+            selectedLens
+              ? "w-full"
+              : isMobile
+              ? "w-2/3"
+              : isTablet
+              ? "w-3/4"
+              : "w-4/5"
           } flex-1 overflow-hidden`}
         >
           {selectedLens ? (

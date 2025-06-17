@@ -1,7 +1,18 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FiSearch, FiPlus } from "react-icons/fi";
 
 const CustomerTabRow = () => {
+  const [userInfo, setUserInfo] = useState(null);
+  useEffect(() => {
+    const userInfo = JSON.parse(localStorage.getItem("user"));
+    if (userInfo) {
+      setUserInfo(userInfo);
+    } else {
+      // Handle case where user info is not available
+      console.error("User info not found in localStorage");
+    }
+  }, []);
+
   return (
     <div className="w-full h-auto px-2 flex flex-col gap-[15px] items-center justify-center lg:hidden">
       {/* Top Row: Search, Name, Mobile, Add New Customer */}
@@ -15,10 +26,10 @@ const CustomerTabRow = () => {
           />
         </div>
         <div className="xs:w-[30%] w-[45%] sm:max-w-[144px] h-[46px] flex items-center justify-center font-poppins font-normal text-[14px] leading-[24px] tracking-[0%] border border-[#E9E9E9]  rounded-lg">
-          Name
+          {userInfo ? userInfo?.name : "Name"}
         </div>
         <div className="xs:w-[30%] w-[45%] sm:max-w-[139px] h-[46px] flex items-center justify-center font-poppins font-normal text-[14px] leading-[24px] tracking-[0%] border border-[#E9E9E9]  rounded-lg">
-          Mobile
+          {userInfo ? userInfo?.phone : "Mobile"}
         </div>
         <button className="xs:w-[30%] w-full sm:max-w-[200px] h-[46px] flex items-center justify-center gap-2 font-poppins font-normal text-[14px] leading-[24px] tracking-[0%] border border-[#E9E9E9]  rounded-lg hover:bg-gray-100">
           <FiPlus className="text-gray-600" />

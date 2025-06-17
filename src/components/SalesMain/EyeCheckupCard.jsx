@@ -11,7 +11,7 @@ const EyeCheckupCard = ({ title = "Eye Check-up", imgSrc, onClick }) => {
   return (
     <div className="eye-checkup-card" onClick={handleClick}>
       <div className="card-content">
-        <h2 className="card-title w-[135px]">{title}</h2>
+        <h2 className="card-title w-auto">{title}</h2>
         <p className="card-arrow">
           <FaArrowRightLong size={20} />
         </p>

@@ -17,15 +17,21 @@ const CartPanel = () => {
     setIsLoading(true);
     setError(null);
 
-    const response = await cartService.getCartItems(currentPage, PAGE_LIMIT);
-    if (response.success) {
-      setCartItems(response.data.message.data || []);
-      setTotalPages(response.data.message.totalPages || 1);
-    } else {
-      setError(response.message);
+    try {
+      const response = await cartService.getCartItems(currentPage, PAGE_LIMIT);
+      if (response.success) {
+        setCartItems(response.data.message.data || []);
+        setTotalPages(response.data.message.totalPages || 1);
+      } else {
+        setError(response.message || "Failed to fetch cart items");
+        setCartItems([]);
+      }
+    } catch (err) {
+      setError("An error occurred while fetching cart items");
       setCartItems([]);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -37,38 +43,59 @@ const CartPanel = () => {
     setIsLoading(true);
     setError(null);
 
-    const response = await cartService.removeCartItems([cartItemId]);
-    if (response.success) {
-      // Refetch cart items to update UI
-      await fetchCartItems();
-    } else {
-      setError(response.message);
+    try {
+      const response = await cartService.removeCartItems([cartItemId]);
+      if (response.success) {
+        await fetchCartItems();
+      } else {
+        setError(response.message || "Failed to remove item");
+      }
+    } catch (err) {
+      setError("An error occurred while removing the item");
+    } finally {
       setIsLoading(false);
     }
   };
 
   // Calculate summary fields
   const calculateSummary = () => {
-    const totalQty = cartItems.length;
+    let totalQty = 0;
     let totalAmt = 0;
     let totalDisc = 0;
+    let uniqueItems = 0;
 
     cartItems.forEach((item) => {
-      const product = item.product || item.lens;
-      if (product) {
-        totalAmt += product.sellPrice || 0;
-        totalDisc += (product.discount / 100) * product.sellPrice || 0;
+      // Count unique items (frames or lenses)
+      if (item.product || item.lens) {
+        uniqueItems += 1;
+      }
+
+      // Calculate for frame (product)
+      if (item.product) {
+        totalQty += 1; // Each frame counts as 1 item
+        const sellPrice = Number(item.product.sellPrice) || 0;
+        const discount = Number(item.product.discount) || 0; // Assuming flat discount
+        totalAmt += sellPrice;
+        totalDisc += discount;
+      }
+
+      // Calculate for lens
+      if (item.lens) {
+        totalQty += 1; // Each lens counts as 1 item
+        const sellPrice = Number(item.lens.sellPrice) || 0;
+        const discount = Number(item.lens.discount) || 0; // Assuming flat discount
+        totalAmt += sellPrice;
+        totalDisc += discount;
       }
     });
 
-    const flatDisc = 0; // Placeholder
-    const otherCharges = 0; // Placeholder
+    // Placeholder values
+    const flatDisc = 0;
+    const otherCharges = 0;
     const netAmount = totalAmt - totalDisc + otherCharges - flatDisc;
-    const coupon = "None"; // Placeholder
-    const salesRep = cartItems.filter(
-      (item) => item.product || item.lens
-    ).length; // Unique items count
-    const location = "Default Store"; // Placeholder
+    const coupon = "None";
+    const salesRep = uniqueItems;
+    const location = "Default Store";
 
     return {
       location,
@@ -77,7 +104,7 @@ const CartPanel = () => {
       totalDisc: totalDisc.toFixed(2),
       flatDisc: flatDisc.toFixed(2),
       otherCharges: otherCharges.toFixed(2),
-      netAmount: netAmount.toFixed(2),
+      netAmount: Math.max(0, netAmount).toFixed(2),
       coupon,
       salesRep,
     };
@@ -112,14 +139,14 @@ const CartPanel = () => {
         <div className="w-full sm:w-64 bg-gray-50 rounded-lg p-4 space-y-3">
           {[
             { label: "Location", value: summary.location },
-            { label: "Total QTY", value: summary.totalQty },
-            { label: "Total AMT", value: `₹${summary.totalAmt}` },
-            { label: "Total DISC", value: `₹${summary.totalDisc}` },
-            { label: "Flat DISC", value: `₹${summary.flatDisc}` },
+            { label: "Total Quantity", value: summary.totalQty },
+            { label: "Total Amount", value: `₹${summary.totalAmt}` },
+            { label: "Total Discount", value: `₹${summary.totalDisc}` },
+            { label: "Flat Discount", value: `₹${summary.flatDisc}` },
             { label: "Other Charges", value: `₹${summary.otherCharges}` },
             { label: "Net Amount", value: `₹${summary.netAmount}` },
-            { label: "Coupon Apply", value: summary.coupon },
-            { label: "Sales REP", value: summary.salesRep },
+            { label: "Coupon Applied", value: summary.coupon },
+            { label: "Items Count", value: summary.salesRep },
           ].map(({ label, value }) => (
             <div
               key={label}
@@ -133,45 +160,45 @@ const CartPanel = () => {
             Place Order
           </button>
         </div>
-        {totalPages > 1 && (
-          <div className="flex justify-center items-center mt-8 w-full">
-            <Pagination
-              count={totalPages}
-              page={currentPage}
-              onChange={handlePageChange}
-              renderItem={(item) => (
-                <PaginationItem
-                  {...item}
-                  sx={{
-                    "&.Mui-selected": {
-                      backgroundColor: "#1976d2",
-                      color: "white",
-                      border: "1px solid #bbdefb",
-                      fontWeight: 500,
-                    },
-                    "&:hover": {
-                      backgroundColor: "#f5f5f5",
-                      border: "1px solid #bdbdbd",
-                    },
-                    border: "1px solid #e0e0e0",
-                    borderRadius: "4px",
-                    margin: "0 4px",
-                    padding: "8px 12px",
-                    fontFamily: "'Poppins', sans-serif",
-                    fontSize: "14px",
-                    color: "#424242",
-                    transition: "all 0.2s",
-                    "&.Mui-disabled": {
-                      opacity: 0.5,
-                      cursor: "not-allowed",
-                    },
-                  }}
-                />
-              )}
-            />
-          </div>
-        )}
       </div>
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center mt-8 w-full">
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={handlePageChange}
+            renderItem={(item) => (
+              <PaginationItem
+                {...item}
+                sx={{
+                  "&.Mui-selected": {
+                    backgroundColor: "#1976d2",
+                    color: "white",
+                    border: "1px solid #bbdefb",
+                    fontWeight: 500,
+                  },
+                  "&:hover": {
+                    backgroundColor: "#f5f5f5",
+                    border: "1px solid #bdbdbd",
+                  },
+                  border: "1px solid #e0e0e0",
+                  borderRadius: "4px",
+                  margin: "0 4px",
+                  padding: "8px 12px",
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: "14px",
+                  color: "#424242",
+                  transition: "all 0.2s",
+                  "&.Mui-disabled": {
+                    opacity: 0.5,
+                    cursor: "not-allowed",
+                  },
+                }}
+              />
+            )}
+          />
+        </div>
+      )}
     </div>
   );
 };
